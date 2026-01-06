@@ -2,9 +2,14 @@
 import { ref, computed } from 'vue'
 import { RouterView, useRoute } from 'vue-router'
 import SidebarNav from './components/SidebarNav.vue'
+import { useThemeStore } from './stores/theme'
 
 const isMobileMenuOpen = ref(false)
 const route = useRoute()
+const themeStore = useThemeStore()
+
+// Initialize theme
+themeStore.initTheme()
 
 // Routes where sidebar should be hidden
 const hideSidebar = computed(() => {

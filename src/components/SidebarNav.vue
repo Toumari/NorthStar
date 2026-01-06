@@ -2,9 +2,11 @@
 import { computed } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
+import { useThemeStore } from '../stores/theme'
 
 const router = useRouter()
 const store = useAuthStore()
+const themeStore = useThemeStore()
 
 const props = defineProps<{
     isOpen?: boolean
@@ -64,6 +66,9 @@ const handleLogout = async () => {
       <div class="user-info">
         <span class="username">{{ store.user?.displayName || 'User' }}</span>
       </div>
+      <button class="theme-toggle" @click.stop="themeStore.toggleTheme" :title="themeStore.isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'">
+        {{ themeStore.isDark ? '☀️' : '🌙' }}
+      </button>
     </div>
   </aside>
 </template>
@@ -179,6 +184,27 @@ const handleLogout = async () => {
   font-weight: 600;
   font-size: 0.875rem;
   flex-shrink: 0;
+}
+
+.theme-toggle {
+  background: none;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-left: auto;
+  color: var(--color-text);
+  transition: all 0.2s;
+}
+
+.theme-toggle:hover {
+  background-color: var(--color-surface-hover);
+  border-color: var(--color-primary);
 }
 
 .user-info {

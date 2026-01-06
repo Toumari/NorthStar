@@ -28,26 +28,18 @@ export const useAuthStore = defineStore('auth', () => {
     }
 
     const register = async (email: string, pass: string, name: string) => {
-        try {
-            const userCredential = await createUserWithEmailAndPassword(auth, email, pass)
-            await updateProfile(userCredential.user, { displayName: name })
-            await userCredential.user.reload()
-            if (auth.currentUser) {
-                // Force reactivity by re-assigning user. 
-                // Since user is a ref, this triggers dependent components.
-                user.value = { ...auth.currentUser } as User
-            }
-        } catch (error: any) {
-            throw new Error(error.message)
+        const userCredential = await createUserWithEmailAndPassword(auth, email, pass)
+        await updateProfile(userCredential.user, { displayName: name })
+        await userCredential.user.reload()
+        if (auth.currentUser) {
+            // Force reactivity by re-assigning user. 
+            // Since user is a ref, this triggers dependent components.
+            user.value = { ...auth.currentUser } as User
         }
     }
 
     const login = async (email: string, pass: string) => {
-        try {
-            await signInWithEmailAndPassword(auth, email, pass)
-        } catch (error: any) {
-            throw new Error(error.message)
-        }
+        await signInWithEmailAndPassword(auth, email, pass)
     }
 
     const logout = async () => {
@@ -57,11 +49,7 @@ export const useAuthStore = defineStore('auth', () => {
     }
 
     const resetPassword = async (email: string) => {
-        try {
-            await sendPasswordResetEmail(auth, email)
-        } catch (error: any) {
-            throw new Error(error.message)
-        }
+        await sendPasswordResetEmail(auth, email)
     }
 
     return {

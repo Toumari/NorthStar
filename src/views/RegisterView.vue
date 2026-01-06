@@ -10,19 +10,61 @@ const email = ref('')
 const fullName = ref('')
 const password = ref('')
 const error = ref('')
+const emailError = ref('')
+const nameError = ref('')
+const passwordError = ref('')
 const loading = ref(false)
 
+const validate = () => {
+  let isValid = true
+  emailError.value = ''
+  nameError.value = ''
+  passwordError.value = ''
+  error.value = ''
+
+  if (!fullName.value.trim()) {
+    nameError.value = 'Full name is required'
+    isValid = false
+  }
+
+  if (!email.value) {
+    emailError.value = 'Email is required'
+    isValid = false
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
+    emailError.value = 'Please enter a valid email address'
+    isValid = false
+  }
+
+  if (!password.value) {
+    passwordError.value = 'Password is required'
+    isValid = false
+  } else if (password.value.length < 6) {
+    passwordError.value = 'Password must be at least 6 characters'
+    isValid = false
+  }
+
+  return isValid
+}
+
 const handleRegister = async () => {
-  if (!email.value || !password.value) return
+  if (!validate()) return
   
   loading.value = true
-  error.value = ''
   
   try {
     await store.register(email.value, password.value, fullName.value)
     router.push('/')
   } catch (e: any) {
-    error.value = e.message
+    console.error(e)
+    if (e.code === 'auth/email-already-in-use') {
+      emailError.value = 'Email is already in use'
+    } else if (e.code === 'auth/weak-password') {
+      passwordError.value = 'Password is too weak'
+    } else if (e.code === 'auth/invalid-email') {
+      emailError.value = 'Invalid email address'
+    } else {
+      error.value = 'Registration failed. Please try again.'
+    }
   } finally {
     loading.value = false
   }
@@ -82,21 +124,40 @@ const handleRegister = async () => {
             <p>Join NorthStar and start planning</p>
           </header>
           
-          <form @submit.prevent="handleRegister">
+          <form @submit.prevent="handleRegister" novalidate>
             <div class="form-group">
               <label>Full Name</label>
-              <input type="text" v-model="fullName" required placeholder="John Doe">
+              <input 
+                type="text" 
+                v-model="fullName" 
+                :class="{ 'input-error': nameError }"
+                placeholder="John Doe"
+              >
+              <span class="error-text" v-if="nameError">{{ nameError }}</span>
             </div>
 
             <div class="form-group">
               <label>Email</label>
-              <input type="email" v-model="email" required placeholder="you@example.com">
+              <input 
+                type="email" 
+                v-model="email" 
+                :class="{ 'input-error': emailError }"
+                placeholder="you@example.com"
+              >
+              <span class="error-text" v-if="emailError">{{ emailError }}</span>
             </div>
             
             <div class="form-group">
               <label>Password</label>
-              <input type="password" v-model="password" required placeholder="••••••••" minlength="6">
-              <p class="hint">Must be at least 6 characters</p>
+              <input 
+                type="password" 
+                v-model="password" 
+                :class="{ 'input-error': passwordError }"
+                placeholder="••••••••" 
+                minlength="6"
+              >
+              <p class="hint" v-if="!passwordError">Must be at least 6 characters</p>
+              <span class="error-text" v-if="passwordError">{{ passwordError }}</span>
             </div>
 
             <div v-if="error" class="error-msg">{{ error }}</div>

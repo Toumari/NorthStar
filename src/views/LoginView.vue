@@ -9,19 +9,49 @@ const store = useAuthStore()
 const email = ref('')
 const password = ref('')
 const error = ref('')
+const emailError = ref('')
+const passwordError = ref('')
 const loading = ref(false)
 
+const validate = () => {
+  let isValid = true
+  emailError.value = ''
+  passwordError.value = ''
+  error.value = ''
+
+  if (!email.value) {
+    emailError.value = 'Email is required'
+    isValid = false
+  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
+    emailError.value = 'Please enter a valid email address'
+    isValid = false
+  }
+
+  if (!password.value) {
+    passwordError.value = 'Password is required'
+    isValid = false
+  }
+
+  return isValid
+}
+
 const handleLogin = async () => {
-  if (!email.value || !password.value) return
+  if (!validate()) return
   
   loading.value = true
-  error.value = ''
   
   try {
     await store.login(email.value, password.value)
     router.push('/')
   } catch (e: any) {
-    error.value = e.message
+    console.error(e)
+    if (e.code === 'auth/invalid-credential' || e.code === 'auth/user-not-found' || e.code === 'auth/wrong-password' || e.code === 'auth/invalid-login-credentials') {
+      error.value = 'Incorrect email or password'
+    } else if (e.code === 'auth/too-many-requests') {
+      error.value = 'Too many attempts. Please try again later.'
+    } else {
+      error.value = 'An error occurred. Please try again.'
+    }
   } finally {
     loading.value = false
   }
@@ -81,15 +111,27 @@ const handleLogin = async () => {
             <p>Sign in to continue to your dashboard</p>
           </header>
           
-          <form @submit.prevent="handleLogin">
+          <form @submit.prevent="handleLogin" novalidate>
             <div class="form-group">
               <label>Email</label>
-              <input type="email" v-model="email" required placeholder="you@example.com">
+              <input 
+                type="email" 
+                v-model="email" 
+                :class="{ 'input-error': emailError }"
+                placeholder="you@example.com"
+              >
+              <span class="error-text" v-if="emailError">{{ emailError }}</span>
             </div>
             
             <div class="form-group">
               <label>Password</label>
-              <input type="password" v-model="password" required placeholder="••••••••">
+              <input 
+                type="password" 
+                v-model="password" 
+                :class="{ 'input-error': passwordError }"
+                placeholder="••••••••"
+              >
+              <span class="error-text" v-if="passwordError">{{ passwordError }}</span>
               <div class="forgot-link">
                 <RouterLink to="/forgot-password">Forgot password?</RouterLink>
               </div>
