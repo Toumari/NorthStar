@@ -183,6 +183,22 @@ input {
 .data-input-row {
   display: flex;
   gap: 0.5rem;
+  flex-wrap: wrap; /* Allow wrapping */
+}
+
+@media (max-width: 480px) {
+  .data-input-row {
+    flex-direction: column;
+  }
+  
+  .data-input-row input {
+    width: 100%;
+  }
+  
+  .btn-small {
+    width: 100%;
+    padding: 0.75rem; /* Larger touch target */
+  }
 }
 
 .btn-small {
