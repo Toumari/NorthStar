@@ -1,0 +1,117 @@
+<script setup lang="ts">
+import { ref } from 'vue'
+import { useGoalsStore } from '../stores/goals'
+import GoalCard from '../components/GoalCard.vue'
+import CreateGoalModal from '../components/CreateGoalModal.vue'
+
+const store = useGoalsStore()
+const showCreateModal = ref(false)
+
+const handleCreateGoal = (goalData: any) => {
+  store.addGoal(goalData)
+  showCreateModal.value = false
+}
+</script>
+
+<template>
+  <div class="goals-view">
+    <header class="page-header">
+      <div class="header-left">
+        <h2>My Goals</h2>
+        <p class="subtitle">{{ store.activeGoalsCount }} active goals</p>
+      </div>
+      <button class="btn-primary" @click="showCreateModal = true">
+        <span class="icon">+</span> New Goal
+      </button>
+    </header>
+
+    <div v-if="store.goals.length === 0" class="empty-state">
+      <h3>No Goals Yet</h3>
+      <p>Define your NorthStar and start tracking your progress.</p>
+      <button class="btn-secondary" @click="showCreateModal = true">Create First Goal</button>
+    </div>
+
+    <div v-else class="goals-grid">
+      <GoalCard 
+        v-for="goal in store.goals" 
+        :key="goal.id" 
+        :goal="goal"
+      />
+    </div>
+
+    <CreateGoalModal 
+      v-if="showCreateModal" 
+      @close="showCreateModal = false"
+      @save="handleCreateGoal"
+    />
+  </div>
+</template>
+
+<style scoped>
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.subtitle {
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+}
+
+.btn-primary {
+  background-color: var(--color-primary);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: opacity 0.2s;
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+}
+
+.btn-secondary {
+  margin-top: 1rem;
+  background-color: transparent;
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.btn-secondary:hover {
+  background-color: var(--color-surface);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 6rem 2rem;
+  color: var(--color-text-muted);
+  background-color: var(--color-surface);
+  border-radius: 16px;
+  border: 1px dashed var(--color-border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.empty-state h3 {
+  font-size: 1.5rem;
+  color: var(--color-text);
+  margin-bottom: 0.5rem;
+}
+
+.goals-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+</style>

@@ -1,0 +1,17 @@
+
+> north-star@0.0.0 build
+> run-p type-check "build-only {@}" --
+
+
+> north-star@0.0.0 type-check
+> vue-tsc --build
+
+
+> north-star@0.0.0 build-only
+> vite build
+
+[36mvite v7.3.0 [32mbuilding client environment for production...[36m[39m
+transforming...
+src/components/SidebarNav.vue(11,42): error TS2532: Object is possibly 'undefined'.
+src/components/SidebarNav.vue(12,36): error TS2532: Object is possibly 'undefined'.
+ERROR: "type-check" exited with 2.
