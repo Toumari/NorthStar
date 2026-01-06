@@ -109,6 +109,19 @@ const addData = (trackerId: string) => {
   display: flex;
   gap: 1rem;
   margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+  .form-row {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .form-row input,
+  .form-row .btn-primary {
+    width: 100%;
+  }
 }
 
 input {
