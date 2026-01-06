@@ -456,4 +456,36 @@ h2 {
   border-radius: 8px;
   cursor: pointer;
 }
+
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .header-content {
+    width: 100%;
+  }
+  
+  .btn-danger {
+    width: 100%;
+    text-align: center;
+  }
+
+  .add-task-form {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .add-task-form input[type="text"],
+  .add-task-form .date-input,
+  .add-task-form .btn-add {
+    width: 100%;
+  }
+
+  .btn-add {
+    height: 44px; /* Easier touch target */
+  }
+}
 </style>
