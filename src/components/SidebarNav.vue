@@ -59,6 +59,11 @@ const handleLogout = async () => {
         <span class="icon">🚪</span>
         Log Out
       </button>
+
+      <button class="nav-item btn-theme-nav mobile-only" @click="themeStore.toggleTheme">
+        <span class="icon">{{ themeStore.isDark ? '☀️' : '🌙' }}</span>
+        {{ themeStore.isDark ? 'Light Mode' : 'Dark Mode' }}
+      </button>
     </nav>
 
     <div class="user-profile" v-if="store.user">
@@ -234,5 +239,30 @@ const handleLogout = async () => {
 .btn-logout:hover {
   color: var(--color-primary);
   text-decoration: underline;
+}
+
+.btn-theme-nav {
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 1rem;
+}
+
+.btn-theme-nav:hover {
+  background-color: var(--color-surface-hover);
+  color: var(--color-text);
+}
+
+.mobile-only {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .mobile-only {
+    display: flex;
+  }
 }
 </style>
