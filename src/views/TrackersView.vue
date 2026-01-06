@@ -186,18 +186,20 @@ input {
   flex-wrap: wrap; /* Allow wrapping */
 }
 
-@media (max-width: 480px) {
+@media (max-width: 768px) {
   .data-input-row {
     flex-direction: column;
+    width: 100%;
   }
   
   .data-input-row input {
     width: 100%;
+    margin-bottom: 0.5rem; /* Add spacing between stacked inputs */
   }
   
   .btn-small {
     width: 100%;
-    padding: 0.75rem; /* Larger touch target */
+    padding: 0.75rem;
   }
 }
 
