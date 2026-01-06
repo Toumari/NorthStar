@@ -31,60 +31,218 @@ const handleRegister = async () => {
 
 <template>
   <div class="auth-view">
-    <div class="auth-card">
-      <header>
-        <h1>NorthStar</h1>
-        <p>Create your account</p>
-      </header>
-      
-      <form @submit.prevent="handleRegister">
-        <div class="form-group">
-          <label>Full Name</label>
-          <input type="text" v-model="fullName" required placeholder="John Doe">
+    <div class="auth-container">
+      <!-- Feature Showcase Section -->
+      <section class="features-panel">
+        <div class="features-content">
+          <div class="brand">
+            <h1>NorthStar</h1>
+            <p class="tagline">Start your journey today.</p>
+          </div>
+          
+          <div class="features-list">
+            <div class="feature-item">
+              <div class="icon-box">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
+              </div>
+              <div>
+                <h3>Goal Tracking</h3>
+                <p>Set clear objectives and break them down into actionable steps.</p>
+              </div>
+            </div>
+            
+            <div class="feature-item">
+              <div class="icon-box">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+              </div>
+              <div>
+                <h3>Daily Journal</h3>
+                <p>Reflect on your progress and capture your daily thoughts.</p>
+              </div>
+            </div>
+            
+            <div class="feature-item">
+              <div class="icon-box">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
+              </div>
+              <div>
+                <h3>Habit Trackers</h3>
+                <p>Monitor your improved habits and vital metrics over time.</p>
+              </div>
+            </div>
+          </div>
         </div>
+      </section>
 
-        <div class="form-group">
-          <label>Email</label>
-          <input type="email" v-model="email" required placeholder="you@example.com">
+      <!-- Register Form Section -->
+      <section class="login-panel">
+        <div class="auth-card">
+          <header>
+            <h2>Create Account</h2>
+            <p>Join NorthStar and start planning</p>
+          </header>
+          
+          <form @submit.prevent="handleRegister">
+            <div class="form-group">
+              <label>Full Name</label>
+              <input type="text" v-model="fullName" required placeholder="John Doe">
+            </div>
+
+            <div class="form-group">
+              <label>Email</label>
+              <input type="email" v-model="email" required placeholder="you@example.com">
+            </div>
+            
+            <div class="form-group">
+              <label>Password</label>
+              <input type="password" v-model="password" required placeholder="••••••••" minlength="6">
+              <p class="hint">Must be at least 6 characters</p>
+            </div>
+
+            <div v-if="error" class="error-msg">{{ error }}</div>
+
+            <button type="submit" class="btn-primary" :disabled="loading">
+              {{ loading ? 'Creating Account...' : 'Sign Up' }}
+            </button>
+          </form>
+
+          <div class="footer">
+            <p>Already have an account? <RouterLink to="/login">Sign in</RouterLink></p>
+          </div>
         </div>
-        
-        <div class="form-group">
-          <label>Password</label>
-          <input type="password" v-model="password" required placeholder="••••••••" minlength="6">
-          <p class="hint">Must be at least 6 characters</p>
-        </div>
-
-        <div v-if="error" class="error-msg">{{ error }}</div>
-
-        <button type="submit" class="btn-primary" :disabled="loading">
-          {{ loading ? 'Creating Account...' : 'Sign Up' }}
-        </button>
-      </form>
-
-      <div class="footer">
-        <p>Already have an account? <RouterLink to="/login">Sign in</RouterLink></p>
-      </div>
+      </section>
     </div>
   </div>
 </template>
 
 <style scoped>
 .auth-view {
-  height: 100vh;
+  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   background-color: var(--color-background);
+  padding: 1rem;
+}
+
+.auth-container {
+  display: flex;
+  width: 100%;
+  max-width: 1000px;
+  background-color: var(--color-surface);
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--color-border);
+  min-height: 600px;
+}
+
+/* Features Panel */
+.features-panel {
+  flex: 1;
+  background: linear-gradient(135deg, var(--color-primary-dark), var(--color-primary));
+  color: white;
+  padding: 3rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.features-panel::before {
+  content: '';
+  position: absolute;
+  top: -50px;
+  right: -50px;
+  width: 200px;
+  height: 200px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+}
+
+.features-panel::after {
+  content: '';
+  position: absolute;
+  bottom: -50px;
+  left: -50px;
+  width: 300px;
+  height: 300px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 50%;
+}
+
+.features-content {
+  position: relative;
+  z-index: 1;
+}
+
+.brand {
+  margin-bottom: 3rem;
+}
+
+.brand h1 {
+  font-size: 2.5rem;
+  color: white;
+  margin-bottom: 0.5rem;
+  letter-spacing: -1px;
+}
+
+.tagline {
+  font-size: 1.125rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 300;
+}
+
+.features-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.feature-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.icon-box {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0.75rem;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.feature-item h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 0.25rem 0;
+  color: white;
+}
+
+.feature-item p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.5;
+}
+
+/* Login Panel */
+.login-panel {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background-color: var(--color-surface);
 }
 
 .auth-card {
   width: 100%;
   max-width: 400px;
-  background-color: var(--color-surface);
-  padding: 2.5rem;
-  border-radius: 16px;
-  border: 1px solid var(--color-border);
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
 }
 
 header {
@@ -92,11 +250,10 @@ header {
   margin-bottom: 2rem;
 }
 
-h1 {
-  font-size: 2rem;
-  color: var(--color-primary);
+header h2 {
+  font-size: 1.75rem;
+  color: var(--color-text);
   margin-bottom: 0.5rem;
-  letter-spacing: -0.5px;
 }
 
 header p {
@@ -148,6 +305,10 @@ input:focus {
   margin-top: 1rem;
 }
 
+.btn-primary:active {
+  transform: translateY(1px);
+}
+
 .btn-primary:disabled {
   opacity: 0.7;
   cursor: not-allowed;
@@ -169,9 +330,36 @@ input:focus {
 .footer a {
   color: var(--color-primary);
   text-decoration: none;
+  font-weight: 500;
 }
 
 .footer a:hover {
   text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .auth-container {
+    flex-direction: column;
+    min-height: auto;
+  }
+
+  .features-panel {
+    padding: 2rem;
+  }
+
+  .brand {
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+
+  .features-list {
+    display: none; /* Hide detailed features on mobile to save space, or keep them if preferred */
+  }
+
+  /* Optional: Show summarized version on mobile */
+  .features-panel {
+    align-items: center;
+    text-align: center;
+  }
 }
 </style>

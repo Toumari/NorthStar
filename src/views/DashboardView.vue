@@ -1,8 +1,14 @@
 <script setup lang="ts">
 import { useGoalsStore } from '../stores/goals'
+import { useJournalStore } from '../stores/journal'
+import { useTrackersStore } from '../stores/trackers'
 import GoalCard from '../components/GoalCard.vue'
+import TrackerChart from '../components/TrackerChart.vue'
+import { RouterLink } from 'vue-router'
 
 const store = useGoalsStore()
+const journalStore = useJournalStore()
+const trackersStore = useTrackersStore()
 </script>
 
 <template>
@@ -30,6 +36,7 @@ const store = useGoalsStore()
     <section class="recent-goals" v-if="store.activeGoals.length > 0">
       <header class="section-header">
         <h3>Recent Goals</h3>
+        <RouterLink to="/goals" class="view-all">View All</RouterLink>
       </header>
       <div class="goals-grid">
         <GoalCard 
@@ -39,6 +46,46 @@ const store = useGoalsStore()
         />
       </div>
     </section>
+
+    <div class="dashboard-grid">
+      <!-- Journal Section -->
+      <section class="dashboard-section journal-section">
+        <header class="section-header">
+          <h3>My Journal</h3>
+          <RouterLink to="/journal" class="view-all">Open Journal</RouterLink>
+        </header>
+        
+        <div class="journal-preview card" v-if="journalStore.entries.length > 0">
+          <div class="journal-date">{{ new Date(journalStore.entries[0].date).toLocaleDateString() }}</div>
+          <p class="journal-content">{{ journalStore.entries[0].content.substring(0, 150) }}...</p>
+        </div>
+        <div class="empty-state card" v-else>
+          <p>No entries yet.</p>
+          <RouterLink to="/journal" class="btn-small">Write Entry</RouterLink>
+        </div>
+      </section>
+
+      <!-- Trackers Section -->
+      <section class="dashboard-section trackers-section">
+        <header class="section-header">
+          <h3>Trackers</h3>
+          <RouterLink to="/trackers" class="view-all">View All</RouterLink>
+        </header>
+
+        <div class="trackers-grid" v-if="trackersStore.trackers.length > 0">
+          <div class="tracker-mini-card card" v-for="tracker in trackersStore.trackers.slice(0, 2)" :key="tracker.id">
+            <h4>{{ tracker.name }}</h4>
+            <div class="mini-chart">
+               <TrackerChart :tracker="tracker" />
+            </div>
+          </div>
+        </div>
+        <div class="empty-state card" v-else>
+          <p>No trackers active.</p>
+          <RouterLink to="/trackers" class="btn-small">Add Tracker</RouterLink>
+        </div>
+      </section>
+    </div>
   </div>
 </template>
 
@@ -97,6 +144,9 @@ const store = useGoalsStore()
 
 .section-header {
   margin-bottom: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .section-header h3 {
@@ -104,11 +154,78 @@ const store = useGoalsStore()
   font-size: 1rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  margin: 0;
+}
+
+.view-all {
+  font-size: 0.875rem;
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+.view-all:hover {
+  text-decoration: underline;
 }
 
 .goals-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.journal-date {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.journal-content {
+  color: var(--color-text);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.tracker-mini-card {
+  margin-bottom: 1rem;
+}
+
+.tracker-mini-card h4 {
+  margin: 0 0 1rem 0;
+  font-size: 1rem;
+  color: var(--color-text);
+}
+
+.mini-chart {
+  height: 150px;
+}
+
+.btn-small {
+  display: inline-block;
+  background-color: var(--color-primary);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 0.875rem;
+  margin-top: 1rem;
+}
+
+.empty-state {
+  text-align: center;
+  color: var(--color-text-muted);
 }
 </style>

@@ -1,10 +1,15 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { RouterView, useRoute } from 'vue-router'
 import SidebarNav from './components/SidebarNav.vue'
 
 const isMobileMenuOpen = ref(false)
 const route = useRoute()
+
+// Routes where sidebar should be hidden
+const hideSidebar = computed(() => {
+  return ['login', 'register', 'forgot-password'].includes(route.name as string)
+})
 
 // Close mobile menu on route change
 const closeMobileMenu = () => {
@@ -15,7 +20,7 @@ const closeMobileMenu = () => {
 <template>
   <div class="app-layout">
     <!-- Mobile Header -->
-    <header class="mobile-header">
+    <header class="mobile-header" v-if="!hideSidebar">
       <button class="menu-btn" @click="isMobileMenuOpen = !isMobileMenuOpen">
         <span class="hamburger">☰</span>
       </button>
@@ -23,12 +28,12 @@ const closeMobileMenu = () => {
     </header>
 
     <!-- Sidebar with overlay logic -->
-    <div class="sidebar-wrapper" :class="{ 'open': isMobileMenuOpen }">
+    <div class="sidebar-wrapper" :class="{ 'open': isMobileMenuOpen }" v-if="!hideSidebar">
       <div class="overlay" @click="isMobileMenuOpen = false"></div>
       <SidebarNav :is-open="isMobileMenuOpen" @link-clicked="closeMobileMenu" />
     </div>
 
-    <main class="main-content">
+    <main class="main-content" :class="{ 'full-screen': hideSidebar }">
       <RouterView v-slot="{ Component }">
         <Transition name="fade" mode="out-in">
           <component :is="Component" />
@@ -90,6 +95,10 @@ const closeMobileMenu = () => {
   position: relative;
 }
 
+.main-content.full-screen {
+  padding: 0;
+}
+
 /* Mobile Responsive Styles */
 @media (max-width: 768px) {
   .app-layout {
@@ -97,8 +106,16 @@ const closeMobileMenu = () => {
     padding-top: 60px; /* Space for mobile header */
   }
 
+  .app-layout:has(.main-content.full-screen) {
+    padding-top: 0;
+  }
+
   .main-content {
     padding: 1rem; /* Reduce padding on mobile */
+  }
+  
+  .main-content.full-screen {
+    padding: 0;
   }
 
   .mobile-header {

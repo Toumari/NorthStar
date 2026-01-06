@@ -50,13 +50,19 @@ const handleLogout = async () => {
         <span class="icon">📈</span>
         Trackers
       </RouterLink>
+      
+      <div class="nav-divider"></div>
+      
+      <button class="nav-item btn-logout-nav" @click="handleLogout">
+        <span class="icon">🚪</span>
+        Log Out
+      </button>
     </nav>
 
     <div class="user-profile" v-if="store.user">
       <div class="avatar">{{ userInitial }}</div>
       <div class="user-info">
         <span class="username">{{ store.user?.displayName || 'User' }}</span>
-        <button class="btn-logout" @click="handleLogout">Log out</button>
       </div>
     </div>
   </aside>
@@ -72,6 +78,7 @@ const handleLogout = async () => {
   padding: 1.5rem;
   height: 100%;
   transition: transform 0.3s ease;
+  overflow-y: auto;
 }
 
 @media (max-width: 768px) {
@@ -128,6 +135,27 @@ const handleLogout = async () => {
 .nav-item.active {
   background-color: var(--color-primary-light);
   color: var(--color-primary);
+}
+
+.nav-divider {
+  height: 1px;
+  background-color: var(--color-border);
+  margin: 0.5rem 0;
+}
+
+.btn-logout-nav {
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 1rem;
+}
+
+.btn-logout-nav:hover {
+  background-color: var(--color-surface-hover);
+  color: var(--color-danger);
 }
 
 .user-profile {
