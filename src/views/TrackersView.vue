@@ -131,8 +131,19 @@ input {
 
 .trackers-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-  gap: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+@media (max-width: 600px) {
+  .trackers-grid {
+    grid-template-columns: 1fr;
+    min-width: 0; /* Prevent grid blowout */
+  }
+  
+  .tracker-card {
+    padding: 1rem;
+  }
 }
 
 .tracker-header {

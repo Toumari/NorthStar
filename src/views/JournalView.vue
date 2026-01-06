@@ -113,7 +113,7 @@ const formatDate = (dateStr: string) => {
 
 .journal-input {
   width: 100%;
-  min-height: 200px;
+  min-height: 150px;
   background-color: var(--color-background);
   border: 1px solid var(--color-border);
   border-radius: 8px;

@@ -27,7 +27,7 @@ const router = useRouter()
     <div class="card-header">
       <span class="category-tag">{{ goal.category }}</span>
       <span class="due-date" :class="{ overdue: daysLeft < 0 }">
-        {{ daysLeft > 0 ? `${daysLeft} days left` : 'Overdue' }}
+        {{ daysLeft > 0 ? `${daysLeft}d left` : 'Overdue' }}
       </span>
     </div>
     
