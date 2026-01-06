@@ -6,6 +6,12 @@ import { useAuthStore } from '../stores/auth'
 const router = useRouter()
 const store = useAuthStore()
 
+const props = defineProps<{
+    isOpen?: boolean
+}>()
+
+const emit = defineEmits(['link-clicked'])
+
 const userInitial = computed(() => {
     const user = store.user
     if (!user) return 'U'
@@ -22,25 +28,25 @@ const handleLogout = async () => {
 </script>
 
 <template>
-  <aside class="sidebar">
+  <aside class="sidebar" :class="{ 'open': isOpen }">
     <div class="logo">
       <h1>NorthStar</h1>
     </div>
     
     <nav class="nav-links" v-if="store.user">
-      <RouterLink to="/" class="nav-item" active-class="active">
+      <RouterLink to="/" class="nav-item" active-class="active" @click="$emit('link-clicked')">
         <span class="icon">📊</span>
         Dashboard
       </RouterLink>
-      <RouterLink to="/goals" class="nav-item" active-class="active">
+      <RouterLink to="/goals" class="nav-item" active-class="active" @click="$emit('link-clicked')">
         <span class="icon">🎯</span>
         Goals
       </RouterLink>
-      <RouterLink to="/journal" class="nav-item" active-class="active">
+      <RouterLink to="/journal" class="nav-item" active-class="active" @click="$emit('link-clicked')">
         <span class="icon">📔</span>
         Journal
       </RouterLink>
-      <RouterLink to="/trackers" class="nav-item" active-class="active">
+      <RouterLink to="/trackers" class="nav-item" active-class="active" @click="$emit('link-clicked')">
         <span class="icon">📈</span>
         Trackers
       </RouterLink>
@@ -64,6 +70,27 @@ const handleLogout = async () => {
   display: flex;
   flex-direction: column;
   padding: 1.5rem;
+  height: 100%;
+  transition: transform 0.3s ease;
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 40;
+    transform: translateX(-100%);
+    box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+  }
+  
+  /* Parent wrapper needs .open class to slide this in */
+}
+
+/* Open state controlled by prop */
+.sidebar.open {
+  transform: translateX(0);
 }
 
 .logo h1 {

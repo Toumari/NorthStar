@@ -114,4 +114,21 @@ const handleCreateGoal = (goalData: any) => {
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 1.5rem;
 }
+
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .btn-primary {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .empty-state {
+    padding: 3rem 1rem;
+  }
+}
 </style>
