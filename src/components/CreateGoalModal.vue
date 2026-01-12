@@ -33,20 +33,28 @@ const save = () => {
   })
 }
 
-// Lock body scroll when modal is open
+// Lock body scroll when modal is open using position: fixed (iOS fix)
+let scrollPosition = 0
+
 onMounted(() => {
-  document.documentElement.style.overflow = 'hidden'
-  document.body.style.overflow = 'hidden'
+  scrollPosition = window.scrollY
+  document.body.style.position = 'fixed'
+  document.body.style.top = `-${scrollPosition}px`
+  document.body.style.width = '100%'
+  document.body.style.overflow = 'hidden' // Redundant but safe
 })
 
 onUnmounted(() => {
-  document.documentElement.style.overflow = ''
+  document.body.style.position = ''
+  document.body.style.top = ''
+  document.body.style.width = ''
   document.body.style.overflow = ''
+  window.scrollTo(0, scrollPosition)
 })
 </script>
 
 <template>
-  <div class="modal-overlay" @click.self="$emit('close')">
+  <div class="modal-overlay" @click.self="$emit('close')" @touchmove.self.prevent>
     <div class="modal-content">
       <header>
         <h2>Create New Goal</h2>
@@ -150,7 +158,6 @@ onUnmounted(() => {
   
   .modal-content {
     max-height: 85dvh; /* Ensure header is never cut off */
-    /* Optional: rounded top only if flushed to bottom, keeping rounded for now */
   }
 }
 
@@ -182,6 +189,7 @@ header {
   overflow-y: auto;
   flex: 1; /* Allow body to take remaining space */
   -webkit-overflow-scrolling: touch; /* Smooth scroll on iOS */
+  overscroll-behavior: contain; /* Prevent scroll chaining */
 }
 
 .form-group {
