@@ -95,7 +95,7 @@ const currentStreak = computed(() => {
 
 <template>
   <div class="calendar-card">
-    <div class="calendar-wrapper">
+    <div class="calendar-section">
       <header class="calendar-header">
         <button class="nav-btn" @click="prevMonth">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
@@ -130,20 +130,18 @@ const currentStreak = computed(() => {
           <div class="dot" v-if="day.hasEntry"></div>
         </div>
       </div>
-      
-      <footer class="calendar-footer">
-        <div class="stat-group">
-          <div class="stat-badge">
-             <span class="stat-value">{{ currentStreak }}</span>
-             <span class="stat-label">Day Streak</span>
-          </div>
-          <div class="divider"></div>
-          <div class="stat-badge">
-             <span class="stat-value">{{ entriesThisMonth }}</span>
-             <span class="stat-label">Entries ({{ new Date().toLocaleString('default', { month: 'short' }) }})</span>
-          </div>
-        </div>
-      </footer>
+    </div>
+    
+    <div class="stats-section">
+      <div class="stat-item big">
+         <span class="stat-value">{{ currentStreak }}</span>
+         <span class="stat-label">Day Streak</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+         <span class="stat-value">{{ entriesThisMonth }}</span>
+         <span class="stat-label">Entries this month</span>
+      </div>
     </div>
   </div>
 </template>
@@ -157,12 +155,43 @@ const currentStreak = computed(() => {
   width: 100%;
   height: 100%;
   display: flex;
-  justify-content: center; /* Center the wrapper on desktop */
+  flex-direction: column;
+  gap: 2rem;
 }
 
-.calendar-wrapper {
-  width: 100%;
-  max-width: 320px; /* Constrain width to prevent huge height on wide screens */
+.calendar-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.stats-section {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--color-border);
+}
+
+@media (min-width: 1024px) {
+  .calendar-card {
+    flex-direction: row;
+    align-items: center;
+    gap: 2rem;
+  }
+
+  .stats-section {
+    flex-direction: column;
+    border-top: none;
+    padding-top: 0;
+    padding-left: 2rem;
+    border-left: 1px solid var(--color-border);
+    height: 100%;
+    justify-content: center;
+    gap: 2rem;
+    min-width: 150px;
+  }
 }
 
 .calendar-header {
@@ -201,7 +230,7 @@ const currentStreak = computed(() => {
   grid-template-columns: repeat(7, 1fr);
   gap: 0.5rem;
   text-align: center;
-  margin-bottom: 1.5rem;
+  flex: 1;
 }
 
 .weekday {
@@ -218,11 +247,14 @@ const currentStreak = computed(() => {
   align-items: center;
   justify-content: center;
   font-size: 0.875rem;
-  border-radius: 50%; /* Circle shape */
+  border-radius: 50%;
   cursor: pointer;
   position: relative;
   transition: background-color 0.2s;
   color: var(--color-text);
+  max-width: 40px; /* Prevent being too huge */
+  margin: 0 auto; /* Center in grid cell */
+  width: 100%;
 }
 
 .day-cell:not(.empty):hover {
@@ -255,43 +287,42 @@ const currentStreak = computed(() => {
   pointer-events: none;
 }
 
-.calendar-footer {
-  display: flex;
-  justify-content: center;
-  border-top: 1px solid var(--color-border);
-  padding-top: 1rem;
-  margin-top: 0.5rem;
-}
-
-.stat-group {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-}
-
-.stat-badge {
+.stat-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  line-height: 1.2;
+  text-align: center;
+}
+
+.stat-item.big .stat-value {
+  font-size: 2.5rem;
 }
 
 .stat-value {
   font-weight: 700;
   color: var(--color-primary);
-  font-size: 1.1rem;
+  font-size: 1.5rem;
+  line-height: 1.1;
 }
 
 .stat-label {
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   color: var(--color-text-muted);
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  margin-top: 0.25rem;
 }
 
-.divider {
+.stat-divider {
   width: 1px;
-  height: 24px;
+  height: 40px;
   background-color: var(--color-border);
+}
+
+@media (min-width: 1024px) {
+  .stat-divider {
+    width: 40px;
+    height: 1px;
+  }
 }
 </style>
