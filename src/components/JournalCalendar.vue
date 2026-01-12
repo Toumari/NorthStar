@@ -133,7 +133,7 @@ const currentStreak = computed(() => {
     </div>
     
     <div class="stats-section">
-      <div class="stat-item big">
+      <div class="stat-item">
          <span class="stat-value">{{ currentStreak }}</span>
          <span class="stat-label">Day Streak</span>
       </div>
@@ -294,14 +294,10 @@ const currentStreak = computed(() => {
   text-align: center;
 }
 
-.stat-item.big .stat-value {
-  font-size: 2.5rem;
-}
-
 .stat-value {
   font-weight: 700;
   color: var(--color-primary);
-  font-size: 1.5rem;
+  font-size: 2rem;
   line-height: 1.1;
 }
 
