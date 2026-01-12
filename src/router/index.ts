@@ -60,6 +60,12 @@ const router = createRouter({
       meta: { requiresAuth: true }
     },
     {
+      path: '/analytics',
+      name: 'analytics',
+      component: () => import('../views/AnalyticsView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
       path: '/subscription/success',
       name: 'subscription-success',
       component: () => import('../views/SubscriptionSuccessView.vue'),
