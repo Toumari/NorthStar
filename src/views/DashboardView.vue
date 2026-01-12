@@ -139,6 +139,10 @@ const handleCreateTracker = (trackerData: any) => {
   margin-bottom: 2rem;
 }
 
+.recent-goals {
+  margin-bottom: 2rem;
+}
+
 @media (max-width: 480px) {
   .stats-grid {
     grid-template-columns: 1fr;
