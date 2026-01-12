@@ -116,19 +116,63 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { loadStripe } from '@stripe/stripe-js'
+import { useAuthStore } from '../stores/auth'
+
+const authStore = useAuthStore()
 
 type PlanType = 'monthly' | 'yearly' | 'lifetime'
 
 const loading = ref<PlanType | null>(null)
+const error = ref('')
+
+// Price IDs from Stripe (these will be set via environment variables)
+const PRICE_IDS = {
+  monthly: import.meta.env.VITE_STRIPE_PRICE_ID_MONTHLY || '',
+  yearly: import.meta.env.VITE_STRIPE_PRICE_ID_YEARLY || '',
+  lifetime: import.meta.env.VITE_STRIPE_PRICE_ID_LIFETIME || ''
+}
 
 const handleUpgrade = async (plan: PlanType) => {
+  if (!authStore.user) {
+    error.value = 'You must be logged in to upgrade'
+    return
+  }
+
   loading.value = plan
-  
-  // TODO: Integrate with Stripe Checkout
-  // For now, just show alert
-  alert(`Stripe integration coming soon! Selected plan: ${plan}`)
-  
-  loading.value = null
+  error.value = ''
+
+  try {
+    // Call Netlify function to create checkout session
+    const response = await fetch('/.netlify/functions/create-checkout-session', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        priceId: PRICE_IDS[plan],
+        userId: authStore.user.uid,
+        userEmail: authStore.user.email
+      })
+    })
+
+    const data = await response.json()
+
+    if (!response.ok) {
+      throw new Error(data.error || 'Failed to create checkout session')
+    }
+
+    // Redirect to Stripe Checkout
+    const stripe = await loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY)
+    if (stripe && data.url) {
+      window.location.href = data.url
+    }
+  } catch (err: any) {
+    console.error('Upgrade error:', err)
+    error.value = err.message || 'Failed to start checkout. Please try again.'
+  } finally {
+    loading.value = null
+  }
 }
 </script>
 

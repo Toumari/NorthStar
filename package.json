@@ -16,9 +16,13 @@
     "format": "prettier --write --experimental-cli src/"
   },
   "dependencies": {
+    "@netlify/functions": "^5.1.2",
+    "@stripe/stripe-js": "^8.6.1",
     "chart.js": "^4.5.1",
     "firebase": "^12.7.0",
+    "firebase-admin": "^13.6.0",
     "pinia": "^3.0.4",
+    "stripe": "^20.1.2",
     "vue": "^3.5.26",
     "vue-chartjs": "^5.3.3",
     "vue-router": "^4.6.4"

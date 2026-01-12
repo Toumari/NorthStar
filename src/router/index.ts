@@ -60,6 +60,18 @@ const router = createRouter({
       meta: { requiresAuth: true }
     },
     {
+      path: '/subscription/success',
+      name: 'subscription-success',
+      component: () => import('../views/SubscriptionSuccessView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/subscription/cancel',
+      name: 'subscription-cancel',
+      component: () => import('../views/SubscriptionCancelView.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
       path: '/privacy',
       name: 'privacy',
       component: () => import('../views/PrivacyView.vue')
