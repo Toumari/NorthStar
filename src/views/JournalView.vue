@@ -112,14 +112,11 @@ const handleDelete = async () => {
            </div>
         </header>
 
-        <div class="editor-container" :class="{ 'locked': isEntryLocked }">
-          <div v-if="isEntryLocked" class="lock-overlay" @click="showUpgradePrompt = true">
-            <div class="lock-content">
-              <div class="lock-icon">🔒</div>
-              <h3>Read-Only Mode</h3>
-              <p>Entries older than 14 days are read-only for free users.<br>Upgrade to Premium to edit your full journal history.</p>
-              <button class="btn-upgrade" @click.stop="showUpgradePrompt = true">Upgrade Now</button>
-            </div>
+        <div class="editor-container">
+          <div v-if="isEntryLocked" class="read-only-banner">
+            <span class="banner-icon">🔒</span>
+            <span class="banner-text">Read-only mode - Entries older than 14 days can't be edited on the free plan.</span>
+            <button class="btn-banner-upgrade" @click="showUpgradePrompt = true">Upgrade to Edit</button>
           </div>
           
           <textarea 
@@ -299,64 +296,40 @@ const handleDelete = async () => {
     position: relative;
 }
 
-.editor-container.locked .main-textarea {
-  cursor: not-allowed;
-  opacity: 0.8;
-}
-
-.lock-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(2px);
-  border-radius: 12px;
+.read-only-banner {
+  background-color: var(--color-primary-soft);
+  border: 1px solid var(--color-primary);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
   display: flex;
   align-items: center;
-  justify-content: center;
-  z-index: 10;
-  pointer-events: all;
-  cursor: pointer;
+  gap: 0.75rem;
+  font-size: 0.9rem;
 }
 
-.lock-overlay:hover {
-  background-color: rgba(0, 0, 0, 0.5);
+.banner-icon {
+  font-size: 1.2rem;
 }
 
-.lock-content {
-  text-align: center;
-  color: white;
-  padding: 2rem;
+.banner-text {
+  flex: 1;
+  color: var(--color-text);
 }
 
-.lock-icon {
-  font-size: 4rem;
-  margin-bottom: 1rem;
-}
-
-.lock-content h3 {
-  margin: 0 0 0.5rem 0;
-  font-size: 1.5rem;
-}
-
-.lock-content p {
-  margin: 0 0 1.5rem 0;
-  opacity: 0.9;
-}
-
-.btn-upgrade {
+.btn-banner-upgrade {
   background-color: var(--color-primary);
   color: white;
   border: none;
-  padding: 0.75rem 2rem;
-  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
   font-weight: 600;
   cursor: pointer;
+  font-size: 0.85rem;
+  white-space: nowrap;
 }
 
-.btn-upgrade:hover {
+.btn-banner-upgrade:hover {
   opacity: 0.9;
 }
 
