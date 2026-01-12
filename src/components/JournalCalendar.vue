@@ -166,6 +166,17 @@ const currentStreak = computed(() => {
   gap: 2rem;
 }
 
+.calendar-card.sidebar-mode {
+    padding: 1rem;
+    gap: 1.5rem;
+}
+
+@media (max-width: 768px) {
+    .calendar-card {
+        padding: 1rem;
+    }
+}
+
 .calendar-section {
   flex: 1;
   display: flex;

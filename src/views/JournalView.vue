@@ -151,6 +151,7 @@ const handleDelete = async () => {
   padding-right: 2rem;
   display: flex;
   flex-direction: column;
+  justify-content: center; /* Center content vertically */
   height: 100%;
   overflow-y: auto;
 }
@@ -161,6 +162,8 @@ const handleDelete = async () => {
         padding-right: 0;
         border-bottom: 1px solid var(--color-border);
         padding-bottom: 2rem;
+        justify-content: flex-start; /* Reset for mobile */
+        max-height: 50vh; /* Limit height so it doesn't take over */
     }
 }
 
