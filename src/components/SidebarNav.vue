@@ -19,8 +19,8 @@ const userInitial = computed(() => {
     if (!user) return 'U'
     
     // Safely access properties with optional chaining and defaults
-    const name = user.displayName || user.email || ''
-    return name.length > 0 ? name[0].toUpperCase() : 'U'
+    const name: string = (user.displayName || user.email || '')
+    return name.length > 0 ? name.charAt(0).toUpperCase() : 'U'
 })
 
 const handleLogout = async () => {

@@ -300,5 +300,10 @@ const handleCreateTracker = (trackerData: any) => {
 .empty-state {
   text-align: center;
   color: var(--color-text-muted);
+  flex: 1; /* Make it fill the available space in the flex container */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 </style>
