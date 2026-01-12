@@ -191,6 +191,11 @@ const handleManageSubscription = async () => {
 
 const isRefreshing = ref(false)
 const refreshSubscription = async () => {
+    // If there's no subscription ID (e.g. freemium user who never subscribed), don't try to sync
+    if (!subscriptionStore.subscriptionData.subscriptionId) {
+        return
+    }
+
     isRefreshing.value = true
     try {
         const response = await fetch('/.netlify/functions/sync-subscription', {
