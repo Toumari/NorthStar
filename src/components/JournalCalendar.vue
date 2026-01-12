@@ -62,15 +62,48 @@ const onDayClick = (day: any) => {
 const entriesThisMonth = computed(() => {
   return daysInMonth.value.filter(d => d.hasEntry).length
 })
+
+const currentStreak = computed(() => {
+  const dates = new Set(store.entries.map(e => e.date))
+  const today = new Date()
+  let streak = 0
+  let checkDate = today
+  
+  // Check if today has an entry, if not, check yesterday to start streak (allow 1 day gap if today isn't done yet)
+  const todayStr = checkDate.toISOString().split('T')[0]
+  if (!dates.has(todayStr)) {
+    checkDate.setDate(checkDate.getDate() - 1)
+    const yesterdayStr = checkDate.toISOString().split('T')[0]
+    if (!dates.has(yesterdayStr)) {
+      return 0
+    }
+  }
+  
+  while (true) {
+    const dateStr = checkDate.toISOString().split('T')[0]
+    if (dates.has(dateStr)) {
+      streak++
+      checkDate.setDate(checkDate.getDate() - 1)
+    } else {
+      break
+    }
+  }
+  
+  return streak
+})
 </script>
 
 <template>
   <div class="calendar-card">
     <div class="calendar-wrapper">
       <header class="calendar-header">
-        <button class="nav-btn" @click="prevMonth">&lt;</button>
+        <button class="nav-btn" @click="prevMonth">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+        </button>
         <h4>{{ displayMonth }}</h4>
-        <button class="nav-btn" @click="nextMonth">&gt;</button>
+        <button class="nav-btn" @click="nextMonth">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+        </button>
       </header>
 
       <div class="calendar-grid">
@@ -99,9 +132,16 @@ const entriesThisMonth = computed(() => {
       </div>
       
       <footer class="calendar-footer">
-        <div class="stat-badge">
-          <span class="dot-legend"></span>
-          <span>{{ entriesThisMonth }} Entries this month</span>
+        <div class="stat-group">
+          <div class="stat-badge">
+             <span class="stat-value">{{ currentStreak }}</span>
+             <span class="stat-label">Day Streak</span>
+          </div>
+          <div class="divider"></div>
+          <div class="stat-badge">
+             <span class="stat-value">{{ entriesThisMonth }}</span>
+             <span class="stat-label">Entries ({{ new Date().toLocaleString('default', { month: 'short' }) }})</span>
+          </div>
         </div>
       </footer>
     </div>
@@ -142,12 +182,17 @@ const entriesThisMonth = computed(() => {
   border: none;
   color: var(--color-text-muted);
   cursor: pointer;
-  padding: 0.25rem 0.5rem;
-  font-weight: 700;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s;
 }
 
 .nav-btn:hover {
   color: var(--color-primary);
+  background-color: var(--color-surface-hover);
 }
 
 .calendar-grid {
@@ -172,7 +217,7 @@ const entriesThisMonth = computed(() => {
   align-items: center;
   justify-content: center;
   font-size: 0.875rem;
-  border-radius: 8px;
+  border-radius: 50%; /* Circle shape */
   cursor: pointer;
   position: relative;
   transition: background-color 0.2s;
@@ -214,20 +259,38 @@ const entriesThisMonth = computed(() => {
   justify-content: center;
   border-top: 1px solid var(--color-border);
   padding-top: 1rem;
+  margin-top: 0.5rem;
+}
+
+.stat-group {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
 }
 
 .stat-badge {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
-  font-size: 0.875rem;
-  color: var(--color-text-muted);
+  line-height: 1.2;
 }
 
-.dot-legend {
-  width: 8px;
-  height: 8px;
-  background-color: var(--color-primary);
-  border-radius: 50%;
+.stat-value {
+  font-weight: 700;
+  color: var(--color-primary);
+  font-size: 1.1rem;
+}
+
+.stat-label {
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.divider {
+  width: 1px;
+  height: 24px;
+  background-color: var(--color-border);
 }
 </style>
