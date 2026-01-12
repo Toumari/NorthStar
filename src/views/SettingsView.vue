@@ -440,6 +440,53 @@ const refreshSubscription = async () => {
     font-weight: 500;
 }
 
+.status-active {
+    color: #4cd964;
+    font-weight: 500;
+}
+
+.status-canceled {
+    color: #ff9500;
+    font-weight: 500;
+}
+
+.status-expired {
+    color: #ff3b30;
+    font-weight: 500;
+}
+
+.subscription-details {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-top: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.detail-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.detail-item:last-child {
+    margin-bottom: 0;
+}
+
+.detail-label {
+    color: var(--text-secondary);
+}
+
+.detail-value {
+    color: var(--text-primary);
+}
+
+.plan-type {
+    text-transform: capitalize;
+    font-weight: 600;
+}
+
 .form-group small {
     display: block;
     margin-top: 0.25rem;
