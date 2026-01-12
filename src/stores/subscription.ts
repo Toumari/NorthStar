@@ -27,8 +27,20 @@ export const useSubscriptionStore = defineStore('subscription', () => {
     const isLoading = ref(false)
 
     // Computed
-    const isPremium = computed(() => subscriptionData.value.tier === 'premium')
-    const isFree = computed(() => subscriptionData.value.tier === 'free')
+    const isPremium = computed(() => {
+        if (subscriptionData.value.tier !== 'premium') return false
+
+        // Check if subscription has expired (for canceled subscriptions)
+        if (subscriptionData.value.status === 'canceled' && subscriptionData.value.subscriptionEndDate) {
+            const now = Date.now()
+            if (now > subscriptionData.value.subscriptionEndDate) {
+                return false // Subscription has expired
+            }
+        }
+
+        return true
+    })
+    const isFree = computed(() => !isPremium.value)
 
     // Limits
     const FREE_GOAL_LIMIT = 3
