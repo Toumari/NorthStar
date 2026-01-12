@@ -460,17 +460,37 @@ h2 {
 @media (max-width: 768px) {
   .page-header {
     flex-direction: column;
-    align-items: flex-start;
-    gap: 1rem;
+    align-items: stretch; /* Stretch to fill width */
+    gap: 1.5rem;
   }
   
   .header-content {
     width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .title-section {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .back-btn {
+    align-self: flex-start;
+    padding: 0.5rem 0; /* Easier touch target */
+  }
+  
+  h2 {
+    font-size: 1.75rem; /* Slightly smaller on mobile */
+    line-height: 1.2;
   }
   
   .btn-danger {
     width: 100%;
     text-align: center;
+    padding: 0.75rem;
   }
 
   .add-task-form {
@@ -485,7 +505,13 @@ h2 {
   }
 
   .btn-add {
-    height: 44px; /* Easier touch target */
+    height: 48px; /* Taller touch target */
+    font-size: 1.25rem;
+  }
+  
+  /* Additional padding adjustments */
+  .progress-card, .smart-info, .tasks-section {
+    padding: 1rem;
   }
 }
 </style>

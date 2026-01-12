@@ -118,17 +118,29 @@ const handleCreateGoal = (goalData: any) => {
 @media (max-width: 768px) {
   .page-header {
     flex-direction: column;
+    align-items: stretch;
+    gap: 1.5rem;
+  }
+  
+  .header-left {
+    display: flex;
+    flex-direction: column;
     align-items: flex-start;
-    gap: 1rem;
+  }
+  
+  .subtitle {
+    margin-top: 0.25rem;
   }
   
   .btn-primary {
     width: 100%;
     justify-content: center;
+    padding: 1rem;
+    font-size: 1rem;
   }
 
   .empty-state {
-    padding: 3rem 1rem;
+    padding: 3rem 1.5rem;
   }
 }
 </style>
