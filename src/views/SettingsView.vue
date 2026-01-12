@@ -163,6 +163,26 @@ const handleDeleteAccount = async () => {
             </div>
         </section>
 
+        <!-- Subscription Section -->
+        <section class="card settings-card">
+            <h3>Subscription</h3>
+            <div class="preference-item">
+                <div class="pref-info">
+                    <h4>Current Plan</h4>
+                    <p v-if="subscriptionStore.isPremium">
+                        <strong>Premium</strong> - You have access to all features
+                    </p>
+                    <p v-else>
+                        <strong>Free</strong> - Limited to 3 goals, 2 trackers, and 14-day journal editing
+                    </p>
+                </div>
+                <RouterLink to="/pricing" class="btn-toggle" v-if="!subscriptionStore.isPremium">
+                    Upgrade to Premium
+                </RouterLink>
+                <span v-else class="premium-badge">✓ Premium</span>
+            </div>
+        </section>
+
         <!-- Security Section -->
         <section class="card settings-card danger-zone">
             <h3>Security</h3>
