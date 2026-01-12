@@ -71,7 +71,35 @@ body {
   line-height: 1.6;
   margin: 0;
   -webkit-font-smoothing: antialiased;
+  /* UI Selection Fix */
+  user-select: none;
+  -webkit-user-select: none;
 }
+
+/* Re-enable selection for text content */
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+input,
+textarea,
+.selectable {
+  user-select: text;
+  -webkit-user-select: text;
+  cursor: text;
+}
+
+/* Ensure buttons remain non-selectable */
+button,
+a {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+
 
 *,
 *::before,
