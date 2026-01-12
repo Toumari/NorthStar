@@ -184,8 +184,30 @@ const toggleDebug = () => {
     showDebug.value = !showDebug.value
 }
 const refreshSubscription = async () => {
-    await subscriptionStore.loadSubscription()
-    alert('Subscription refreshed!')
+    try {
+        const response = await fetch('/.netlify/functions/sync-subscription', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ userId: authStore.user?.uid })
+        })
+        
+        if (!response.ok) {
+            const data = await response.json()
+            throw new Error(data.error || 'Failed to sync subscription')
+        }
+
+        const result = await response.json()
+        console.log('Sync result:', result)
+
+        // Reload store data
+        await subscriptionStore.loadSubscription()
+        alert(`Subscription synced! Status: ${result.status}`)
+    } catch (error: any) {
+        console.error('Sync error:', error)
+        alert('Failed to sync subscription: ' + error.message)
+    }
 }
 </script>
 
