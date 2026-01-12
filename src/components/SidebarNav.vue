@@ -58,10 +58,6 @@ const handleLogout = async () => {
         <span class="icon">📈</span>
         Trackers
       </RouterLink>
-      <RouterLink to="/analytics" class="nav-item" active-class="active" @click="$emit('link-clicked')">
-        <span class="icon">🔮</span>
-        Analytics
-      </RouterLink>
       <RouterLink to="/settings" class="nav-item" active-class="active" @click="$emit('link-clicked')">
         <span class="icon">⚙️</span>
         Settings
