@@ -3,6 +3,10 @@ import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useJournalStore } from '../stores/journal'
 
+const props = defineProps<{
+  mode?: 'dashboard' | 'sidebar'
+}>()
+
 const store = useJournalStore()
 const router = useRouter()
 
@@ -177,22 +181,6 @@ const currentStreak = computed(() => {
   border-top: 1px solid var(--color-border);
 }
 
-<script setup lang="ts">
-import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
-import { useJournalStore } from '../stores/journal'
-
-const props = defineProps<{
-  mode?: 'dashboard' | 'sidebar'
-}>()
-
-const store = useJournalStore()
-// ... existing script ...
-</script>
-
-<style scoped>
-/* ... existing styles ... */
-
 @media (min-width: 1024px) {
   .calendar-card:not(.sidebar-mode) {
     flex-direction: row;
@@ -212,7 +200,7 @@ const store = useJournalStore()
     min-width: 150px;
   }
 }
-</style>
+
 
 .calendar-header {
   display: flex;
