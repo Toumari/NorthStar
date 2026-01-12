@@ -94,12 +94,16 @@ export const handler: Handler = async (event) => {
                 const userId = subscription.metadata?.userId
 
                 if (userId) {
+                    // Check if subscription is canceled (either immediately or at period end)
+                    const isCanceled = subscription.cancel_at_period_end || subscription.status === 'canceled'
+                    const status = isCanceled ? 'canceled' : subscription.status === 'active' ? 'active' : 'expired'
+
                     await db.collection('users').doc(userId).set({
-                        subscriptionStatus: subscription.status === 'active' ? 'active' : 'canceled',
-                        subscriptionEndDate: subscription.cancel_at ? subscription.cancel_at * 1000 : null
+                        subscriptionStatus: status,
+                        subscriptionEndDate: subscription.current_period_end * 1000
                     }, { merge: true })
 
-                    console.log(`Updated subscription for user: ${userId}`)
+                    console.log(`Updated subscription for user: ${userId}, status: ${status}, cancel_at_period_end: ${subscription.cancel_at_period_end}`)
                 }
                 break
             }
