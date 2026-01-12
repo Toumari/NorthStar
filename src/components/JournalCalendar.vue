@@ -155,6 +155,7 @@ const currentStreak = computed(() => {
   border-radius: 12px;
   padding: 1.5rem;
   width: 100%;
+  height: 100%;
   display: flex;
   justify-content: center; /* Center the wrapper on desktop */
 }

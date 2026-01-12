@@ -249,7 +249,10 @@ const handleCreateTracker = (trackerData: any) => {
 }
 
 .tracker-mini-card {
-  margin-bottom: 1rem;
+  margin-bottom: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .tracker-mini-card h4 {
@@ -259,7 +262,9 @@ const handleCreateTracker = (trackerData: any) => {
 }
 
 .mini-chart {
-  height: 150px;
+  flex: 1;
+  min-height: 200px;
+  width: 100%;
 }
 
 .btn-small {
@@ -271,6 +276,19 @@ const handleCreateTracker = (trackerData: any) => {
   text-decoration: none;
   font-size: 0.875rem;
   margin-top: 1rem;
+}
+
+.dashboard-section {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.trackers-grid {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
 .empty-state {
