@@ -10,9 +10,7 @@ const subscriptionStore = useSubscriptionStore()
 const themeStore = useThemeStore()
 const router = useRouter()
 
-onMounted(() => {
-  subscriptionStore.loadSubscription()
-})
+
 
 // Profile State
 const displayName = ref(authStore.user?.displayName || '')
@@ -212,6 +210,11 @@ const refreshSubscription = async () => {
         isRefreshing.value = false
     }
 }
+
+onMounted(() => {
+  subscriptionStore.loadSubscription()
+  refreshSubscription()
+})
 </script>
 
 <template>
