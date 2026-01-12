@@ -20,6 +20,12 @@ const createTracker = () => {
   }
 }
 
+const deleteTracker = (id: string, name: string) => {
+  if (confirm(`Are you sure you want to delete the tracker "${name}"? This action cannot be undone.`)) {
+    store.removeTracker(id)
+  }
+}
+
 const addData = (trackerId: string) => {
   if (newDataValue.value !== null && newDataDate.value) {
     store.addDataPoint(trackerId, newDataValue.value, newDataDate.value)
@@ -54,7 +60,7 @@ const addData = (trackerId: string) => {
       <div v-for="tracker in store.trackers" :key="tracker.id" class="card tracker-card">
         <header class="tracker-header">
           <h3>{{ tracker.name }} <span class="unit">({{ tracker.unit }})</span></h3>
-          <button class="btn-delete" @click="store.removeTracker(tracker.id)">&times;</button>
+          <button class="btn-delete" @click="deleteTracker(tracker.id, tracker.name)">&times;</button>
         </header>
 
         <div class="chart-wrapper">
@@ -177,6 +183,11 @@ input {
   color: var(--color-text-muted);
   font-size: 1.5rem;
   line-height: 1;
+  cursor: pointer;
+}
+
+.btn-delete:hover {
+  color: var(--color-danger);
 }
 
 .chart-wrapper {
@@ -185,8 +196,9 @@ input {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: rgba(0,0,0,0.2);
+  background-color: var(--color-background);
   border-radius: 8px;
+  border: 1px solid var(--color-border);
 }
 
 .no-data {
@@ -217,17 +229,21 @@ input {
 }
 
 .btn-small {
-  background-color: var(--color-surface-hover);
-  color: var(--color-text);
+  background-color: var(--color-primary);
+  color: white;
   border: none;
   padding: 0.5rem 1rem;
   border-radius: 6px;
   cursor: pointer;
+  font-weight: 600;
+  transition: opacity 0.2s;
 }
 
 .btn-small:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+  background-color: var(--color-surface-hover);
+  color: var(--color-text-muted);
 }
 
 .empty-state {

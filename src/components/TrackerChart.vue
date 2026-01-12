@@ -12,6 +12,7 @@ import {
 import { Line } from 'vue-chartjs'
 import { computed } from 'vue'
 import type { Tracker } from '../stores/trackers'
+import { useThemeStore } from '../stores/theme'
 
 ChartJS.register(
   CategoryScale,
@@ -42,33 +43,42 @@ const chartData = computed(() => {
   }
 })
 
-const chartOptions = {
-  responsive: true,
-  maintainAspectRatio: false,
-  plugins: {
-    legend: {
-      display: false
-    }
-  },
-  scales: {
-    x: {
-      grid: {
-        color: '#334155'
-      },
-      ticks: {
-        color: '#94a3b8'
+const themeStore = useThemeStore()
+
+const chartOptions = computed(() => {
+  const isDark = themeStore.isDark
+  
+  const gridColor = isDark ? '#334155' : '#e2e8f0'
+  const tickColor = isDark ? '#94a3b8' : '#64748b'
+  
+  return {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: false
       }
     },
-    y: {
-      grid: {
-        color: '#334155'
+    scales: {
+      x: {
+        grid: {
+          color: gridColor
+        },
+        ticks: {
+          color: tickColor
+        }
       },
-      ticks: {
-        color: '#94a3b8'
+      y: {
+        grid: {
+          color: gridColor
+        },
+        ticks: {
+          color: tickColor
+        }
       }
     }
   }
-}
+})
 </script>
 
 <template>
