@@ -59,18 +59,21 @@ const handleCreateTracker = (trackerData: any) => {
            <RouterLink to="/goals" class="view-all">View All</RouterLink>
         </div>
       </header>
-      <div class="goals-grid" v-if="store.activeGoals.length > 0">
-        <GoalCard 
-          v-for="goal in store.activeGoals.slice(0, 3)" 
-          :key="goal.id" 
-          :goal="goal"
-        />
-      </div>
-      <div class="empty-state card" v-else>
-         <p>No active goals set your NorthStar.</p>
-         <button class="btn-small" @click="showGoalModal = true">
-            <span class="icon">+</span> Create a goal
-         </button>
+      <div class="goals-grid">
+        <template v-if="store.activeGoals.length > 0">
+          <GoalCard 
+            v-for="goal in store.activeGoals.slice(0, 3)" 
+            :key="goal.id" 
+            :goal="goal"
+          />
+        </template>
+        <div class="empty-goal-card card" v-else @click="showGoalModal = true">
+           <div class="empty-content">
+             <span class="icon-large">+</span>
+             <p>Create your first goal</p>
+             <span class="sub-text">Set your NorthStar</span>
+           </div>
+        </div>
       </div>
     </section>
 
@@ -310,4 +313,46 @@ const handleCreateTracker = (trackerData: any) => {
   align-items: center;
   justify-content: center;
 }
+
+.empty-goal-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px; /* Approximate height of a goal card */
+  border: 2px dashed var(--color-border);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background-color: var(--color-surface-hover); /* Slight contrast */
+}
+
+.empty-goal-card:hover {
+  border-color: var(--color-primary);
+  background-color: var(--color-surface);
+}
+
+.empty-content {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.icon-large {
+  font-size: 2rem;
+  color: var(--color-primary);
+  font-weight: 300;
+}
+
+.empty-content p {
+  margin: 0;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.sub-text {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
 </style>
