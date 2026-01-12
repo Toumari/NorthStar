@@ -11,6 +11,8 @@ export interface SubscriptionData {
     tier: SubscriptionTier
     status: SubscriptionStatus
     subscriptionId?: string
+    subscriptionPlanType?: string
+    subscriptionCustomerId?: string
     subscriptionEndDate?: number
 }
 
@@ -46,6 +48,8 @@ export const useSubscriptionStore = defineStore('subscription', () => {
                     tier: data.subscriptionTier || 'free',
                     status: data.subscriptionStatus || 'none',
                     subscriptionId: data.subscriptionId,
+                    subscriptionPlanType: data.subscriptionPlanType,
+                    subscriptionCustomerId: data.subscriptionCustomerId,
                     subscriptionEndDate: data.subscriptionEndDate
                 }
             } else {

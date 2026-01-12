@@ -148,9 +148,34 @@ const getStatusClass = (status: string) => {
 }
 
 const handleManageSubscription = async () => {
-    // Redirect to Stripe Customer Portal
-    // This requires a backend endpoint to create a portal session
-    alert('Stripe Customer Portal integration coming soon! You can manage your subscription directly in Stripe Dashboard for now.')
+    const customerId = subscriptionStore.subscriptionData.subscriptionCustomerId
+    
+    if (!customerId) {
+        alert('Unable to access subscription management. Please contact support.')
+        return
+    }
+    
+    try {
+        const response = await fetch('/.netlify/functions/create-portal-session', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ customerId })
+        })
+        
+        const data = await response.json()
+        
+        if (!response.ok) {
+            throw new Error(data.error || 'Failed to create portal session')
+        }
+        
+        // Redirect to Stripe Customer Portal
+        window.location.href = data.url
+    } catch (error: any) {
+        console.error('Portal error:', error)
+        alert('Failed to open subscription management. Please try again.')
+    }
 }
 </script>
 
@@ -212,6 +237,10 @@ const handleManageSubscription = async () => {
                     <!-- Show subscription details for premium users -->
                     <div v-if="subscriptionStore.isPremium && subscriptionStore.subscriptionData.subscriptionId" class="subscription-details">
                         <p class="detail-item">
+                            <span class="detail-label">Plan:</span>
+                            <span class="detail-value plan-type">{{ subscriptionStore.subscriptionData.subscriptionPlanType || 'Premium' }}</span>
+                        </p>
+                        <p class="detail-item">
                             <span class="detail-label">Status:</span>
                             <span class="detail-value" :class="getStatusClass(subscriptionStore.subscriptionData.subscriptionStatus)">
                                 {{ formatStatus(subscriptionStore.subscriptionData.subscriptionStatus) }}
@@ -220,10 +249,6 @@ const handleManageSubscription = async () => {
                         <p v-if="subscriptionStore.subscriptionData.subscriptionEndDate" class="detail-item">
                             <span class="detail-label">{{ subscriptionStore.subscriptionData.subscriptionStatus === 'canceled' ? 'Access until:' : 'Renews on:' }}</span>
                             <span class="detail-value">{{ formatDate(subscriptionStore.subscriptionData.subscriptionEndDate) }}</span>
-                        </p>
-                        <p v-else class="detail-item">
-                            <span class="detail-label">Type:</span>
-                            <span class="detail-value">Lifetime Access</span>
                         </p>
                     </div>
                 </div>
