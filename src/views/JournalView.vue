@@ -299,9 +299,9 @@ const handleDelete = async () => {
     position: relative;
 }
 
-.editor-container.locked {
-  filter: blur(4px);
-  pointer-events: none;
+.editor-container.locked .main-textarea {
+  cursor: not-allowed;
+  opacity: 0.8;
 }
 
 .lock-overlay {
@@ -310,8 +310,8 @@ const handleDelete = async () => {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(8px);
+  background-color: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(2px);
   border-radius: 12px;
   display: flex;
   align-items: center;
@@ -319,6 +319,10 @@ const handleDelete = async () => {
   z-index: 10;
   pointer-events: all;
   cursor: pointer;
+}
+
+.lock-overlay:hover {
+  background-color: rgba(0, 0, 0, 0.5);
 }
 
 .lock-content {
