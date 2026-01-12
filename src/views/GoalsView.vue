@@ -1,11 +1,35 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useGoalsStore } from '../stores/goals'
+import { useSubscriptionStore } from '../stores/subscription'
 import GoalCard from '../components/GoalCard.vue'
 import CreateGoalModal from '../components/CreateGoalModal.vue'
+import UpgradePrompt from '../components/UpgradePrompt.vue'
 
 const store = useGoalsStore()
+const subscriptionStore = useSubscriptionStore()
 const showCreateModal = ref(false)
+const showUpgradePrompt = ref(false)
+
+onMounted(() => {
+  subscriptionStore.loadSubscription()
+})
+
+const canCreateGoal = computed(() => {
+  return subscriptionStore.canCreateGoal(store.goals.length)
+})
+
+const remainingGoals = computed(() => {
+  return subscriptionStore.getRemainingGoals(store.goals.length)
+})
+
+const handleNewGoalClick = () => {
+  if (canCreateGoal.value) {
+    showCreateModal.value = true
+  } else {
+    showUpgradePrompt.value = true
+  }
+}
 
 const handleCreateGoal = (goalData: any) => {
   store.addGoal(goalData)
@@ -18,9 +42,14 @@ const handleCreateGoal = (goalData: any) => {
     <header class="page-header">
       <div class="header-left">
         <h2>My Goals</h2>
-        <p class="subtitle">{{ store.activeGoalsCount }} active goals</p>
+        <p class="subtitle">
+          {{ store.activeGoalsCount }} active goals
+          <span v-if="!subscriptionStore.isPremium" class="limit-badge">
+            ({{ remainingGoals }} remaining)
+          </span>
+        </p>
       </div>
-      <button class="btn-primary" @click="showCreateModal = true">
+      <button class="btn-primary" @click="handleNewGoalClick">
         <span class="icon">+</span> New Goal
       </button>
     </header>
@@ -28,7 +57,7 @@ const handleCreateGoal = (goalData: any) => {
     <div v-if="store.goals.length === 0" class="empty-state">
       <h3>No Goals Yet</h3>
       <p>Define your PathMark and start tracking your progress.</p>
-      <button class="btn-secondary" @click="showCreateModal = true">Create First Goal</button>
+      <button class="btn-secondary" @click="handleNewGoalClick">Create First Goal</button>
     </div>
 
     <div v-else class="goals-grid">
@@ -44,6 +73,12 @@ const handleCreateGoal = (goalData: any) => {
       @close="showCreateModal = false"
       @save="handleCreateGoal"
     />
+    
+    <UpgradePrompt
+      v-if="showUpgradePrompt"
+      message="You've reached the free plan limit of 3 goals. Upgrade to Premium for unlimited goals!"
+      @close="showUpgradePrompt = false"
+    />
   </div>
 </template>
 
@@ -58,6 +93,11 @@ const handleCreateGoal = (goalData: any) => {
 .subtitle {
   color: var(--color-text-muted);
   font-size: 0.9rem;
+}
+
+.limit-badge {
+  color: var(--color-primary);
+  font-weight: 600;
 }
 
 .btn-primary {

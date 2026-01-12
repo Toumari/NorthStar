@@ -1,12 +1,18 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useAuthStore } from '../stores/auth'
+import { useSubscriptionStore } from '../stores/subscription'
 import { useThemeStore } from '../stores/theme'
 import { useRouter } from 'vue-router'
 
 const authStore = useAuthStore()
+const subscriptionStore = useSubscriptionStore()
 const themeStore = useThemeStore()
 const router = useRouter()
+
+onMounted(() => {
+  subscriptionStore.loadSubscription()
+})
 
 // Profile State
 const displayName = ref(authStore.user?.displayName || '')
@@ -346,6 +352,14 @@ input {
     padding: 0.5rem 1rem;
     border-radius: 20px;
     cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.premium-badge {
+    color: var(--color-primary);
+    font-weight: 600;
+    font-size: 1rem;
 }
 
 .preference-item {

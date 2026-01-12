@@ -1,12 +1,20 @@
 <script setup lang="ts">
-import { ref, computed, watchEffect } from 'vue'
+import { ref, computed, watchEffect, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useJournalStore } from '../stores/journal'
+import { useSubscriptionStore } from '../stores/subscription'
 import JournalCalendar from '../components/JournalCalendar.vue'
+import UpgradePrompt from '../components/UpgradePrompt.vue'
 
 const store = useJournalStore()
+const subscriptionStore = useSubscriptionStore()
 const route = useRoute()
 const router = useRouter()
+const showUpgradePrompt = ref(false)
+
+onMounted(() => {
+  subscriptionStore.loadSubscription()
+})
 
 // Get date from query or default to today
 const selectedDate = computed(() => {
@@ -17,16 +25,28 @@ const content = ref('')
 const isSaving = ref(false)
 const saveMessage = ref('')
 
+// Check if current entry is locked (older than 7 days for free users)
+const isEntryLocked = computed(() => {
+  const entryDate = new Date(selectedDate.value)
+  return !subscriptionStore.canAccessJournalEntry(entryDate)
+})
+
 // Load content when selectedDate changes
 watchEffect(() => {
   const dateStr = selectedDate.value
   const entry = store.entries.find(e => e.date === dateStr)
-  content.value = entry ? entry.content : ''
+  
+  if (isEntryLocked.value) {
+    content.value = entry ? '🔒 This entry is locked. Upgrade to Premium to access your full journal history.' : ''
+  } else {
+    content.value = entry ? entry.content : ''
+  }
+  
   saveMessage.value = ''
 })
 
 const handleSave = async () => {
-  if (!content.value.trim()) return
+  if (!content.value.trim() || isEntryLocked.value) return
   
   isSaving.value = true
   saveMessage.value = 'Saving...'
@@ -56,6 +76,7 @@ const formattedDate = computed(() => {
 })
 
 const handleDelete = async () => {
+    if (isEntryLocked.value) return
     if(!confirm('Are you sure you want to delete this entry?')) return
     const entry = store.entries.find(e => e.date === selectedDate.value)
     if(entry) {
@@ -81,7 +102,12 @@ const handleDelete = async () => {
         <header class="page-header">
            <div class="date-display">
              <h1>{{ formattedDate }}</h1>
-             <p class="subtitle">Daily Journal</p>
+             <p class="subtitle">
+               Daily Journal
+               <span v-if="isEntryLocked" class="locked-badge" @click="showUpgradePrompt = true">
+                 🔒 Locked
+               </span>
+             </p>
            </div>
            
            <div class="actions">
@@ -92,23 +118,39 @@ const handleDelete = async () => {
            </div>
         </header>
 
-        <div class="editor-container">
+        <div class="editor-container" :class="{ 'locked': isEntryLocked }">
+          <div v-if="isEntryLocked" class="lock-overlay" @click="showUpgradePrompt = true">
+            <div class="lock-content">
+              <div class="lock-icon">🔒</div>
+              <h3>Premium Feature</h3>
+              <p>Upgrade to access journal entries older than 7 days</p>
+              <button class="btn-upgrade" @click.stop="showUpgradePrompt = true">Upgrade Now</button>
+            </div>
+          </div>
+          
           <textarea 
             v-model="content" 
             placeholder="What's on your mind?..." 
             class="main-textarea"
+            :disabled="isEntryLocked"
             @blur="handleSave"
             @keydown.ctrl.enter="handleSave"
           ></textarea>
           <!-- Save hint -->
            <div class="editor-footer">
-              <button class="btn-primary" @click="handleSave" :disabled="isSaving">
+              <button class="btn-primary" @click="handleSave" :disabled="isSaving || isEntryLocked">
                   {{ isSaving ? 'Saving...' : 'Save Entry' }}
               </button>
            </div>
         </div>
       </main>
     </div>
+    
+    <UpgradePrompt
+      v-if="showUpgradePrompt"
+      message="Free users can only access journal entries from the last 7 days. Upgrade to Premium for unlimited journal history!"
+      @close="showUpgradePrompt = false"
+    />
   </div>
 </template>
 
@@ -200,6 +242,20 @@ const handleDelete = async () => {
   color: var(--color-text-muted);
   font-size: 1rem;
   margin-top: 0.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.locked-badge {
+  color: var(--color-primary);
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.locked-badge:hover {
+  text-decoration: underline;
 }
 
 .actions {
@@ -246,6 +302,64 @@ const handleDelete = async () => {
     border: 1px solid var(--color-border);
     padding: 2rem;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    position: relative;
+}
+
+.editor-container.locked {
+  filter: blur(4px);
+  pointer-events: none;
+}
+
+.lock-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  pointer-events: all;
+  cursor: pointer;
+}
+
+.lock-content {
+  text-align: center;
+  color: white;
+  padding: 2rem;
+}
+
+.lock-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.lock-content h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.5rem;
+}
+
+.lock-content p {
+  margin: 0 0 1.5rem 0;
+  opacity: 0.9;
+}
+
+.btn-upgrade {
+  background-color: var(--color-primary);
+  color: white;
+  border: none;
+  padding: 0.75rem 2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-upgrade:hover {
+  opacity: 0.9;
 }
 
 .main-textarea {

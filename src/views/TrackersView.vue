@@ -1,23 +1,44 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useTrackersStore } from '../stores/trackers'
+import { useSubscriptionStore } from '../stores/subscription'
 import TrackerChart from '../components/TrackerChart.vue'
+import UpgradePrompt from '../components/UpgradePrompt.vue'
 
 const store = useTrackersStore()
+const subscriptionStore = useSubscriptionStore()
 
 const newTrackerName = ref('')
 const newTrackerUnit = ref('')
+const showUpgradePrompt = ref(false)
 
 const newDataValue = ref<number | null>(null)
 const newDataDate = ref(new Date().toISOString().split('T')[0])
 const selectedTrackerId = ref<string | null>(null)
 
+onMounted(() => {
+  subscriptionStore.loadSubscription()
+})
+
+const canCreateTracker = computed(() => {
+  return subscriptionStore.canCreateTracker(store.trackers.length)
+})
+
+const remainingTrackers = computed(() => {
+  return subscriptionStore.getRemainingTrackers(store.trackers.length)
+})
+
 const createTracker = () => {
-  if (newTrackerName.value && newTrackerUnit.value) {
-    store.addTracker(newTrackerName.value, newTrackerUnit.value)
-    newTrackerName.value = ''
-    newTrackerUnit.value = ''
+  if (!newTrackerName.value || !newTrackerUnit.value) return
+  
+  if (!canCreateTracker.value) {
+    showUpgradePrompt.value = true
+    return
   }
+  
+  store.addTracker(newTrackerName.value, newTrackerUnit.value)
+  newTrackerName.value = ''
+  newTrackerUnit.value = ''
 }
 
 const deleteTracker = (id: string, name: string) => {
@@ -38,7 +59,12 @@ const addData = (trackerId: string) => {
   <div class="trackers-view">
     <header class="page-header">
       <h2>Trackers</h2>
-      <p class="subtitle">Monitor your habits and vital metrics.</p>
+      <p class="subtitle">
+        Monitor your habits and vital metrics.
+        <span v-if="!subscriptionStore.isPremium" class="limit-badge">
+          ({{ remainingTrackers }} remaining)
+        </span>
+      </p>
     </header>
 
     <section class="create-tracker-section">
@@ -88,6 +114,12 @@ const addData = (trackerId: string) => {
         </div>
       </div>
     </div>
+    
+    <UpgradePrompt
+      v-if="showUpgradePrompt"
+      message="You've reached the free plan limit of 2 trackers. Upgrade to Premium for unlimited trackers!"
+      @close="showUpgradePrompt = false"
+    />
   </div>
 </template>
 
@@ -98,6 +130,11 @@ const addData = (trackerId: string) => {
 
 .subtitle {
   color: var(--color-text-muted);
+}
+
+.limit-badge {
+  color: var(--color-primary);
+  font-weight: 600;
 }
 
 .create-tracker-section {
