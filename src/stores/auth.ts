@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { auth } from '../firebase'
+import { auth, db } from '../firebase'
 import {
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
@@ -16,6 +16,7 @@ import {
     signInWithPopup,
     type User
 } from 'firebase/auth'
+import { collection, doc, deleteDoc, getDocs } from 'firebase/firestore'
 
 export const useAuthStore = defineStore('auth', () => {
     const user = ref<User | null>(null)
@@ -85,6 +86,22 @@ export const useAuthStore = defineStore('auth', () => {
 
     const deleteAccount = async () => {
         if (!auth.currentUser) return
+
+        const userId = auth.currentUser.uid
+
+        // Delete all user data from Firestore
+        const collections = ['goals', 'journal', 'trackers']
+
+        for (const collectionName of collections) {
+            const userCollectionRef = collection(db, 'users', userId, collectionName)
+            const snapshot = await getDocs(userCollectionRef)
+
+            // Delete each document in the collection
+            const deletePromises = snapshot.docs.map(doc => deleteDoc(doc.ref))
+            await Promise.all(deletePromises)
+        }
+
+        // Delete the Firebase Auth account
         await deleteUser(auth.currentUser)
         user.value = null
         isAuthenticated.value = false
