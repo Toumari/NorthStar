@@ -1,0 +1,163 @@
+<script setup lang="ts">
+import { ref } from 'vue'
+
+const emit = defineEmits(['close', 'save'])
+
+const name = ref('')
+const unit = ref('')
+
+const save = () => {
+  if (!name.value || !unit.value) return
+  emit('save', { name: name.value, unit: unit.value })
+}
+</script>
+
+<template>
+  <div class="modal-overlay" @click.self="$emit('close')">
+    <div class="modal-content">
+      <header>
+        <h2>Create New Tracker</h2>
+        <button class="close-btn" @click="$emit('close')">&times;</button>
+      </header>
+
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Tracker Name</label>
+          <input v-model="name" type="text" placeholder="e.g., Weight" autofocus>
+        </div>
+
+        <div class="form-group">
+          <label>Unit</label>
+          <input v-model="unit" type="text" placeholder="e.g., kg">
+        </div>
+      </div>
+
+      <footer>
+        <button class="btn-text" @click="$emit('close')">Cancel</button>
+        <button class="btn-primary" @click="save" :disabled="!name || !unit">Create Tracker</button>
+      </footer>
+    </div>
+  </div>
+</template>
+
+<style scoped>
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+  backdrop-filter: blur(4px);
+}
+
+.modal-content {
+  background-color: var(--color-surface);
+  width: 100%;
+  max-width: 400px;
+  max-height: 90vh;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--color-border);
+}
+
+header {
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  font-size: 2rem;
+  line-height: 1;
+  padding: 0;
+  cursor: pointer;
+}
+
+.close-btn:hover {
+  color: var(--color-text);
+}
+
+.modal-body {
+  padding: 1.5rem;
+  overflow-y: auto;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+}
+
+input {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  color: var(--color-text);
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+
+input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+footer {
+  padding: 1.5rem;
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+.btn-text {
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.btn-text:hover {
+  text-decoration: underline;
+}
+
+.btn-primary {
+  background-color: var(--color-primary);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary:hover:not(:disabled) {
+  opacity: 0.9;
+}
+</style>

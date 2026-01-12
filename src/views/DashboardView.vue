@@ -6,9 +6,26 @@ import GoalCard from '../components/GoalCard.vue'
 import TrackerChart from '../components/TrackerChart.vue'
 import { RouterLink } from 'vue-router'
 
+import CreateGoalModal from '../components/CreateGoalModal.vue'
+import CreateTrackerModal from '../components/CreateTrackerModal.vue'
+import { ref } from 'vue'
+
 const store = useGoalsStore()
 const journalStore = useJournalStore()
 const trackersStore = useTrackersStore()
+
+const showGoalModal = ref(false)
+const showTrackerModal = ref(false)
+
+const handleCreateGoal = (goalData: any) => {
+  store.addGoal(goalData)
+  showGoalModal.value = false
+}
+
+const handleCreateTracker = (trackerData: any) => {
+  trackersStore.addTracker(trackerData.name, trackerData.unit)
+  showTrackerModal.value = false
+}
 </script>
 
 <template>
@@ -36,7 +53,10 @@ const trackersStore = useTrackersStore()
     <section class="recent-goals" v-if="store.activeGoals.length > 0">
       <header class="section-header">
         <h3>Recent Goals</h3>
-        <RouterLink to="/goals" class="view-all">View All</RouterLink>
+        <div class="actions">
+           <button class="btn-text-action" @click="showGoalModal = true">+ Add Goal</button>
+           <RouterLink to="/goals" class="view-all">View All</RouterLink>
+        </div>
       </header>
       <div class="goals-grid">
         <GoalCard 
@@ -69,7 +89,10 @@ const trackersStore = useTrackersStore()
       <section class="dashboard-section trackers-section">
         <header class="section-header">
           <h3>Trackers</h3>
-          <RouterLink to="/trackers" class="view-all">View All</RouterLink>
+          <div class="actions">
+             <button class="btn-text-action" @click="showTrackerModal = true">+ Add Tracker</button>
+             <RouterLink to="/trackers" class="view-all">View All</RouterLink>
+          </div>
         </header>
 
         <div class="trackers-grid" v-if="trackersStore.trackers.length > 0">
@@ -86,6 +109,18 @@ const trackersStore = useTrackersStore()
         </div>
       </section>
     </div>
+
+    <CreateGoalModal 
+      v-if="showGoalModal" 
+      @close="showGoalModal = false"
+      @save="handleCreateGoal"
+    />
+
+    <CreateTrackerModal 
+      v-if="showTrackerModal" 
+      @close="showTrackerModal = false"
+      @save="handleCreateTracker"
+    />
   </div>
 </template>
 
@@ -164,6 +199,26 @@ const trackersStore = useTrackersStore()
 }
 
 .view-all:hover {
+  text-decoration: underline;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.btn-text-action {
+  background: none;
+  border: none;
+  color: var(--color-primary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0;
+}
+
+.btn-text-action:hover {
   text-decoration: underline;
 }
 
