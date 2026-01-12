@@ -59,39 +59,51 @@ const onDayClick = (day: any) => {
   if (day.empty) return
   router.push({ path: '/journal', query: { date: day.fullDate } })
 }
+const entriesThisMonth = computed(() => {
+  return daysInMonth.value.filter(d => d.hasEntry).length
+})
 </script>
 
 <template>
   <div class="calendar-card">
-    <header class="calendar-header">
-      <button class="nav-btn" @click="prevMonth">&lt;</button>
-      <h4>{{ displayMonth }}</h4>
-      <button class="nav-btn" @click="nextMonth">&gt;</button>
-    </header>
+    <div class="calendar-wrapper">
+      <header class="calendar-header">
+        <button class="nav-btn" @click="prevMonth">&lt;</button>
+        <h4>{{ displayMonth }}</h4>
+        <button class="nav-btn" @click="nextMonth">&gt;</button>
+      </header>
 
-    <div class="calendar-grid">
-      <div class="weekday">S</div>
-      <div class="weekday">M</div>
-      <div class="weekday">T</div>
-      <div class="weekday">W</div>
-      <div class="weekday">T</div>
-      <div class="weekday">F</div>
-      <div class="weekday">S</div>
+      <div class="calendar-grid">
+        <div class="weekday">S</div>
+        <div class="weekday">M</div>
+        <div class="weekday">T</div>
+        <div class="weekday">W</div>
+        <div class="weekday">T</div>
+        <div class="weekday">F</div>
+        <div class="weekday">S</div>
 
-      <div 
-        v-for="day in daysInMonth" 
-        :key="day.id"
-        class="day-cell"
-        :class="{ 
-          'empty': day.empty, 
-          'today': day.today,
-          'has-entry': day.hasEntry
-        }"
-        @click="onDayClick(day)"
-      >
-        <span v-if="!day.empty">{{ day.date }}</span>
-        <div class="dot" v-if="day.hasEntry"></div>
+        <div 
+          v-for="day in daysInMonth" 
+          :key="day.id"
+          class="day-cell"
+          :class="{ 
+            'empty': day.empty, 
+            'today': day.today,
+            'has-entry': day.hasEntry
+          }"
+          @click="onDayClick(day)"
+        >
+          <span v-if="!day.empty">{{ day.date }}</span>
+          <div class="dot" v-if="day.hasEntry"></div>
+        </div>
       </div>
+      
+      <footer class="calendar-footer">
+        <div class="stat-badge">
+          <span class="dot-legend"></span>
+          <span>{{ entriesThisMonth }} Entries this month</span>
+        </div>
+      </footer>
     </div>
   </div>
 </template>
@@ -103,6 +115,13 @@ const onDayClick = (day: any) => {
   border-radius: 12px;
   padding: 1.5rem;
   width: 100%;
+  display: flex;
+  justify-content: center; /* Center the wrapper on desktop */
+}
+
+.calendar-wrapper {
+  width: 100%;
+  max-width: 320px; /* Constrain width to prevent huge height on wide screens */
 }
 
 .calendar-header {
@@ -136,6 +155,7 @@ const onDayClick = (day: any) => {
   grid-template-columns: repeat(7, 1fr);
   gap: 0.5rem;
   text-align: center;
+  margin-bottom: 1.5rem;
 }
 
 .weekday {
@@ -187,5 +207,27 @@ const onDayClick = (day: any) => {
 .empty {
   cursor: default;
   pointer-events: none;
+}
+
+.calendar-footer {
+  display: flex;
+  justify-content: center;
+  border-top: 1px solid var(--color-border);
+  padding-top: 1rem;
+}
+
+.stat-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.dot-legend {
+  width: 8px;
+  height: 8px;
+  background-color: var(--color-primary);
+  border-radius: 50%;
 }
 </style>
