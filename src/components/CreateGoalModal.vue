@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted, onUnmounted } from 'vue'
 
 const emit = defineEmits(['close', 'save'])
 
@@ -32,6 +32,15 @@ const save = () => {
     }
   })
 }
+
+// Lock body scroll when modal is open
+onMounted(() => {
+  document.body.style.overflow = 'hidden'
+})
+
+onUnmounted(() => {
+  document.body.style.overflow = ''
+})
 </script>
 
 <template>
@@ -104,12 +113,12 @@ const save = () => {
   top: 0;
   left: 0;
   width: 100vw;
-  height: 100vh;
+  height: 100dvh; /* Use dynamic viewport height for mobile */
   background-color: rgba(0, 0, 0, 0.7);
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 1.5rem; /* Add breathing room from edges */
+  padding: 1rem; /* Provide safe spacing */
   z-index: 100;
   backdrop-filter: blur(4px);
 }
@@ -118,20 +127,22 @@ const save = () => {
   background-color: var(--color-surface);
   width: 100%;
   max-width: 600px;
-  max-height: 100%; /* Respect overlay padding */
+  max-height: 100%; /* Fill available space up to padding */
   border-radius: 16px;
   display: flex;
   flex-direction: column;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   border: 1px solid var(--color-border);
+  overflow: hidden; /* Ensure only body scrolls */
 }
 
 header {
-  padding: 1.5rem;
+  padding: 1rem 1.5rem;
   border-bottom: 1px solid var(--color-border);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-shrink: 0;
 }
 
 .close-btn {
@@ -145,11 +156,14 @@ header {
 
 .close-btn:hover {
   color: var(--color-text);
+  text-decoration: none;
 }
 
 .modal-body {
   padding: 1.5rem;
   overflow-y: auto;
+  flex: 1; /* Allow body to take remaining space */
+  -webkit-overflow-scrolling: touch; /* Smooth scroll on iOS */
 }
 
 .form-group {
@@ -217,11 +231,12 @@ textarea {
 }
 
 footer {
-  padding: 1.5rem;
+  padding: 1rem 1.5rem;
   border-top: 1px solid var(--color-border);
   display: flex;
   justify-content: flex-end;
   gap: 1rem;
+  flex-shrink: 0;
 }
 
 .btn-text {
