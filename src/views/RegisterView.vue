@@ -55,7 +55,6 @@ const handleRegister = async () => {
     await store.register(email.value, password.value, fullName.value)
     router.push('/')
   } catch (e: any) {
-    console.error(e)
     if (e.code === 'auth/email-already-in-use') {
       emailError.value = 'Email is already in use'
     } else if (e.code === 'auth/weak-password') {
@@ -64,6 +63,24 @@ const handleRegister = async () => {
       emailError.value = 'Invalid email address'
     } else {
       error.value = 'Registration failed. Please try again.'
+    }
+  } finally {
+    loading.value = false
+  }
+}
+
+const handleGoogleLogin = async () => {
+  loading.value = true
+  error.value = ''
+  
+  try {
+    await store.loginWithGoogle()
+    router.push('/')
+  } catch (e: any) {
+    if (e.code === 'auth/popup-closed-by-user') {
+      // User closed popup, no error needed usually
+    } else {
+      error.value = 'Failed to sign up with Google'
     }
   } finally {
     loading.value = false
@@ -164,6 +181,22 @@ const handleRegister = async () => {
 
             <button type="submit" class="btn-primary" :disabled="loading">
               {{ loading ? 'Creating Account...' : 'Sign Up' }}
+            </button>
+
+            <div class="separator">
+              <span>or</span>
+            </div>
+
+            <button type="button" class="btn-google" @click="handleGoogleLogin" :disabled="loading">
+              <svg class="google-icon" viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
+                <g transform="matrix(1, 0, 0, 1, 27.009001, -39.238998)">
+                  <path fill="#4285F4" d="M -3.264 51.509 C -3.264 50.719 -3.334 49.969 -3.454 49.239 L -14.754 49.239 L -14.754 53.749 L -8.284 53.749 C -8.574 55.229 -9.424 56.479 -10.684 57.329 L -10.684 60.329 L -6.824 60.329 C -4.564 58.239 -3.264 55.159 -3.264 51.509 Z" />
+                  <path fill="#34A853" d="M -14.754 63.239 C -11.514 63.239 -8.804 62.159 -6.824 60.329 L -10.684 57.329 C -11.764 58.049 -13.134 58.489 -14.754 58.489 C -17.884 58.489 -20.534 56.379 -21.484 53.529 L -25.464 53.529 L -25.464 56.619 C -23.494 60.539 -19.444 63.239 -14.754 63.239 Z" />
+                  <path fill="#FBBC05" d="M -21.484 53.529 C -21.734 52.769 -21.864 51.959 -21.864 51.129 C -21.864 50.299 -21.734 49.489 -21.484 48.729 L -21.484 45.639 L -25.464 45.639 C -26.284 47.269 -26.754 49.129 -26.754 51.129 C -26.754 53.129 -26.284 54.989 -25.464 56.619 L -21.484 53.529 Z" />
+                  <path fill="#EA4335" d="M -14.754 43.749 C -12.984 43.749 -11.404 44.369 -10.154 45.569 L -6.744 42.159 C -8.804 40.239 -11.514 39.009 -14.754 39.009 C -19.444 39.009 -23.494 41.709 -25.464 45.639 L -21.484 48.729 C -20.534 45.879 -17.884 43.749 -14.754 43.749 Z" />
+                </g>
+              </svg>
+              Sign up with Google
             </button>
           </form>
 
@@ -373,6 +406,63 @@ input:focus {
 .btn-primary:disabled {
   opacity: 0.7;
   cursor: not-allowed;
+}
+
+.separator {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 1.5rem 0;
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+}
+
+.separator::before,
+.separator::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.separator span {
+  padding: 0 1rem;
+}
+
+.btn-google {
+  width: 100%;
+  background-color: white;
+  color: #3c4043;
+  border: 1px solid var(--color-border);
+  padding: 0.75rem;
+  border-radius: 8px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s;
+  font-family: inherit;
+  font-size: 0.9rem;
+}
+
+.btn-google:hover {
+  background-color: #f8f9fa;
+  border-color: #dadce0;
+}
+
+.btn-google:active {
+  background-color: #f1f3f4;
+}
+
+.btn-google:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.google-icon {
+  width: 18px;
+  height: 18px;
 }
 
 .error-msg {

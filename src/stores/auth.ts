@@ -12,6 +12,8 @@ import {
     deleteUser,
     reauthenticateWithCredential,
     EmailAuthProvider,
+    GoogleAuthProvider,
+    signInWithPopup,
     type User
 } from 'firebase/auth'
 
@@ -44,6 +46,11 @@ export const useAuthStore = defineStore('auth', () => {
 
     const login = async (email: string, pass: string) => {
         await signInWithEmailAndPassword(auth, email, pass)
+    }
+
+    const loginWithGoogle = async () => {
+        const provider = new GoogleAuthProvider()
+        await signInWithPopup(auth, provider)
     }
 
     const logout = async () => {
@@ -90,6 +97,7 @@ export const useAuthStore = defineStore('auth', () => {
         initAuth,
         register,
         login,
+        loginWithGoogle,
         logout,
         resetPassword,
         reauthenticate,
