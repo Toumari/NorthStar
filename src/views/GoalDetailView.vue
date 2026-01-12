@@ -307,7 +307,9 @@ h2 {
   border: 1px solid var(--color-border);
   border-radius: 8px;
   color: var(--color-text);
-  padding: 0.5rem;
+  padding: 0.75rem;
+  font-family: inherit;
+  text-align: left;
 }
 
 .btn-add {
