@@ -51,20 +51,26 @@ const handleCreateTracker = (trackerData: any) => {
       </div>
     </div>
 
-    <section class="recent-goals" v-if="store.activeGoals.length > 0">
+    <section class="recent-goals">
       <header class="section-header">
         <h3>Recent Goals</h3>
-        <div class="actions">
+        <div class="actions" v-if="store.activeGoals.length > 0">
            <button class="btn-text-action" @click="showGoalModal = true">+ Add Goal</button>
            <RouterLink to="/goals" class="view-all">View All</RouterLink>
         </div>
       </header>
-      <div class="goals-grid">
+      <div class="goals-grid" v-if="store.activeGoals.length > 0">
         <GoalCard 
           v-for="goal in store.activeGoals.slice(0, 3)" 
           :key="goal.id" 
           :goal="goal"
         />
+      </div>
+      <div class="empty-state card" v-else>
+         <p>No active goals set your NorthStar.</p>
+         <button class="btn-small" @click="showGoalModal = true">
+            <span class="icon">+</span> Create a goal
+         </button>
       </div>
     </section>
 
