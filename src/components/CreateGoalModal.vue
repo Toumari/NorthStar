@@ -109,6 +109,7 @@ const save = () => {
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: 1.5rem; /* Add breathing room from edges */
   z-index: 100;
   backdrop-filter: blur(4px);
 }
@@ -117,7 +118,7 @@ const save = () => {
   background-color: var(--color-surface);
   width: 100%;
   max-width: 600px;
-  max-height: 90vh;
+  max-height: 100%; /* Respect overlay padding */
   border-radius: 16px;
   display: flex;
   flex-direction: column;
@@ -195,9 +196,7 @@ textarea {
 
 .smart-section {
   margin-top: 2rem;
-  background-color: var(--color-background);
-  padding: 1rem;
-  border-radius: 8px;
+  /* Removed background and padding for cleaner look */
 }
 
 .smart-section h3 {
