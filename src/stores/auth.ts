@@ -8,6 +8,10 @@ import {
     onAuthStateChanged,
     updateProfile,
     sendPasswordResetEmail,
+    updatePassword,
+    deleteUser,
+    reauthenticateWithCredential,
+    EmailAuthProvider,
     type User
 } from 'firebase/auth'
 
@@ -52,6 +56,33 @@ export const useAuthStore = defineStore('auth', () => {
         await sendPasswordResetEmail(auth, email)
     }
 
+    const reauthenticate = async (password: string) => {
+        if (!auth.currentUser || !auth.currentUser.email) throw new Error('No user to reauthenticate')
+
+        const credential = EmailAuthProvider.credential(auth.currentUser.email, password)
+        await reauthenticateWithCredential(auth.currentUser, credential)
+    }
+
+    const updateDisplayName = async (name: string) => {
+        if (!auth.currentUser) return
+        await updateProfile(auth.currentUser, { displayName: name })
+        if (auth.currentUser) {
+            user.value = { ...auth.currentUser } as User
+        }
+    }
+
+    const updateUserPassword = async (password: string) => {
+        if (!auth.currentUser) return
+        await updatePassword(auth.currentUser, password)
+    }
+
+    const deleteAccount = async () => {
+        if (!auth.currentUser) return
+        await deleteUser(auth.currentUser)
+        user.value = null
+        isAuthenticated.value = false
+    }
+
     return {
         user,
         isAuthenticated,
@@ -60,6 +91,10 @@ export const useAuthStore = defineStore('auth', () => {
         register,
         login,
         logout,
-        resetPassword
+        resetPassword,
+        reauthenticate,
+        updateDisplayName,
+        updateUserPassword,
+        deleteAccount
     }
 })
