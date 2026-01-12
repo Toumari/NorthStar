@@ -8,6 +8,7 @@ import { RouterLink } from 'vue-router'
 
 import CreateGoalModal from '../components/CreateGoalModal.vue'
 import CreateTrackerModal from '../components/CreateTrackerModal.vue'
+import JournalCalendar from '../components/JournalCalendar.vue'
 import { ref } from 'vue'
 
 const store = useGoalsStore()
@@ -75,14 +76,7 @@ const handleCreateTracker = (trackerData: any) => {
           <RouterLink to="/journal" class="view-all">Open Journal</RouterLink>
         </header>
         
-        <div class="journal-preview card" v-if="journalStore.entries.length > 0">
-          <div class="journal-date">{{ new Date(journalStore.entries[0].date).toLocaleDateString() }}</div>
-          <p class="journal-content">{{ journalStore.entries[0].content.substring(0, 150) }}...</p>
-        </div>
-        <div class="empty-state card" v-else>
-          <p>No entries yet.</p>
-          <RouterLink to="/journal" class="btn-small">Write Entry</RouterLink>
-        </div>
+        <JournalCalendar />
       </section>
 
       <!-- Trackers Section -->

@@ -1,12 +1,21 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watchEffect } from 'vue'
+import { useRoute } from 'vue-router'
 import { useJournalStore } from '../stores/journal'
 
 const store = useJournalStore()
 
 const newContent = ref('')
 // Default to today's date
+const route = useRoute()
 const newDate = ref(new Date().toISOString().split('T')[0])
+
+// Update date from query param if exists
+watchEffect(() => {
+  if (route.query.date as string) {
+    newDate.value = route.query.date as string
+  }
+})
 
 const handleSave = () => {
   if (!newContent.value.trim() || !newDate.value) return
