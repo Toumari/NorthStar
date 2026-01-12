@@ -176,39 +176,6 @@ const handleManageSubscription = async () => {
         console.error('Portal error:', error)
         alert('Failed to open subscription management. Please try again.')
     }
-}
-
-// Debug helper
-const showDebug = ref(false)
-const toggleDebug = () => {
-    showDebug.value = !showDebug.value
-}
-const refreshSubscription = async () => {
-    try {
-        const response = await fetch('/.netlify/functions/sync-subscription', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ userId: authStore.user?.uid })
-        })
-        
-        if (!response.ok) {
-            const data = await response.json()
-            throw new Error(data.error || 'Failed to sync subscription')
-        }
-
-        const result = await response.json()
-        console.log('Sync result:', result)
-
-        // Reload store data
-        await subscriptionStore.loadSubscription()
-        alert(`Subscription synced! Status: ${result.status}`)
-    } catch (error: any) {
-        console.error('Sync error:', error)
-        alert('Failed to sync subscription: ' + error.message)
-    }
-}
 </script>
 
 <template>
@@ -304,18 +271,8 @@ const refreshSubscription = async () => {
                     </template>
                 </div>
 
-                <!-- Debug Section (Hidden by default) -->
-                <div class="debug-section" style="margin-top: 2rem; border-top: 1px dashed #333; padding-top: 1rem;">
-                    <button @click="toggleDebug" style="background:none; border:none; color: #666; font-size: 0.8rem; cursor: pointer;">
-                        {{ showDebug ? 'Hide Debug Info' : 'Show Debug Info' }}
-                    </button>
-                    <button v-if="showDebug" @click="refreshSubscription" style="margin-left: 10px; font-size: 0.8rem;">
-                        Refresh Data
-                    </button>
-                    <pre v-if="showDebug" style="background: #111; padding: 10px; border-radius: 4px; margin-top: 10px; font-size: 0.75rem; overflow: auto; color: #0f0;">
-{{ JSON.stringify(subscriptionStore.subscriptionData, null, 2) }}
-                    </pre>
-                </div>
+            </div>
+        </section>
             </div>
         </section>
 
