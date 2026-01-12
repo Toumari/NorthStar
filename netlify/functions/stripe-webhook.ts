@@ -90,8 +90,20 @@ export const handler: Handler = async (event) => {
             }
 
             case 'customer.subscription.updated': {
-                const subscription = stripeEvent.data.object as Stripe.Subscription
-                const userId = subscription.metadata?.userId
+                const subscription = stripeEvent.data.object as any
+                let userId = subscription.metadata?.userId
+
+                // If no userId in metadata, try to find user by subscriptionCustomerId
+                if (!userId) {
+                    console.log(`No userId in metadata for subscription ${subscription.id}, searching by customer ID ${subscription.customer}`)
+                    const usersRef = db.collection('users')
+                    const snapshot = await usersRef.where('subscriptionCustomerId', '==', subscription.customer).limit(1).get()
+
+                    if (!snapshot.empty) {
+                        userId = snapshot.docs[0].id
+                        console.log(`Found user ${userId} by subscriptionCustomerId`)
+                    }
+                }
 
                 if (userId) {
                     // Check if subscription is canceled (either immediately or at period end)
@@ -104,6 +116,8 @@ export const handler: Handler = async (event) => {
                     }, { merge: true })
 
                     console.log(`Updated subscription for user: ${userId}, status: ${status}, cancel_at_period_end: ${subscription.cancel_at_period_end}`)
+                } else {
+                    console.error(`Could not find user for subscription ${subscription.id}`)
                 }
                 break
             }
