@@ -53,15 +53,30 @@ export const handler: Handler = async (event) => {
                 const userId = session.metadata?.userId || session.client_reference_id
 
                 if (userId) {
-                    // Activate premium subscription
-                    await db.collection('users').doc(userId).set({
-                        subscriptionTier: 'premium',
-                        subscriptionStatus: 'active',
-                        subscriptionId: session.subscription || session.id,
-                        subscriptionEndDate: null // For lifetime, no end date
-                    }, { merge: true })
+                    // Check if this is a subscription or one-time payment
+                    if (session.mode === 'subscription' && session.subscription) {
+                        // For subscriptions, fetch the subscription object to get the end date
+                        const subscription = await stripe.subscriptions.retrieve(session.subscription as string)
 
-                    console.log(`Activated premium for user: ${userId}`)
+                        await db.collection('users').doc(userId).set({
+                            subscriptionTier: 'premium',
+                            subscriptionStatus: 'active',
+                            subscriptionId: subscription.id,
+                            subscriptionEndDate: subscription.current_period_end * 1000 // Convert to milliseconds
+                        }, { merge: true })
+
+                        console.log(`Activated premium subscription for user: ${userId}, ends: ${new Date(subscription.current_period_end * 1000)}`)
+                    } else {
+                        // One-time payment (lifetime)
+                        await db.collection('users').doc(userId).set({
+                            subscriptionTier: 'premium',
+                            subscriptionStatus: 'active',
+                            subscriptionId: session.id,
+                            subscriptionEndDate: null // Lifetime has no end date
+                        }, { merge: true })
+
+                        console.log(`Activated premium lifetime for user: ${userId}`)
+                    }
                 }
                 break
             }
