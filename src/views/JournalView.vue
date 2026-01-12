@@ -1,203 +1,289 @@
 <script setup lang="ts">
 import { ref, computed, watchEffect } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useJournalStore } from '../stores/journal'
+import JournalCalendar from '../components/JournalCalendar.vue'
 
 const store = useJournalStore()
-
-const newContent = ref('')
-// Default to today's date
 const route = useRoute()
-const newDate = ref(new Date().toISOString().split('T')[0])
+const router = useRouter()
 
-// Update date from query param if exists
-watchEffect(() => {
-  if (route.query.date as string) {
-    newDate.value = route.query.date as string
-  }
+// Get date from query or default to today
+const selectedDate = computed(() => {
+  return (route.query.date as string) || new Date().toISOString().split('T')[0]
 })
 
-const handleSave = () => {
-  if (!newContent.value.trim() || !newDate.value) return
-  store.addEntry(newContent.value, newDate.value)
-  newContent.value = ''
+const content = ref('')
+const isSaving = ref(false)
+const saveMessage = ref('')
+
+// Load content when selectedDate changes
+watchEffect(() => {
+  const dateStr = selectedDate.value
+  const entry = store.entries.find(e => e.date === dateStr)
+  content.value = entry ? entry.content : ''
+  saveMessage.value = ''
+})
+
+const handleSave = async () => {
+  if (!content.value.trim()) return
+  
+  isSaving.value = true
+  saveMessage.value = 'Saving...'
+  try {
+    // @ts-ignore
+    await store.saveEntry(content.value, selectedDate.value)
+    saveMessage.value = 'Saved'
+    setTimeout(() => {
+      if (saveMessage.value === 'Saved') saveMessage.value = ''
+    }, 2000)
+  } catch (error) {
+    console.error(error)
+    saveMessage.value = 'Error saving'
+  } finally {
+    isSaving.value = false
+  }
 }
 
-const formatDate = (dateStr: string) => {
-  return new Date(dateStr).toLocaleDateString('en-US', {
+// Auto-save debounce could be added here, but manual for now is safer/simpler
+const formattedDate = computed(() => {
+  return new Date(selectedDate.value).toLocaleDateString('en-US', {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
     day: 'numeric'
   })
+})
+
+const handleDelete = async () => {
+    if(!confirm('Are you sure you want to delete this entry?')) return
+    const entry = store.entries.find(e => e.date === selectedDate.value)
+    if(entry) {
+        await store.deleteEntry(entry.id)
+        content.value = ''
+        saveMessage.value = 'Deleted'
+    }
 }
 </script>
 
 <template>
   <div class="journal-view">
-    <header class="page-header">
-      <h2>Journal</h2>
-      <p class="subtitle">Capture your thoughts and progress.</p>
-    </header>
+    <div class="layout-grid">
+      <!-- Left Sidebar: Calendar & Stats -->
+      <aside class="journal-sidebar">
+        <div class="sidebar-content">
+             <JournalCalendar />
+        </div>
+      </aside>
 
-    <div class="main-layout">
-      <section class="editor-section">
-        <div class="card editor-card">
-          <div class="editor-header">
-            <h3>New Entry</h3>
-            <input type="date" v-model="newDate" class="date-picker">
-          </div>
+      <!-- Main Content: Daily Editor -->
+      <main class="daily-page">
+        <header class="page-header">
+           <div class="date-display">
+             <h1>{{ formattedDate }}</h1>
+             <p class="subtitle">Daily Journal</p>
+           </div>
+           
+           <div class="actions">
+             <span class="save-status" :class="{ 'visible': saveMessage }">{{ saveMessage }}</span>
+             <button class="btn-text delete-btn" @click="handleDelete" v-if="store.entries.find(e => e.date === selectedDate)">
+                Delete
+             </button>
+           </div>
+        </header>
+
+        <div class="editor-container">
           <textarea 
-            v-model="newContent" 
-            placeholder="What's on your mind today?"
-            class="journal-input"
+            v-model="content" 
+            placeholder="What's on your mind?..." 
+            class="main-textarea"
+            @blur="handleSave"
+            @keydown.ctrl.enter="handleSave"
           ></textarea>
-          <div class="editor-footer">
-            <button class="btn-primary" @click="handleSave" :disabled="!newContent.trim()">Save Entry</button>
-          </div>
+          <!-- Save hint -->
+           <div class="editor-footer">
+              <button class="btn-primary" @click="handleSave" :disabled="isSaving">
+                  {{ isSaving ? 'Saving...' : 'Save Entry' }}
+              </button>
+           </div>
         </div>
-      </section>
-
-      <section class="entries-section">
-        <div v-if="store.entries.length === 0" class="empty-state">
-          <p>No entries yet. Write your first one!</p>
-        </div>
-        
-        <div v-else class="entries-list">
-          <div v-for="entry in store.entries" :key="entry.id" class="entry-card">
-            <div class="entry-header">
-              <span class="entry-date">{{ formatDate(entry.date) }}</span>
-              <button class="btn-delete" @click="store.deleteEntry(entry.id)">&times;</button>
-            </div>
-            <p class="entry-content">{{ entry.content }}</p>
-          </div>
-        </div>
-      </section>
+      </main>
     </div>
   </div>
 </template>
 
 <style scoped>
+.journal-view {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.layout-grid {
+  display: grid;
+  grid-template-columns: 350px 1fr;
+  gap: 2rem;
+  height: 100%;
+  overflow: hidden; /* Prevent double scrollbars */
+}
+
+@media (max-width: 900px) {
+  .layout-grid {
+    grid-template-columns: 1fr;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .journal-sidebar {
+      order: 2; /* Move calendar below editor on mobile? Or above? Usually above for nav. */
+      order: 1;
+      height: auto;
+  }
+}
+
+/* Sidebar */
+.journal-sidebar {
+  border-right: 1px solid var(--color-border);
+  padding-right: 2rem;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow-y: auto;
+}
+
+@media (max-width: 900px) {
+    .journal-sidebar {
+        border-right: none;
+        padding-right: 0;
+        border-bottom: 1px solid var(--color-border);
+        padding-bottom: 2rem;
+    }
+}
+
+.sidebar-content {
+    /* Container for calendar */
+}
+
+/* Main Page */
+.daily-page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow-y: auto;
+  padding-right: 1rem; /* Space for scrollbar */
+}
+
 .page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
   margin-bottom: 2rem;
+  padding-top: 1rem;
+}
+
+.date-display h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0;
+  line-height: 1.2;
 }
 
 .subtitle {
   color: var(--color-text-muted);
+  font-size: 1rem;
+  margin-top: 0.25rem;
 }
 
-.main-layout {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2rem;
+.actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
 }
 
-@media (max-width: 900px) {
-  .main-layout {
-    grid-template-columns: 1fr;
-  }
+.save-status {
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+    opacity: 0;
+    transition: opacity 0.3s;
 }
 
-.card {
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: 12px;
-  padding: 1.5rem;
+.save-status.visible {
+    opacity: 1;
 }
 
-.editor-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
+.delete-btn {
+    color: var(--color-danger);
+    font-size: 0.875rem;
 }
 
-.date-picker {
-  background-color: var(--color-background);
-  border: 1px solid var(--color-border);
-  color: var(--color-text);
-  padding: 0.5rem;
-  border-radius: 6px;
+.btn-text {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    font-weight: 500;
 }
 
-.journal-input {
-  width: 100%;
-  min-height: 150px;
-  background-color: var(--color-background);
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  padding: 1rem;
-  color: var(--color-text);
-  resize: vertical;
-  font-family: inherit;
-  margin-bottom: 1rem;
+.btn-text:hover {
+    text-decoration: underline;
 }
 
-.journal-input:focus {
-  outline: none;
-  border-color: var(--color-primary);
+/* Editor */
+.editor-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--color-surface);
+    border-radius: 12px;
+    border: 1px solid var(--color-border);
+    padding: 2rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.main-textarea {
+    flex: 1;
+    width: 100%;
+    border: none;
+    background: transparent;
+    font-size: 1.125rem;
+    line-height: 1.6;
+    color: var(--color-text);
+    resize: none;
+    font-family: inherit; /* OR 'Merriweather', serif if we want book feel */
+}
+
+.main-textarea:focus {
+    outline: none;
 }
 
 .editor-footer {
-  display: flex;
-  justify-content: flex-end;
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 1rem;
 }
 
 .btn-primary {
   background-color: var(--color-primary);
   color: white;
   border: none;
-  padding: 0.75rem 1.5rem;
+  padding: 0.75rem 2rem;
   border-radius: 8px;
   font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
 }
 
-.entry-card {
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: 12px;
-  padding: 1.5rem;
-  margin-bottom: 1rem;
+.btn-primary:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
 }
 
-.entry-header {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 1rem;
-  border-bottom: 1px solid var(--color-border);
-  padding-bottom: 0.5rem;
-}
-
-.entry-date {
-  font-weight: 600;
-  color: var(--color-primary);
-}
-
-.btn-delete {
-  background: none;
-  border: none;
-  color: var(--color-text-muted);
-  font-size: 1.25rem;
-  line-height: 1;
-  padding: 0 0.5rem;
-}
-
-.btn-delete:hover {
-  color: var(--color-danger);
-}
-
-.entry-content {
-  white-space: pre-wrap;
-  color: var(--color-text);
-  line-height: 1.6;
-}
-
-.empty-state {
-  text-align: center;
-  color: var(--color-text-muted);
-  padding: 3rem;
-  background-color: var(--color-surface);
-  border-radius: 12px;
-  border: 1px dashed var(--color-border);
+@media (max-width: 900px) {
+    .editor-container {
+        padding: 1rem;
+        min-height: 50vh;
+    }
 }
 </style>

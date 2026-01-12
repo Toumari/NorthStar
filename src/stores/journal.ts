@@ -44,16 +44,31 @@ export const useJournalStore = defineStore('journal', () => {
         }
     })
 
-    const addEntry = async (content: string, date: string) => {
+    const saveEntry = async (content: string, date: string) => {
         const authStore = useAuthStore()
         const user = authStore.user
         if (!user) return
 
-        await addDoc(collection(db, `users/${user.uid}/journal`), {
-            content,
-            date,
-            createdAt: Date.now()
-        })
+        // Check if entry exists for this date locally first (optimization)
+        const existingEntry = entries.value.find(e => e.date === date)
+
+        if (existingEntry) {
+            // Update
+            const { setDoc, doc } = await import('firebase/firestore')
+            await setDoc(doc(db, `users/${user.uid}/journal`, existingEntry.id), {
+                content,
+                date,
+                updatedAt: Date.now(),
+                createdAt: existingEntry.createdAt // Preserve creation time
+            }, { merge: true })
+        } else {
+            // Create
+            await addDoc(collection(db, `users/${user.uid}/journal`), {
+                content,
+                date,
+                createdAt: Date.now()
+            })
+        }
     }
 
     const deleteEntry = async (id: string) => {
@@ -65,7 +80,7 @@ export const useJournalStore = defineStore('journal', () => {
 
     return {
         entries,
-        addEntry,
+        saveEntry,
         deleteEntry
     }
 })
