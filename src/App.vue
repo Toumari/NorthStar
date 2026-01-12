@@ -51,7 +51,7 @@ const closeMobileMenu = () => {
 <style scoped>
 .app-layout {
   display: flex;
-  height: 100vh;
+  height: 100dvh;
   width: 100vw;
   background-color: var(--color-background);
   color: var(--color-text);
@@ -97,6 +97,7 @@ const closeMobileMenu = () => {
   flex: 1;
   padding: 2rem;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   position: relative;
 }
 
@@ -131,7 +132,7 @@ const closeMobileMenu = () => {
     position: fixed;
     top: 0;
     left: 0;
-    height: 100vh;
+    height: 100dvh;
     z-index: 30;
     pointer-events: none;
   }
@@ -142,7 +143,7 @@ const closeMobileMenu = () => {
     top: 0;
     left: 0;
     width: 100vw;
-    height: 100vh;
+    height: 100dvh;
     background: rgba(0, 0, 0, 0.5);
     opacity: 0;
     transition: opacity 0.3s ease;

@@ -79,7 +79,7 @@ const chartOptions = {
 
 <style scoped>
 .chart-container {
-  height: 250px;
+  height: 100%;
   width: 100%;
 }
 </style>

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="15" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+  <g fill="none" fill-rule="evenodd">
+    <!-- Main Compass Star -->
+    <path fill="#4F46E5" d="M256 0L319.3 192.7L512 256L319.3 319.3L256 512L192.7 319.3L0 256L192.7 192.7L256 0Z"/>
+    <!-- Central White Circle for contrast -->
+    <circle cx="256" cy="256" r="40" fill="white" opacity="0.3"/>
+    <!-- Secondary Points (Darker/Smaller) -->
+    <path fill="#4338CA" d="M375 137L319.3 192.7L256 256L192.7 192.7L137 137L192.7 192.7L256 256L319.3 319.3L375 375L319.3 319.3L256 256L192.7 319.3L137 375L192.7 319.3L256 256L319.3 192.7L375 137Z" opacity="0.5"/>
+  </g>
+</svg>
