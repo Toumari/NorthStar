@@ -2,21 +2,44 @@
 import { useGoalsStore } from '../stores/goals'
 import { useJournalStore } from '../stores/journal'
 import { useTrackersStore } from '../stores/trackers'
+import { useSubscriptionStore } from '../stores/subscription'
 import GoalCard from '../components/GoalCard.vue'
 import TrackerSummaryCard from '../components/TrackerSummaryCard.vue'
 import { RouterLink } from 'vue-router'
 
 import CreateGoalModal from '../components/CreateGoalModal.vue'
 import CreateTrackerModal from '../components/CreateTrackerModal.vue'
+import UpgradePrompt from '../components/UpgradePrompt.vue'
 import JournalCalendar from '../components/JournalCalendar.vue'
 import { ref } from 'vue'
 
 const store = useGoalsStore()
 const journalStore = useJournalStore()
 const trackersStore = useTrackersStore()
+const subscriptionStore = useSubscriptionStore()
 
 const showGoalModal = ref(false)
 const showTrackerModal = ref(false)
+const showUpgradePrompt = ref(false)
+const upgradeMessage = ref('')
+
+const handleCreateGoalClick = () => {
+    if (subscriptionStore.canCreateGoal(store.goals.length)) {
+        showGoalModal.value = true
+    } else {
+        upgradeMessage.value = `You've reached the free plan limit of ${subscriptionStore.FREE_GOAL_LIMIT} goals. Upgrade to Premium for unlimited goals!`
+        showUpgradePrompt.value = true
+    }
+}
+
+const handleCreateTrackerClick = () => {
+    if (subscriptionStore.canCreateTracker(trackersStore.trackers.length)) {
+        showTrackerModal.value = true
+    } else {
+        upgradeMessage.value = `You've reached the free plan limit of ${subscriptionStore.FREE_TRACKER_LIMIT} trackers. Upgrade to Premium for unlimited trackers!`
+        showUpgradePrompt.value = true
+    }
+}
 
 const handleCreateGoal = (goalData: any) => {
   store.addGoal(goalData)
@@ -55,7 +78,7 @@ const handleCreateTracker = (trackerData: any) => {
       <header class="section-header">
         <h3>Recent Goals</h3>
         <div class="actions" v-if="store.activeGoals.length > 0">
-           <button class="btn-text-action" @click="showGoalModal = true">+ Add Goal</button>
+           <button class="btn-text-action" @click="handleCreateGoalClick">+ Add Goal</button>
            <RouterLink to="/goals" class="view-all">View All</RouterLink>
         </div>
       </header>
@@ -67,7 +90,7 @@ const handleCreateTracker = (trackerData: any) => {
             :goal="goal"
           />
         </template>
-        <div class="empty-goal-card card" v-else @click="showGoalModal = true">
+        <div class="empty-goal-card card" v-else @click="handleCreateGoalClick">
            <div class="empty-content">
              <span class="icon-large">+</span>
              <p>Create your first goal</p>
@@ -93,7 +116,7 @@ const handleCreateTracker = (trackerData: any) => {
         <header class="section-header">
           <h3>Trackers</h3>
           <div class="actions">
-             <button class="btn-text-action" @click="showTrackerModal = true">+ Add Tracker</button>
+             <button class="btn-text-action" @click="handleCreateTrackerClick">+ Add Tracker</button>
              <RouterLink to="/trackers" class="view-all">View All</RouterLink>
           </div>
         </header>
@@ -107,7 +130,7 @@ const handleCreateTracker = (trackerData: any) => {
         </div>
         <div class="empty-state card" v-else>
           <p>No trackers active.</p>
-          <RouterLink to="/trackers" class="btn-small">Add Tracker</RouterLink>
+          <button @click="handleCreateTrackerClick" class="btn-small">Add Tracker</button>
         </div>
       </section>
     </div>
@@ -122,6 +145,12 @@ const handleCreateTracker = (trackerData: any) => {
       v-if="showTrackerModal" 
       @close="showTrackerModal = false"
       @save="handleCreateTracker"
+    />
+
+    <UpgradePrompt
+      v-if="showUpgradePrompt"
+      :message="upgradeMessage"
+      @close="showUpgradePrompt = false"
     />
   </div>
 </template>

@@ -14,6 +14,7 @@ import {
     EmailAuthProvider,
     GoogleAuthProvider,
     signInWithPopup,
+    reauthenticateWithPopup,
     type User
 } from 'firebase/auth'
 import { collection, doc, deleteDoc, getDocs } from 'firebase/firestore'
@@ -71,6 +72,12 @@ export const useAuthStore = defineStore('auth', () => {
         await reauthenticateWithCredential(auth.currentUser, credential)
     }
 
+    const reauthenticateWithGoogle = async () => {
+        if (!auth.currentUser) throw new Error('No user to reauthenticate')
+        const provider = new GoogleAuthProvider()
+        await reauthenticateWithPopup(auth.currentUser, provider)
+    }
+
     const updateDisplayName = async (name: string) => {
         if (!auth.currentUser) return
         await updateProfile(auth.currentUser, { displayName: name })
@@ -118,6 +125,7 @@ export const useAuthStore = defineStore('auth', () => {
         logout,
         resetPassword,
         reauthenticate,
+        reauthenticateWithGoogle,
         updateDisplayName,
         updateUserPassword,
         deleteAccount

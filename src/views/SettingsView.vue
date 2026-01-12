@@ -14,6 +14,9 @@ const router = useRouter()
 
 // Profile State
 const displayName = ref(authStore.user?.displayName || '')
+const isGoogleUser = computed(() => {
+    return authStore.user?.providerData.some(provider => provider.providerId === 'google.com')
+})
 const isUpdatingProfile = ref(false)
 const profileMessage = ref('')
 
@@ -56,7 +59,17 @@ const initiateChangePassword = () => {
     reauthError.value = ''
 }
 
-const initiateDeleteAccount = () => {
+const initiateDeleteAccount = async () => {
+    if (isGoogleUser.value) {
+        try {
+            await authStore.reauthenticateWithGoogle()
+            showDeleteConfirm.value = true
+        } catch (e: any) {
+            alert('Verification failed: ' + e.message)
+        }
+        return
+    }
+
     reauthAction.value = 'delete'
     showReauthModal.value = true
     reauthPassword.value = ''
@@ -325,7 +338,7 @@ onMounted(() => {
         <section class="card settings-card danger-zone">
             <h3>Security</h3>
             
-            <div class="security-action">
+            <div class="security-action" v-if="!isGoogleUser">
                 <div class="action-info">
                     <h4>Change Password</h4>
                     <p>Update your password to keep your account secure.</p>
@@ -333,7 +346,7 @@ onMounted(() => {
                 <button class="btn-secondary" @click="initiateChangePassword">Change Password</button>
             </div>
 
-            <div class="divider"></div>
+            <div class="divider" v-if="!isGoogleUser"></div>
 
             <div class="security-action">
                 <div class="action-info">
