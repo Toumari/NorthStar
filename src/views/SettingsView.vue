@@ -177,6 +177,41 @@ const handleManageSubscription = async () => {
         alert('Failed to open subscription management. Please try again.')
     }
 }
+
+const isRefreshing = ref(false)
+const refreshSubscription = async () => {
+    isRefreshing.value = true
+    try {
+        const response = await fetch('/.netlify/functions/sync-subscription', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ userId: authStore.user?.uid })
+        })
+        
+        if (!response.ok) {
+            const data = await response.json()
+            throw new Error(data.error || 'Failed to sync subscription')
+        }
+
+        const result = await response.json()
+        
+        // Reload store data
+        await subscriptionStore.loadSubscription()
+        
+        // Show subtle feedback instead of alert
+        const status = result.status
+        const msg = status === 'canceled' ? 'Subscription synced: Canceled' : 'Subscription synced'
+        console.log(msg)
+        
+    } catch (error: any) {
+        console.error('Sync error:', error)
+        alert('Failed to sync subscription: ' + error.message)
+    } finally {
+        isRefreshing.value = false
+    }
+}
 </script>
 
 <template>
@@ -269,6 +304,15 @@ const handleManageSubscription = async () => {
                         >
                             Manage Subscription
                         </a>
+                        
+                        <button 
+                            @click="refreshSubscription" 
+                            class="btn-text"
+                            style="margin-left: 1rem; font-size: 0.9rem;"
+                            :disabled="isRefreshing"
+                        >
+                            {{ isRefreshing ? 'Syncing...' : '↻ Sync Status' }}
+                        </button>
                     </template>
                 </div>
             </div>
