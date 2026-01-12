@@ -110,7 +110,17 @@ export const handler: Handler = async (event) => {
 
             case 'customer.subscription.deleted': {
                 const subscription = stripeEvent.data.object as Stripe.Subscription
-                const userId = subscription.metadata?.userId
+                let userId = subscription.metadata?.userId
+
+                // If no userId in metadata, try to find user by subscriptionCustomerId
+                if (!userId) {
+                    const usersRef = db.collection('users')
+                    const snapshot = await usersRef.where('subscriptionCustomerId', '==', subscription.customer).limit(1).get()
+
+                    if (!snapshot.empty) {
+                        userId = snapshot.docs[0].id
+                    }
+                }
 
                 if (userId) {
                     // Downgrade to free
@@ -122,6 +132,8 @@ export const handler: Handler = async (event) => {
                     }, { merge: true })
 
                     console.log(`Downgraded user to free: ${userId}`)
+                } else {
+                    console.error(`Could not find user for deleted subscription ${subscription.id}`)
                 }
                 break
             }
