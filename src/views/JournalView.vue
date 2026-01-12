@@ -72,7 +72,7 @@ const handleDelete = async () => {
       <!-- Left Sidebar: Calendar & Stats -->
       <aside class="journal-sidebar">
         <div class="sidebar-content">
-             <JournalCalendar />
+             <JournalCalendar mode="sidebar" />
         </div>
       </aside>
 
@@ -136,9 +136,12 @@ const handleDelete = async () => {
   }
   
   .journal-sidebar {
-      order: 2; /* Move calendar below editor on mobile? Or above? Usually above for nav. */
-      order: 1;
+      order: -1; /* Sidebar ON TOP */
       height: auto;
+      border-right: none;
+      padding-right: 0;
+      border-bottom: 1px solid var(--color-border);
+      padding-bottom: 2rem;
   }
 }
 

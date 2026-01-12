@@ -97,7 +97,7 @@ const currentStreak = computed(() => {
 </script>
 
 <template>
-  <div class="calendar-card">
+  <div class="calendar-card" :class="{ 'sidebar-mode': mode === 'sidebar' }">
     <div class="calendar-section">
       <header class="calendar-header">
         <button class="nav-btn" @click="prevMonth">
@@ -156,7 +156,7 @@ const currentStreak = computed(() => {
   border-radius: 12px;
   padding: 1.5rem;
   width: 100%;
-  height: 100%;
+  /* height: 100%; Removed to allow natural height in sidebar */
   display: flex;
   flex-direction: column;
   gap: 2rem;
@@ -177,14 +177,30 @@ const currentStreak = computed(() => {
   border-top: 1px solid var(--color-border);
 }
 
+<script setup lang="ts">
+import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
+import { useJournalStore } from '../stores/journal'
+
+const props = defineProps<{
+  mode?: 'dashboard' | 'sidebar'
+}>()
+
+const store = useJournalStore()
+// ... existing script ...
+</script>
+
+<style scoped>
+/* ... existing styles ... */
+
 @media (min-width: 1024px) {
-  .calendar-card {
+  .calendar-card:not(.sidebar-mode) {
     flex-direction: row;
     align-items: center;
     gap: 2rem;
   }
 
-  .stats-section {
+  .calendar-card:not(.sidebar-mode) .stats-section {
     flex-direction: column;
     border-top: none;
     padding-top: 0;
@@ -196,6 +212,7 @@ const currentStreak = computed(() => {
     min-width: 150px;
   }
 }
+</style>
 
 .calendar-header {
   display: flex;
