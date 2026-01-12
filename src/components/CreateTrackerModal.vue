@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 
 const emit = defineEmits(['close', 'save'])
 
@@ -10,10 +10,29 @@ const save = () => {
   if (!name.value || !unit.value) return
   emit('save', { name: name.value, unit: unit.value })
 }
+
+// Lock body scroll when modal is open using position: fixed (iOS fix)
+let scrollPosition = 0
+
+onMounted(() => {
+  scrollPosition = window.scrollY
+  document.body.style.position = 'fixed'
+  document.body.style.top = `-${scrollPosition}px`
+  document.body.style.width = '100%'
+  document.body.style.overflow = 'hidden' // Redundant but safe
+})
+
+onUnmounted(() => {
+  document.body.style.position = ''
+  document.body.style.top = ''
+  document.body.style.width = ''
+  document.body.style.overflow = ''
+  window.scrollTo(0, scrollPosition)
+})
 </script>
 
 <template>
-  <div class="modal-overlay" @click.self="$emit('close')">
+  <div class="modal-overlay" @click.self="$emit('close')" @touchmove.self.prevent>
     <div class="modal-content">
       <header>
         <h2>Create New Tracker</h2>
@@ -46,13 +65,16 @@ const save = () => {
   top: 0;
   left: 0;
   width: 100vw;
-  height: 100vh;
+  height: 100dvh;
   background-color: rgba(0, 0, 0, 0.7);
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: 1rem;
+  padding-bottom: env(safe-area-inset-bottom, 1rem);
   z-index: 100;
   backdrop-filter: blur(4px);
+  overscroll-behavior: none;
 }
 
 .modal-content {
@@ -65,14 +87,29 @@ const save = () => {
   flex-direction: column;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   border: 1px solid var(--color-border);
+  overflow: hidden;
+}
+
+/* Mobile specific overrides */
+@media (max-width: 768px) {
+  .modal-overlay {
+    align-items: flex-end;
+    padding: 1rem;
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+  
+  .modal-content {
+    max-height: 85dvh;
+  }
 }
 
 header {
-  padding: 1.5rem;
+  padding: 1rem 1.5rem;
   border-bottom: 1px solid var(--color-border);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-shrink: 0;
 }
 
 .close-btn {
@@ -87,11 +124,15 @@ header {
 
 .close-btn:hover {
   color: var(--color-text);
+  text-decoration: none;
 }
 
 .modal-body {
   padding: 1.5rem;
   overflow-y: auto;
+  flex: 1;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }
 
 .form-group {
@@ -123,11 +164,12 @@ input:focus {
 }
 
 footer {
-  padding: 1.5rem;
+  padding: 1rem 1.5rem;
   border-top: 1px solid var(--color-border);
   display: flex;
   justify-content: flex-end;
   gap: 1rem;
+  flex-shrink: 0;
 }
 
 .btn-text {
