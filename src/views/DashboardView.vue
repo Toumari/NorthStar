@@ -3,7 +3,7 @@ import { useGoalsStore } from '../stores/goals'
 import { useJournalStore } from '../stores/journal'
 import { useTrackersStore } from '../stores/trackers'
 import GoalCard from '../components/GoalCard.vue'
-import TrackerChart from '../components/TrackerChart.vue'
+import TrackerSummaryCard from '../components/TrackerSummaryCard.vue'
 import { RouterLink } from 'vue-router'
 
 import CreateGoalModal from '../components/CreateGoalModal.vue'
@@ -90,12 +90,11 @@ const handleCreateTracker = (trackerData: any) => {
         </header>
 
         <div class="trackers-grid" v-if="trackersStore.trackers.length > 0">
-          <div class="tracker-mini-card card" v-for="tracker in trackersStore.trackers.slice(0, 2)" :key="tracker.id">
-            <h4>{{ tracker.name }}</h4>
-            <div class="mini-chart">
-               <TrackerChart :tracker="tracker" />
-            </div>
-          </div>
+          <TrackerSummaryCard 
+            v-for="tracker in trackersStore.trackers.slice(0, 4)" 
+            :key="tracker.id" 
+            :tracker="tracker"
+          />
         </div>
         <div class="empty-state card" v-else>
           <p>No trackers active.</p>
@@ -286,9 +285,10 @@ const handleCreateTracker = (trackerData: any) => {
 
 .trackers-grid {
   flex: 1;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 1rem;
+  align-content: start;
 }
 
 .empty-state {
