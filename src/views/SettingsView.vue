@@ -274,12 +274,12 @@ const refreshSubscription = async () => {
                         </p>
                         <p class="detail-item">
                             <span class="detail-label">Status:</span>
-                            <span class="detail-value" :class="getStatusClass(subscriptionStore.subscriptionData.subscriptionStatus)">
-                                {{ formatStatus(subscriptionStore.subscriptionData.subscriptionStatus) }}
+                            <span class="detail-value" :class="getStatusClass(subscriptionStore.subscriptionData.status)">
+                                {{ formatStatus(subscriptionStore.subscriptionData.status) }}
                             </span>
                         </p>
                         <p v-if="subscriptionStore.subscriptionData.subscriptionEndDate" class="detail-item">
-                            <span class="detail-label">{{ subscriptionStore.subscriptionData.subscriptionStatus === 'canceled' ? 'Access until:' : 'Renews on:' }}</span>
+                            <span class="detail-label">{{ subscriptionStore.subscriptionData.status === 'canceled' ? 'Access until:' : 'Renews on:' }}</span>
                             <span class="detail-value">{{ formatDate(subscriptionStore.subscriptionData.subscriptionEndDate) }}</span>
                         </p>
                     </div>
