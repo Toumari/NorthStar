@@ -82,7 +82,7 @@ const handleGoogleLogin = async () => {
       <section class="features-panel">
         <div class="features-content">
           <div class="brand">
-            <h1>NorthStar</h1>
+            <h1>PathMark</h1>
             <p class="tagline">Navigate your life with purpose.</p>
           </div>
           

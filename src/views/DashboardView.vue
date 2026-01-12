@@ -33,7 +33,7 @@ const handleCreateTracker = (trackerData: any) => {
   <div class="dashboard-view">
     <header class="page-header">
       <h2>Dashboard</h2>
-      <p class="subtitle">Welcome back to your NorthStar.</p>
+      <p class="subtitle">Welcome back to your PathMark.</p>
     </header>
 
     <div class="stats-grid">
@@ -71,7 +71,7 @@ const handleCreateTracker = (trackerData: any) => {
            <div class="empty-content">
              <span class="icon-large">+</span>
              <p>Create your first goal</p>
-             <span class="sub-text">Set your NorthStar</span>
+             <span class="sub-text">Set your PathMark</span>
            </div>
         </div>
       </div>

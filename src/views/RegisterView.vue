@@ -95,7 +95,7 @@ const handleGoogleLogin = async () => {
       <section class="features-panel">
         <div class="features-content">
           <div class="brand">
-            <h1>NorthStar</h1>
+            <h1>PathMark</h1>
             <p class="tagline">Start your journey today.</p>
           </div>
           
@@ -138,7 +138,7 @@ const handleGoogleLogin = async () => {
         <div class="auth-card">
           <header>
             <h2>Create Account</h2>
-            <p>Join NorthStar and start planning</p>
+            <p>Join PathMark and start planning</p>
           </header>
           
           <form @submit.prevent="handleRegister" novalidate>

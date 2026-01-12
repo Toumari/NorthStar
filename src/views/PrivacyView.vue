@@ -7,7 +7,7 @@
       <section>
         <h2>Introduction</h2>
         <p>
-          Welcome to NorthStar. We respect your privacy and are committed to protecting your personal data. This privacy policy explains how we collect, use, and safeguard your information when you use our application.
+          Welcome to PathMark. We respect your privacy and are committed to protecting your personal data. This privacy policy explains how we collect, use, and safeguard your information when you use our application.
         </p>
       </section>
 
@@ -22,7 +22,7 @@
         </ul>
 
         <h3>Application Data</h3>
-        <p>When you use NorthStar, we store:</p>
+        <p>When you use PathMark, we store:</p>
         <ul>
           <li><strong>Goals</strong> - Your personal goals and progress</li>
           <li><strong>Journal entries</strong> - Your daily reflections and notes</li>
@@ -34,7 +34,7 @@
         <h2>How We Use Your Information</h2>
         <p>We use your information to:</p>
         <ul>
-          <li>Provide and maintain the NorthStar service</li>
+          <li>Provide and maintain the PathMark service</li>
           <li>Authenticate your identity and secure your account</li>
           <li>Store and sync your personal data across devices</li>
           <li>Improve and personalize your experience</li>
@@ -88,7 +88,7 @@
       <section>
         <h2>Children's Privacy</h2>
         <p>
-          NorthStar is not intended for users under the age of 13. We do not knowingly collect personal information from children under 13.
+          PathMark is not intended for users under the age of 13. We do not knowingly collect personal information from children under 13.
         </p>
       </section>
 

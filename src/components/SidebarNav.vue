@@ -32,7 +32,7 @@ const handleLogout = async () => {
 <template>
   <aside class="sidebar" :class="{ 'open': isOpen }">
     <div class="logo">
-      <h1>NorthStar</h1>
+      <h1>PathMark</h1>
     </div>
     
     <nav class="nav-links" v-if="store.user">

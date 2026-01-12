@@ -27,7 +27,7 @@ const handleCreateGoal = (goalData: any) => {
 
     <div v-if="store.goals.length === 0" class="empty-state">
       <h3>No Goals Yet</h3>
-      <p>Define your NorthStar and start tracking your progress.</p>
+      <p>Define your PathMark and start tracking your progress.</p>
       <button class="btn-secondary" @click="showCreateModal = true">Create First Goal</button>
     </div>
 

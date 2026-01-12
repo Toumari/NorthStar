@@ -29,7 +29,7 @@ const closeMobileMenu = () => {
       <button class="menu-btn" @click="isMobileMenuOpen = !isMobileMenuOpen">
         <span class="hamburger">☰</span>
       </button>
-      <span class="mobile-title">NorthStar</span>
+      <span class="mobile-title">PathMark</span>
     </header>
 
     <!-- Sidebar with overlay logic -->

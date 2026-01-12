@@ -32,7 +32,7 @@ const handleReset = async () => {
     <div class="auth-view">
         <div class="auth-card">
             <header>
-                <h1>NorthStar</h1>
+                <h1>PathMark</h1>
                 <p>Reset your password</p>
             </header>
 
