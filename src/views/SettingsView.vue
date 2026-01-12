@@ -229,9 +229,9 @@ const refreshSubscription = async () => {
     }
 }
 
-onMounted(() => {
-  subscriptionStore.loadSubscription()
-  refreshSubscription()
+onMounted(async () => {
+  await subscriptionStore.loadSubscription()
+  await refreshSubscription()
 })
 </script>
 
