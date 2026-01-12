@@ -119,6 +119,39 @@ const handleDeleteAccount = async () => {
         alert('Failed to delete account: ' + e.message)
     }
 }
+
+// Subscription management
+const formatDate = (timestamp: number) => {
+    return new Date(timestamp).toLocaleDateString('en-GB', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+    })
+}
+
+const formatStatus = (status: string) => {
+    const statusMap: Record<string, string> = {
+        'active': 'Active',
+        'canceled': 'Canceled',
+        'expired': 'Expired',
+        'none': 'None'
+    }
+    return statusMap[status] || status
+}
+
+const getStatusClass = (status: string) => {
+    return {
+        'status-active': status === 'active',
+        'status-canceled': status === 'canceled',
+        'status-expired': status === 'expired'
+    }
+}
+
+const handleManageSubscription = async () => {
+    // Redirect to Stripe Customer Portal
+    // This requires a backend endpoint to create a portal session
+    alert('Stripe Customer Portal integration coming soon! You can manage your subscription directly in Stripe Dashboard for now.')
+}
 </script>
 
 <template>
@@ -175,11 +208,44 @@ const handleDeleteAccount = async () => {
                     <p v-else>
                         <strong>Free</strong> - Limited to 3 goals, 2 trackers, and 14-day journal editing
                     </p>
+                    
+                    <!-- Show subscription details for premium users -->
+                    <div v-if="subscriptionStore.isPremium && subscriptionStore.subscriptionData.subscriptionId" class="subscription-details">
+                        <p class="detail-item">
+                            <span class="detail-label">Status:</span>
+                            <span class="detail-value" :class="getStatusClass(subscriptionStore.subscriptionData.subscriptionStatus)">
+                                {{ formatStatus(subscriptionStore.subscriptionData.subscriptionStatus) }}
+                            </span>
+                        </p>
+                        <p v-if="subscriptionStore.subscriptionData.subscriptionEndDate" class="detail-item">
+                            <span class="detail-label">{{ subscriptionStore.subscriptionData.subscriptionStatus === 'canceled' ? 'Access until:' : 'Renews on:' }}</span>
+                            <span class="detail-value">{{ formatDate(subscriptionStore.subscriptionData.subscriptionEndDate) }}</span>
+                        </p>
+                        <p v-else class="detail-item">
+                            <span class="detail-label">Type:</span>
+                            <span class="detail-value">Lifetime Access</span>
+                        </p>
+                    </div>
                 </div>
-                <RouterLink to="/pricing" class="btn-toggle" v-if="!subscriptionStore.isPremium">
-                    Upgrade to Premium
-                </RouterLink>
-                <span v-else class="premium-badge">✓ Premium</span>
+                
+                <!-- Action buttons -->
+                <div class="subscription-actions">
+                    <RouterLink to="/pricing" class="btn-toggle" v-if="!subscriptionStore.isPremium">
+                        Upgrade to Premium
+                    </RouterLink>
+                    <template v-else>
+                        <span class="premium-badge">✓ Premium</span>
+                        <!-- Only show manage button for recurring subscriptions -->
+                        <a 
+                            v-if="subscriptionStore.subscriptionData.subscriptionId && subscriptionStore.subscriptionData.subscriptionEndDate"
+                            href="#" 
+                            class="btn-manage" 
+                            @click.prevent="handleManageSubscription"
+                        >
+                            Manage Subscription
+                        </a>
+                    </template>
+                </div>
             </div>
         </section>
 
@@ -380,6 +446,62 @@ input {
     color: var(--color-primary);
     font-weight: 600;
     font-size: 1rem;
+}
+
+.subscription-details {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--color-border);
+}
+
+.detail-item {
+    display: flex;
+    justify-content: space-between;
+    margin: 0.5rem 0;
+    font-size: 0.9rem;
+}
+
+.detail-label {
+    color: var(--color-text-muted);
+}
+
+.detail-value {
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.status-active {
+    color: #10b981;
+}
+
+.status-canceled {
+    color: #f59e0b;
+}
+
+.status-expired {
+    color: var(--color-danger);
+}
+
+.subscription-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-end;
+}
+
+.btn-manage {
+    font-size: 0.875rem;
+    color: var(--color-primary);
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--color-primary);
+    border-radius: 6px;
+    transition: all 0.2s;
+}
+
+.btn-manage:hover {
+    background-color: var(--color-primary);
+    color: white;
 }
 
 .preference-item {
