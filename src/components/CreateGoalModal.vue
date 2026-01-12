@@ -18,7 +18,19 @@ const categories = ['General', 'Health', 'Career', 'Finance', 'Education', 'Life
 
 const save = () => {
   if (!form.title) return
-  emit('save', { ...form })
+  
+  emit('save', {
+    title: form.title,
+    category: form.category,
+    dueDate: form.dueDate,
+    smart: {
+      specific: form.specific,
+      measurable: form.measurable,
+      achievable: form.achievable,
+      relevant: form.relevant,
+      timeBound: form.timeBound
+    }
+  })
 }
 </script>
 
@@ -69,6 +81,10 @@ const save = () => {
             <div class="form-group">
               <label>Relevant</label>
               <textarea v-model="form.relevant" placeholder="Why does this goal matter to you?"></textarea>
+            </div>
+            <div class="form-group">
+              <label>Time-bound</label>
+              <textarea v-model="form.timeBound" placeholder="When exactly do you want to accomplish this?"></textarea>
             </div>
           </div>
         </div>

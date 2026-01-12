@@ -11,7 +11,7 @@ const goalId = route.params.id as string
 const goal = computed(() => store.goals.find(g => g.id === goalId))
 
 const newTaskTitle = ref('')
-const newTaskDate = ref('')
+const newTaskDate = ref(new Date().toISOString().split('T')[0])
 const showSmartDetails = ref(false)
 
 const handleAddTask = () => {
@@ -499,7 +499,10 @@ h2 {
   }
   
   .add-task-form input[type="text"],
-  .add-task-form .date-input,
+  .add-task-form .date-input {
+    width: 100%;
+    min-height: 48px; /* Taller touch target */
+  }
   .add-task-form .btn-add {
     width: 100%;
   }
