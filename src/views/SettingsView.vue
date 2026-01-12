@@ -176,6 +176,7 @@ const handleManageSubscription = async () => {
         console.error('Portal error:', error)
         alert('Failed to open subscription management. Please try again.')
     }
+}
 </script>
 
 <template>
