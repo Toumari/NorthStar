@@ -35,10 +35,12 @@ const save = () => {
 
 // Lock body scroll when modal is open
 onMounted(() => {
+  document.documentElement.style.overflow = 'hidden'
   document.body.style.overflow = 'hidden'
 })
 
 onUnmounted(() => {
+  document.documentElement.style.overflow = ''
   document.body.style.overflow = ''
 })
 </script>
@@ -113,27 +115,43 @@ onUnmounted(() => {
   top: 0;
   left: 0;
   width: 100vw;
-  height: 100dvh; /* Use dynamic viewport height for mobile */
+  height: 100dvh;
   background-color: rgba(0, 0, 0, 0.7);
   display: flex;
   justify-content: center;
-  align-items: center;
-  padding: 1rem; /* Provide safe spacing */
+  align-items: center; /* Center by default */
+  padding: 1rem;
+  padding-bottom: env(safe-area-inset-bottom, 1rem); /* Safe area */
   z-index: 100;
   backdrop-filter: blur(4px);
+  overscroll-behavior: none; /* Prevent bounce */
 }
 
 .modal-content {
   background-color: var(--color-surface);
   width: 100%;
   max-width: 600px;
-  max-height: 100%; /* Fill available space up to padding */
+  max-height: 90vh; /* Default desktop max */
   border-radius: 16px;
   display: flex;
   flex-direction: column;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   border: 1px solid var(--color-border);
-  overflow: hidden; /* Ensure only body scrolls */
+  overflow: hidden;
+}
+
+/* Mobile specific overrides */
+@media (max-width: 768px) {
+  .modal-overlay {
+    align-items: flex-end; /* Bottom sheet style safer for inputs */
+    padding: 1rem;
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+  
+  .modal-content {
+    max-height: 85dvh; /* Ensure header is never cut off */
+    /* Optional: rounded top only if flushed to bottom, keeping rounded for now */
+  }
 }
 
 header {
