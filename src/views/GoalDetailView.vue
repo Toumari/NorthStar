@@ -14,6 +14,8 @@ const newTaskTitle = ref('')
 const newTaskDate = ref(new Date().toISOString().split('T')[0])
 const showSmartDetails = ref(false)
 
+const isDeleting = ref(false)
+
 const handleAddTask = () => {
   if (!newTaskTitle.value.trim()) return
   store.addTask(goalId, newTaskTitle.value, newTaskDate.value)
@@ -21,16 +23,24 @@ const handleAddTask = () => {
   newTaskDate.value = ''
 }
 
-const handleDelete = () => {
+const handleDelete = async () => {
   if (confirm('Are you sure you want to delete this goal?')) {
-    store.removeGoal(goalId)
-    router.push('/goals')
+    isDeleting.value = true
+    try {
+        await store.removeGoal(goalId)
+        router.push('/goals')
+    } catch (e) {
+        console.error(e)
+        // If error, revert state (though likely goal is still there)
+        isDeleting.value = false
+        alert('Failed to delete goal.')
+    }
   }
 }
 </script>
 
 <template>
-  <div v-if="goal" class="goal-detail-view">
+  <div v-if="goal && !isDeleting" class="goal-detail-view">
     <header class="page-header">
       <div class="header-content">
         <button class="back-btn" @click="router.back()">← Back</button>
@@ -140,14 +150,14 @@ const handleDelete = () => {
       </div>
     </div>
   </div>
-  <div v-else-if="store.isLoading" class="loading-state">
+  <div v-else-if="store.isLoading || isDeleting" class="loading-state">
     <div class="spinner"></div>
-    <p>Loading goal details...</p>
+    <p>{{ isDeleting ? 'Deleting goal...' : 'Loading goal details...' }}</p>
   </div>
   <div v-else class="not-found">
     <h2>Goal not found</h2>
     <p>The goal you're looking for doesn't exist or you don't have permission to view it.</p>
-    <button @click="router.push('/goals')">Return to Goals</button>
+    <button class="btn-primary" @click="router.push('/goals')">Return to Goals</button>
   </div>
 </template>
 
@@ -437,6 +447,17 @@ h2 {
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+.btn-primary {
+  background-color: var(--color-primary);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-block;
 }
 
 .not-found {

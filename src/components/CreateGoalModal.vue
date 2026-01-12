@@ -248,4 +248,15 @@ footer {
 .btn-primary:hover {
   opacity: 0.9;
 }
+
+@media (max-width: 768px) {
+  .row {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .smart-grid {
+    grid-template-columns: 1fr;
+  }
+}
 </style>

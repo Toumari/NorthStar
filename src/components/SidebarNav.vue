@@ -36,7 +36,7 @@ const handleLogout = async () => {
     </div>
     
     <nav class="nav-links" v-if="store.user">
-      <RouterLink to="/" class="nav-item" active-class="active" @click="$emit('link-clicked')">
+      <RouterLink to="/" class="nav-item" exact-active-class="active" @click="$emit('link-clicked')">
         <span class="icon">📊</span>
         Dashboard
       </RouterLink>
