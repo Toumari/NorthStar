@@ -25,23 +25,17 @@ const content = ref('')
 const isSaving = ref(false)
 const saveMessage = ref('')
 
-// Check if current entry is locked (older than 7 days for free users)
+// Check if current entry can be edited (older than 14 days for free users)
 const isEntryLocked = computed(() => {
   const entryDate = new Date(selectedDate.value)
-  return !subscriptionStore.canAccessJournalEntry(entryDate)
+  return !subscriptionStore.canEditJournalEntry(entryDate)
 })
 
 // Load content when selectedDate changes
 watchEffect(() => {
   const dateStr = selectedDate.value
   const entry = store.entries.find(e => e.date === dateStr)
-  
-  if (isEntryLocked.value) {
-    content.value = entry ? '🔒 This entry is locked. Upgrade to Premium to access your full journal history.' : ''
-  } else {
-    content.value = entry ? entry.content : ''
-  }
-  
+  content.value = entry ? entry.content : ''
   saveMessage.value = ''
 })
 
@@ -105,7 +99,7 @@ const handleDelete = async () => {
              <p class="subtitle">
                Daily Journal
                <span v-if="isEntryLocked" class="locked-badge" @click="showUpgradePrompt = true">
-                 🔒 Locked
+                 🔒 Read-only
                </span>
              </p>
            </div>
@@ -122,8 +116,8 @@ const handleDelete = async () => {
           <div v-if="isEntryLocked" class="lock-overlay" @click="showUpgradePrompt = true">
             <div class="lock-content">
               <div class="lock-icon">🔒</div>
-              <h3>Premium Feature</h3>
-              <p>Upgrade to access journal entries older than 7 days</p>
+              <h3>Read-Only Mode</h3>
+              <p>Entries older than 14 days are read-only for free users.<br>Upgrade to Premium to edit your full journal history.</p>
               <button class="btn-upgrade" @click.stop="showUpgradePrompt = true">Upgrade Now</button>
             </div>
           </div>
@@ -148,7 +142,7 @@ const handleDelete = async () => {
     
     <UpgradePrompt
       v-if="showUpgradePrompt"
-      message="Free users can only access journal entries from the last 7 days. Upgrade to Premium for unlimited journal history!"
+      message="Free users can only edit journal entries from the last 14 days. Upgrade to Premium to edit your full journal history!"
       @close="showUpgradePrompt = false"
     />
   </div>

@@ -31,7 +31,7 @@ export const useSubscriptionStore = defineStore('subscription', () => {
     // Limits
     const FREE_GOAL_LIMIT = 3
     const FREE_TRACKER_LIMIT = 2
-    const FREE_JOURNAL_DAYS = 7
+    const FREE_JOURNAL_EDIT_DAYS = 14
 
     // Load subscription data from Firestore
     const loadSubscription = async () => {
@@ -96,12 +96,12 @@ export const useSubscriptionStore = defineStore('subscription', () => {
         return currentTrackerCount < FREE_TRACKER_LIMIT
     }
 
-    // Check if user can access a journal entry by date
-    const canAccessJournalEntry = (entryDate: Date): boolean => {
+    // Check if user can edit a journal entry by date
+    const canEditJournalEntry = (entryDate: Date): boolean => {
         if (isPremium.value) return true
 
         const daysDiff = Math.floor((Date.now() - entryDate.getTime()) / (1000 * 60 * 60 * 24))
-        return daysDiff <= FREE_JOURNAL_DAYS
+        return daysDiff <= FREE_JOURNAL_EDIT_DAYS
     }
 
     // Get remaining goals
@@ -123,12 +123,12 @@ export const useSubscriptionStore = defineStore('subscription', () => {
         isFree,
         FREE_GOAL_LIMIT,
         FREE_TRACKER_LIMIT,
-        FREE_JOURNAL_DAYS,
+        FREE_JOURNAL_EDIT_DAYS,
         loadSubscription,
         updateSubscription,
         canCreateGoal,
         canCreateTracker,
-        canAccessJournalEntry,
+        canEditJournalEntry,
         getRemainingGoals,
         getRemainingTrackers
     }
