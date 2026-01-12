@@ -202,6 +202,7 @@ const handleGoogleLogin = async () => {
 
           <div class="footer">
             <p>Already have an account? <RouterLink to="/login">Sign in</RouterLink></p>
+            <p class="privacy-link"><RouterLink to="/privacy">Privacy Policy</RouterLink></p>
           </div>
         </div>
       </section>
@@ -486,6 +487,11 @@ input:focus {
 
 .footer a:hover {
   text-decoration: underline;
+}
+
+.privacy-link {
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
 }
 
 @media (max-width: 768px) {
