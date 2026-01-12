@@ -177,6 +177,16 @@ const handleManageSubscription = async () => {
         alert('Failed to open subscription management. Please try again.')
     }
 }
+
+// Debug helper
+const showDebug = ref(false)
+const toggleDebug = () => {
+    showDebug.value = !showDebug.value
+}
+const refreshSubscription = async () => {
+    await subscriptionStore.loadSubscription()
+    alert('Subscription refreshed!')
+}
 </script>
 
 <template>
@@ -270,6 +280,19 @@ const handleManageSubscription = async () => {
                             Manage Subscription
                         </a>
                     </template>
+                </div>
+
+                <!-- Debug Section (Hidden by default) -->
+                <div class="debug-section" style="margin-top: 2rem; border-top: 1px dashed #333; padding-top: 1rem;">
+                    <button @click="toggleDebug" style="background:none; border:none; color: #666; font-size: 0.8rem; cursor: pointer;">
+                        {{ showDebug ? 'Hide Debug Info' : 'Show Debug Info' }}
+                    </button>
+                    <button v-if="showDebug" @click="refreshSubscription" style="margin-left: 10px; font-size: 0.8rem;">
+                        Refresh Data
+                    </button>
+                    <pre v-if="showDebug" style="background: #111; padding: 10px; border-radius: 4px; margin-top: 10px; font-size: 0.75rem; overflow: auto; color: #0f0;">
+{{ JSON.stringify(subscriptionStore.subscriptionData, null, 2) }}
+                    </pre>
                 </div>
             </div>
         </section>
