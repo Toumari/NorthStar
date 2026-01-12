@@ -1,12 +1,18 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
+import { useSubscriptionStore } from '../stores/subscription'
 import { useThemeStore } from '../stores/theme'
 
 const router = useRouter()
 const store = useAuthStore()
+const subscriptionStore = useSubscriptionStore()
 const themeStore = useThemeStore()
+
+onMounted(() => {
+  subscriptionStore.loadSubscription()
+})
 
 const props = defineProps<{
     isOpen?: boolean
@@ -74,6 +80,7 @@ const handleLogout = async () => {
       <div class="avatar">{{ userInitial }}</div>
       <div class="user-info">
         <span class="username">{{ store.user?.displayName || 'User' }}</span>
+        <span v-if="subscriptionStore.isPremium" class="premium-badge">✓ Premium</span>
       </div>
       <button class="theme-toggle" @click.stop="themeStore.toggleTheme" :title="themeStore.isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'">
         {{ themeStore.isDark ? '☀️' : '🌙' }}
@@ -228,6 +235,12 @@ const handleLogout = async () => {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.premium-badge {
+  font-size: 0.75rem;
+  color: var(--color-primary);
+  font-weight: 600;
 }
 
 .btn-logout {
