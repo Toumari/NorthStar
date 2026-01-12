@@ -267,6 +267,9 @@ const handleManageSubscription = async () => {
                             @click.prevent="handleManageSubscription"
                         >
                             Manage Subscription
+                        </a>
+                    </template>
+                </div>
             </div>
         </section>
 
