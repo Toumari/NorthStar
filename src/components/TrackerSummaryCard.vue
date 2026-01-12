@@ -102,6 +102,7 @@ const formattedDate = computed(() => {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
+  gap: 0.5rem;
   margin-bottom: 0.75rem;
 }
 
