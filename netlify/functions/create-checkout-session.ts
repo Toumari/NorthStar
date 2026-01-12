@@ -40,6 +40,11 @@ export const handler: Handler = async (event) => {
             cancel_url: `${process.env.URL}/subscription/cancel`,
             metadata: {
                 userId: userId
+            },
+            subscription_data: {
+                metadata: {
+                    userId: userId
+                }
             }
         })
 
