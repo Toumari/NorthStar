@@ -7,12 +7,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Content-Security-Policy" content="
     default-src 'self';
-    script-src 'self' 'unsafe-inline' 'unsafe-eval' https://apis.google.com https://www.gstatic.com;
+    script-src 'self' 'unsafe-inline' 'unsafe-eval' https://apis.google.com https://www.gstatic.com https://js.stripe.com https://checkout.stripe.com;
     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
     font-src 'self' https://fonts.gstatic.com;
-    img-src 'self' data: https://lh3.googleusercontent.com;
-    connect-src 'self' https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firestore.googleapis.com https://www.googleapis.com ws://localhost:*;
-    frame-src https://*.firebaseapp.com https://apis.google.com;
+    img-src 'self' data: https: blob:;
+    connect-src 'self' https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://firestore.googleapis.com https://www.googleapis.com ws://localhost:* https://api.stripe.com https://checkout.stripe.com https://*.netlify.app https://*.functions.netlify.app;
+    frame-src 'self' https://js.stripe.com https://checkout.stripe.com https://accounts.google.com;
   ">
   <title>PathMark</title>
 </head>
