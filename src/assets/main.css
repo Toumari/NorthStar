@@ -74,11 +74,12 @@
 }
 
 :root.dark .theme-ocean {
-  --color-primary: #38bdf8;
-  /* Sky 400 */
+  --color-primary: #0ea5e9;
+  /* Sky 500 - More saturated than 400 */
   --color-primary-dark: #0284c7;
   /* Sky 600 */
-  --color-primary-light: rgba(56, 189, 248, 0.1);
+  --color-primary-light: rgba(14, 165, 233, 0.2);
+  /* Increased opacity for glow */
 }
 
 /* Sunset (Orange/Pink) */
@@ -91,11 +92,12 @@
 }
 
 :root.dark .theme-sunset {
-  --color-primary: #fdba74;
-  /* Orange 300 */
-  --color-primary-dark: #fb923c;
-  /* Orange 400 */
-  --color-primary-light: rgba(253, 186, 116, 0.1);
+  --color-primary: #f97316;
+  /* Orange 500 - Much warmer than 300 */
+  --color-primary-dark: #ea580c;
+  /* Orange 600 */
+  --color-primary-light: rgba(249, 115, 22, 0.2);
+  /* Increased opacity */
 }
 
 /* Forest (Green) */
@@ -108,11 +110,12 @@
 }
 
 :root.dark .theme-forest {
-  --color-primary: #6ee7b7;
-  /* Emerald 300 */
-  --color-primary-dark: #34d399;
-  /* Emerald 400 */
-  --color-primary-light: rgba(110, 231, 183, 0.1);
+  --color-primary: #10b981;
+  /* Emerald 500 - Deeper green than 300 */
+  --color-primary-dark: #059669;
+  /* Emerald 600 */
+  --color-primary-light: rgba(16, 185, 129, 0.2);
+  /* Increased opacity */
 }
 
 /* Lavender (Purple) */
@@ -125,11 +128,12 @@
 }
 
 :root.dark .theme-lavender {
-  --color-primary: #c4b5fd;
-  /* Violet 300 */
-  --color-primary-dark: #a78bfa;
-  /* Violet 400 */
-  --color-primary-light: rgba(196, 181, 253, 0.1);
+  --color-primary: #a78bfa;
+  /* Violet 400 - Slightly brighter than 300 */
+  --color-primary-dark: #8b5cf6;
+  /* Violet 500 */
+  --color-primary-light: rgba(167, 139, 250, 0.2);
+  /* Increased opacity */
 }
 
 body {
