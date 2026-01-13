@@ -509,13 +509,21 @@ input:focus {
 }
 
 @media (max-width: 768px) {
+  .auth-view {
+    padding: 0;
+  }
+
   .auth-container {
     flex-direction: column;
-    min-height: auto;
+    min-height: 100vh;
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
   }
 
   .features-panel {
     padding: 2rem;
+    padding-top: calc(2rem + env(safe-area-inset-top));
   }
 
   .brand {
