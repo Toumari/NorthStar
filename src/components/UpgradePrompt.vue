@@ -80,6 +80,8 @@ defineEmits<{
   position: relative;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   text-align: center;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 .close-btn {
