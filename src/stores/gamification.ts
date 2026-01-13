@@ -26,7 +26,6 @@ export const useGamificationStore = defineStore('gamification', () => {
     const level = ref(1)
     const unlockedBadgeIds = ref<string[]>([])
     const recentUnlock = ref<Badge | null>(null) // For toast/notification
-    const hasSeenTour = ref(false)
 
     // Constants
     const XP_PER_LEVEL_BASE = 100
@@ -90,7 +89,6 @@ export const useGamificationStore = defineStore('gamification', () => {
                     xp.value = data.xp || 0
                     level.value = data.level || 1
                     unlockedBadgeIds.value = data.badges || []
-                    hasSeenTour.value = data.hasSeenTour || false
                 } else {
                     // Initialize if missing
                     await initGamification(userDocRef)
@@ -105,14 +103,12 @@ export const useGamificationStore = defineStore('gamification', () => {
         const initialState = {
             xp: 0,
             level: 1,
-            badges: [],
-            hasSeenTour: false
+            badges: []
         }
         await setDoc(docRef, { gamification: initialState }, { merge: true })
         xp.value = 0
         level.value = 1
         unlockedBadgeIds.value = []
-        hasSeenTour.value = false
     }
 
     const saveGamificationData = async () => {
@@ -122,8 +118,7 @@ export const useGamificationStore = defineStore('gamification', () => {
                 gamification: {
                     xp: xp.value,
                     level: level.value,
-                    badges: unlockedBadgeIds.value,
-                    hasSeenTour: hasSeenTour.value
+                    badges: unlockedBadgeIds.value
                 }
             })
         } catch (error) {
@@ -164,11 +159,6 @@ export const useGamificationStore = defineStore('gamification', () => {
         }
     }
 
-    const completeTour = async () => {
-        hasSeenTour.value = true
-        await saveGamificationData()
-    }
-
     return {
         xp,
         level,
@@ -177,11 +167,9 @@ export const useGamificationStore = defineStore('gamification', () => {
         xpToNextLevel,
         progressPercent,
         recentUnlock,
-        hasSeenTour,
         loadGamificationData,
         awardXP,
         unlockBadge,
-        completeTour,
         AVAILABLE_BADGES
     }
 })
