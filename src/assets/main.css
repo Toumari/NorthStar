@@ -73,7 +73,7 @@
   --color-primary-light: rgba(2, 132, 199, 0.1);
 }
 
-:root.dark .theme-ocean {
+:root.dark.theme-ocean {
   --color-primary: #0ea5e9;
   /* Sky 500 - More saturated than 400 */
   --color-primary-dark: #0284c7;
@@ -91,7 +91,7 @@
   --color-primary-light: rgba(249, 115, 22, 0.1);
 }
 
-:root.dark .theme-sunset {
+:root.dark.theme-sunset {
   --color-primary: #f97316;
   /* Orange 500 - Much warmer than 300 */
   --color-primary-dark: #ea580c;
@@ -109,7 +109,7 @@
   --color-primary-light: rgba(16, 185, 129, 0.1);
 }
 
-:root.dark .theme-forest {
+:root.dark.theme-forest {
   --color-primary: #10b981;
   /* Emerald 500 - Deeper green than 300 */
   --color-primary-dark: #059669;
@@ -127,7 +127,7 @@
   --color-primary-light: rgba(139, 92, 246, 0.1);
 }
 
-:root.dark .theme-lavender {
+:root.dark.theme-lavender {
   --color-primary: #a78bfa;
   /* Violet 400 - Slightly brighter than 300 */
   --color-primary-dark: #8b5cf6;
