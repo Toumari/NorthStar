@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue'
 import { RouterView, useRoute } from 'vue-router'
 import SidebarNav from './components/SidebarNav.vue'
+import OnboardingTour from './components/OnboardingTour.vue'
 import { useThemeStore } from './stores/theme'
 
 const isMobileMenuOpen = ref(false)
@@ -45,6 +46,8 @@ const closeMobileMenu = () => {
         </Transition>
       </RouterView>
     </main>
+
+    <OnboardingTour />
   </div>
 </template>
 

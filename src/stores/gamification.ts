@@ -26,12 +26,13 @@ export const useGamificationStore = defineStore('gamification', () => {
     const level = ref(1)
     const unlockedBadgeIds = ref<string[]>([])
     const recentUnlock = ref<Badge | null>(null) // For toast/notification
+    const hasSeenTour = ref(false)
 
     // Constants
     const XP_PER_LEVEL_BASE = 100
     const XP_MULTIPLIER = 1.5 // Each level needs 1.5x more XP than the last
 
-    // Badge Definitions (Static for now)
+    // Badge Definitions
     const AVAILABLE_BADGES: Record<string, Badge> = {
         'first_goal': {
             id: 'first_goal',
@@ -68,8 +69,6 @@ export const useGamificationStore = defineStore('gamification', () => {
 
     const xpToNextLevel = computed(() => {
         // Simple formula: Level 1 needs 100, Level 2 needs 150, etc.
-        // Or cleaner: 100 * (Level ^ 1.2) or similar.
-        // Let's stick to linear-ish for MVP: Base * Level
         return XP_PER_LEVEL_BASE * level.value
     })
 
@@ -86,11 +85,12 @@ export const useGamificationStore = defineStore('gamification', () => {
             const userDoc = await getDoc(userDocRef)
 
             if (userDoc.exists()) {
-                const data = userDoc.data().gamification as GamificationState
+                const data = userDoc.data().gamification as any
                 if (data) {
                     xp.value = data.xp || 0
                     level.value = data.level || 1
                     unlockedBadgeIds.value = data.badges || []
+                    hasSeenTour.value = data.hasSeenTour || false
                 } else {
                     // Initialize if missing
                     await initGamification(userDocRef)
@@ -102,15 +102,17 @@ export const useGamificationStore = defineStore('gamification', () => {
     }
 
     const initGamification = async (docRef: any) => {
-        const initialState: GamificationState = {
+        const initialState = {
             xp: 0,
             level: 1,
-            badges: []
+            badges: [],
+            hasSeenTour: false
         }
         await setDoc(docRef, { gamification: initialState }, { merge: true })
         xp.value = 0
         level.value = 1
         unlockedBadgeIds.value = []
+        hasSeenTour.value = false
     }
 
     const saveGamificationData = async () => {
@@ -120,7 +122,8 @@ export const useGamificationStore = defineStore('gamification', () => {
                 gamification: {
                     xp: xp.value,
                     level: level.value,
-                    badges: unlockedBadgeIds.value
+                    badges: unlockedBadgeIds.value,
+                    hasSeenTour: hasSeenTour.value
                 }
             })
         } catch (error) {
@@ -161,16 +164,24 @@ export const useGamificationStore = defineStore('gamification', () => {
         }
     }
 
+    const completeTour = async () => {
+        hasSeenTour.value = true
+        await saveGamificationData()
+    }
+
     return {
         xp,
         level,
         unlockedBadges,
+        unlockedBadgeIds,
         xpToNextLevel,
         progressPercent,
         recentUnlock,
+        hasSeenTour,
         loadGamificationData,
         awardXP,
         unlockBadge,
+        completeTour,
         AVAILABLE_BADGES
     }
 })

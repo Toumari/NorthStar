@@ -76,16 +76,47 @@ const handleCreateTracker = (trackerData: any) => {
       </div>
     </div>
     
+    
+    <!-- Recent Achievements & Next Steps -->
     <section class="achievements-section" v-if="gamificationStore.unlockedBadges.length > 0">
         <header class="section-header">
-            <h3>Achievements</h3>
+            <h3>Recent Unlocks</h3>
+            <RouterLink to="/badges" class="view-all">View All Badges</RouterLink>
         </header>
-        <div class="badges-grid">
-            <div class="badge-card" v-for="badge in gamificationStore.unlockedBadges" :key="badge.id">
-                <span class="badge-icon">{{ badge.icon }}</span>
-                <div class="badge-info">
-                    <h4>{{ badge.name }}</h4>
-                    <p>{{ badge.description }}</p>
+        <div class="badges-row">
+            <!-- Show only the most recent badge (last one added) -->
+            <div 
+                v-if="gamificationStore.recentUnlock || gamificationStore.unlockedBadges.length > 0" 
+                class="badge-card recent-badge"
+            >
+                <div class="badge-content">
+                     <span class="badge-icon">{{ (gamificationStore.recentUnlock || gamificationStore.unlockedBadges[gamificationStore.unlockedBadges.length - 1]).icon }}</span>
+                     <div class="badge-info">
+                        <span class="label">Just Unlocked!</span>
+                        <h4>{{ (gamificationStore.recentUnlock || gamificationStore.unlockedBadges[gamificationStore.unlockedBadges.length - 1]).name }}</h4>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Simple 'Next Step' Suggestion (Hardcoded logic for MVP demo) -->
+            <div class="badge-card next-step-badge" v-if="!gamificationStore.unlockedBadgeIds.includes('writer_streak')">
+                 <div class="badge-content">
+                     <span class="badge-icon locked">🔒</span>
+                     <div class="badge-info">
+                        <span class="label">Next Goal</span>
+                        <h4>Dedicated Writer</h4>
+                        <p class="progress-text">Write 3 journal entries</p>
+                    </div>
+                </div>
+            </div>
+             <div class="badge-card next-step-badge" v-else-if="!gamificationStore.unlockedBadgeIds.includes('tracker_pro')">
+                 <div class="badge-content">
+                     <span class="badge-icon locked">🔒</span>
+                     <div class="badge-info">
+                        <span class="label">Next Goal</span>
+                        <h4>Tracker Pro</h4>
+                        <p class="progress-text">Add 10 tracker points</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -406,26 +437,36 @@ const handleCreateTracker = (trackerData: any) => {
     margin-bottom: 2rem;
 }
 
-.badges-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 1rem;
+
+.achievements-section {
+    margin-bottom: 2rem;
+}
+
+.badges-row {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
 }
 
 .badge-card {
+    flex: 1;
+    min-width: 250px;
     background-color: var(--color-surface);
     border: 1px solid var(--color-border);
     border-radius: 12px;
     padding: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
     transition: transform 0.2s;
 }
 
-.badge-card:hover {
-    transform: translateY(-2px);
+.badge-content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.recent-badge {
     border-color: var(--color-warning);
+    background: linear-gradient(to right, var(--color-surface), rgba(251, 191, 36, 0.05));
 }
 
 .badge-icon {
@@ -437,15 +478,31 @@ const handleCreateTracker = (trackerData: any) => {
     align-items: center;
     justify-content: center;
     border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.badge-icon.locked {
+    background-color: var(--color-border);
+    font-size: 1.5rem;
+    filter: grayscale(1);
 }
 
 .badge-info h4 {
     margin: 0;
-    font-size: 0.9rem;
+    font-size: 0.95rem;
     color: var(--color-text);
 }
 
-.badge-info p {
+.badge-info .label {
+    display: block;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    font-weight: 700;
+    margin-bottom: 0.2rem;
+}
+
+.progress-text {
     margin: 0;
     font-size: 0.8rem;
     color: var(--color-text-muted);
