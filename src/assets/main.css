@@ -213,6 +213,8 @@ textarea {
   border-radius: 0;
   min-height: 44px;
   /* Touch target size */
+  font-size: 16px;
+  /* Prevent iOS zoom */
 }
 
 /* Adjust textarea min-height override */

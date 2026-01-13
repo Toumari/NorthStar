@@ -1,0 +1,15 @@
+22cb972 chore: remove activity heatmap feature
+8ea12d7 style(heatmap): add custom sleek horizontal scrollbar
+fddaf69 Revert "feat(ui): implement 12-column dashboard grid and style scrollbars"
+6aee6ce feat(ui): implement 12-column dashboard grid and style scrollbars
+5dd7578 style(ui): reduce heatmap container width to fit content
+90392d3 feat(ui): update heatmap to match github contribution graph style
+1be7d97 feat: add activity heatmap tracker
+5842c8f fix(css): correct dark mode theme selector specificity
+15f2a1b style(theme): enhance dark mode color vibrancy and distinction
+e3d2673 style(shop): improve theme preview colors for dark mode
+7ec617d fix(css): resolve syntax error in GoalDetailView.vue
+e963734 feat: enable goal editing and improve smart details view
+0610675 feat: enhance form UX with inline errors, required flags, and defaults
+8f9c8df feat: implement input validation across auth, modals, and main views
+1bdac07 fix(css): restore missing :root.dark selector in variables
