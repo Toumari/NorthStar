@@ -3,15 +3,18 @@ import { computed, onMounted } from 'vue'
 import { RouterLink, useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { useSubscriptionStore } from '../stores/subscription'
+import { useGamificationStore } from '../stores/gamification'
 import { useThemeStore } from '../stores/theme'
 
 const router = useRouter()
 const store = useAuthStore()
 const subscriptionStore = useSubscriptionStore()
+const gamificationStore = useGamificationStore()
 const themeStore = useThemeStore()
 
 onMounted(() => {
   subscriptionStore.loadSubscription()
+  gamificationStore.loadGamificationData()
 })
 
 const props = defineProps<{
@@ -77,11 +80,21 @@ const handleLogout = async () => {
     </nav>
 
     <div class="user-profile" v-if="store.user">
-      <div class="avatar">{{ userInitial }}</div>
-      <div class="user-info">
-        <span class="username">{{ store.user?.displayName || 'User' }}</span>
-        <span v-if="subscriptionStore.isPremium" class="premium-badge">✓ Premium</span>
+      <!-- Profile & Level -->
+      <div class="profile-header">
+        <div class="avatar">{{ userInitial }}</div>
+        <div class="user-info">
+            <span class="username">{{ store.user?.displayName || 'User' }}</span>
+            <span class="level-badge" v-if="gamificationStore.level > 1">Lvl {{ gamificationStore.level }}</span>
+            <span v-else-if="subscriptionStore.isPremium" class="premium-badge">✓ Premium</span>
+        </div>
       </div>
+      
+      <!-- XP Bar -->
+      <div class="xp-container" :title="`XP: ${Math.floor(gamificationStore.xp)} / ${gamificationStore.xpToNextLevel}`">
+        <div class="xp-bar" :style="{ width: gamificationStore.progressPercent + '%' }"></div>
+      </div>
+
       <button class="theme-toggle" @click.stop="themeStore.toggleTheme" :title="themeStore.isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'">
         {{ themeStore.isDark ? '☀️' : '🌙' }}
       </button>
@@ -90,6 +103,39 @@ const handleLogout = async () => {
 </template>
 
 <style scoped>
+/* Only showing NEW or MODIFIED styles for brevity */
+
+.profile-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+    width: 100%;
+}
+
+.level-badge {
+    font-size: 0.75rem;
+    color: var(--color-warning);
+    font-weight: 700;
+}
+
+.xp-container {
+    width: 100%;
+    height: 4px;
+    background-color: var(--color-border);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 0.5rem; /* Space before toggle if needed, or rearrange */
+}
+
+.xp-bar {
+    height: 100%;
+    background-color: var(--color-warning);
+    transition: width 0.5s ease-out;
+}
+
+/* ... existing styles ... */
+
 .sidebar {
   width: 250px;
   background-color: var(--color-surface);

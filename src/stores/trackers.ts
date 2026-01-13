@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, watchEffect } from 'vue'
 import { db } from '../firebase'
 import { useAuthStore } from './auth'
+import { useGamificationStore } from './gamification'
 import {
     collection,
     addDoc,
@@ -84,6 +85,20 @@ export const useTrackersStore = defineStore('trackers', () => {
             await updateDoc(doc(db, `users/${user.uid}/trackers`, trackerId), {
                 data: newData
             })
+
+            // Gamification Hook
+            const gamificationStore = useGamificationStore()
+            gamificationStore.awardXP(5)
+
+            // Check total data points across all trackers
+            const totalPoints = trackers.value.reduce((sum, t) => {
+                const count = t.id === trackerId ? newData.length : t.data.length
+                return sum + count
+            }, 0)
+
+            if (totalPoints >= 10) {
+                gamificationStore.unlockBadge('tracker_pro')
+            }
         }
     }
 

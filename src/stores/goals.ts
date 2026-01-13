@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, computed, watchEffect } from 'vue'
 import { db } from '../firebase'
 import { useAuthStore } from './auth'
+import { useGamificationStore } from './gamification'
 import {
     collection,
     addDoc,
@@ -130,11 +131,20 @@ export const useGoalsStore = defineStore('goals', () => {
             completed = progress === 100
         }
 
+        const wasCompleted = goals.value.find(g => g.id === goalId)?.completed || false
+
         await updateGoal(goalId, {
             tasks: currentTasks,
             progress,
             completed
         })
+
+        // Gamification Hook
+        if (completed && !wasCompleted) {
+            const gamificationStore = useGamificationStore()
+            gamificationStore.awardXP(50)
+            gamificationStore.unlockBadge('first_goal')
+        }
     }
 
     const addTask = async (goalId: string, taskTitle: string, dueDate?: string) => {

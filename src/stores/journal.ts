@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, watchEffect } from 'vue'
 import { db } from '../firebase'
 import { useAuthStore } from './auth'
+import { useGamificationStore } from './gamification'
 import {
     collection,
     addDoc,
@@ -68,6 +69,14 @@ export const useJournalStore = defineStore('journal', () => {
                 date,
                 createdAt: Date.now()
             })
+
+            // Gamification Hook
+            const gamificationStore = useGamificationStore()
+            gamificationStore.awardXP(10)
+
+            if (entries.value.length + 1 >= 3) {
+                gamificationStore.unlockBadge('writer_streak')
+            }
         }
     }
 

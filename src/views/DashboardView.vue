@@ -3,6 +3,7 @@ import { useGoalsStore } from '../stores/goals'
 import { useJournalStore } from '../stores/journal'
 import { useTrackersStore } from '../stores/trackers'
 import { useSubscriptionStore } from '../stores/subscription'
+import { useGamificationStore } from '../stores/gamification'
 import GoalCard from '../components/GoalCard.vue'
 import TrackerSummaryCard from '../components/TrackerSummaryCard.vue'
 import { RouterLink } from 'vue-router'
@@ -17,6 +18,7 @@ const store = useGoalsStore()
 const journalStore = useJournalStore()
 const trackersStore = useTrackersStore()
 const subscriptionStore = useSubscriptionStore()
+const gamificationStore = useGamificationStore()
 
 const showGoalModal = ref(false)
 const showTrackerModal = ref(false)
@@ -73,6 +75,21 @@ const handleCreateTracker = (trackerData: any) => {
         <p class="stat-value">{{ store.todaysTasksCount }}</p>
       </div>
     </div>
+    
+    <section class="achievements-section" v-if="gamificationStore.unlockedBadges.length > 0">
+        <header class="section-header">
+            <h3>Achievements</h3>
+        </header>
+        <div class="badges-grid">
+            <div class="badge-card" v-for="badge in gamificationStore.unlockedBadges" :key="badge.id">
+                <span class="badge-icon">{{ badge.icon }}</span>
+                <div class="badge-info">
+                    <h4>{{ badge.name }}</h4>
+                    <p>{{ badge.description }}</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
     <section class="recent-goals">
       <header class="section-header">
@@ -384,4 +401,53 @@ const handleCreateTracker = (trackerData: any) => {
   color: var(--color-text-muted);
 }
 
+
+.achievements-section {
+    margin-bottom: 2rem;
+}
+
+.badges-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.badge-card {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: transform 0.2s;
+}
+
+.badge-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--color-warning);
+}
+
+.badge-icon {
+    font-size: 2rem;
+    background-color: var(--color-surface-hover);
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+.badge-info h4 {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--color-text);
+}
+
+.badge-info p {
+    margin: 0;
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+}
 </style>
