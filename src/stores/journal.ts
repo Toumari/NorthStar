@@ -74,8 +74,23 @@ export const useJournalStore = defineStore('journal', () => {
             const gamificationStore = useGamificationStore()
             gamificationStore.awardXP(10)
 
-            if (entries.value.length + 1 >= 3) {
+            // Streak & Volume Check
+            const entryCount = entries.value.length + 1
+            if (entryCount >= 3) {
                 gamificationStore.unlockBadge('writer_streak')
+            }
+            if (entryCount >= 10) {
+                gamificationStore.unlockBadge('journal_enthusiast')
+            }
+
+            // Time-based Achievements
+            const hour = new Date(date + 'T12:00:00').getHours() // Fallback if date is just YYYY-MM-DD
+            const currentHour = new Date().getHours() // Use actual current time for "Night Owl" / "Early Bird"
+
+            if (currentHour < 8) {
+                gamificationStore.unlockBadge('early_bird')
+            } else if (currentHour >= 22) {
+                gamificationStore.unlockBadge('night_owl')
             }
         }
     }

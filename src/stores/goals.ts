@@ -144,6 +144,12 @@ export const useGoalsStore = defineStore('goals', () => {
             const gamificationStore = useGamificationStore()
             gamificationStore.awardXP(50)
             gamificationStore.unlockBadge('first_goal')
+
+            // Check for Goal Master (5 goals)
+            const completedCount = completedGoals.value.length
+            if (completedCount >= 5) {
+                gamificationStore.unlockBadge('goal_master')
+            }
         }
     }
 

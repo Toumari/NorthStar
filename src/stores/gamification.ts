@@ -39,17 +39,47 @@ export const useGamificationStore = defineStore('gamification', () => {
             description: 'Completed your first goal!',
             icon: '🎯'
         },
+        'goal_master': {
+            id: 'goal_master',
+            name: 'Goal Master',
+            description: 'Completed 5 goals.',
+            icon: '🏆'
+        },
         'writer_streak': {
             id: 'writer_streak',
             name: 'Dedicated Writer',
             description: 'Created 3 journal entries.',
             icon: '✍️'
         },
+        'journal_enthusiast': {
+            id: 'journal_enthusiast',
+            name: 'Journal Enthusiast',
+            description: 'Created 10 journal entries.',
+            icon: '📖'
+        },
+        'night_owl': {
+            id: 'night_owl',
+            name: 'Night Owl',
+            description: 'Wrote a journal entry after 10 PM.',
+            icon: '🦉'
+        },
+        'early_bird': {
+            id: 'early_bird',
+            name: 'Early Bird',
+            description: 'Wrote a journal entry before 8 AM.',
+            icon: '🌅'
+        },
         'tracker_pro': {
             id: 'tracker_pro',
             name: 'Data Scientist',
             description: 'Added 10 data points to your trackers.',
             icon: '📊'
+        },
+        'tracker_titan': {
+            id: 'tracker_titan',
+            name: 'Tracker Titan',
+            description: 'Added 50 data points to your trackers.',
+            icon: '📈'
         },
         'level_5': {
             id: 'level_5',

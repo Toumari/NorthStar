@@ -56,6 +56,34 @@ const isUnlocked = (badgeId: string) => unlockedIds.value.includes(badgeId)
         </div>
       </div>
     </div>
+
+    <!-- XP Guide Section -->
+    <section class="xp-guide">
+        <h3>How to Earn XP</h3>
+        <div class="xp-methods">
+            <div class="xp-method-card">
+                <span class="method-icon">🎯</span>
+                <div class="method-info">
+                    <h4>Reach a Goal</h4>
+                    <span class="xp-value">+50 XP</span>
+                </div>
+            </div>
+            <div class="xp-method-card">
+                <span class="method-icon">✍️</span>
+                <div class="method-info">
+                    <h4>Journal Entry</h4>
+                    <span class="xp-value">+10 XP</span>
+                </div>
+            </div>
+            <div class="xp-method-card">
+                <span class="method-icon">📊</span>
+                <div class="method-info">
+                    <h4>Track Data</h4>
+                    <span class="xp-value">+5 XP</span>
+                </div>
+            </div>
+        </div>
+    </section>
   </div>
 </template>
 
@@ -239,8 +267,52 @@ const isUnlocked = (badgeId: string) => unlockedIds.value.includes(badgeId)
     color: var(--color-success);
 }
 
+
 .status-tag.locked-tag {
     background-color: var(--color-surface-hover);
     color: var(--color-text-muted);
+}
+
+.xp-guide {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--color-border);
+}
+
+.xp-guide h3 {
+    margin-bottom: 1.5rem;
+    color: var(--color-text);
+}
+
+.xp-methods {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.xp-method-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    padding: 1rem;
+    border-radius: 8px;
+}
+
+.method-icon {
+    font-size: 1.5rem;
+}
+
+.method-info h4 {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--color-text);
+}
+
+.xp-value {
+    font-weight: 700;
+    color: var(--color-warning);
+    font-size: 0.8rem;
 }
 </style>

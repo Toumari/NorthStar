@@ -99,6 +99,9 @@ export const useTrackersStore = defineStore('trackers', () => {
             if (totalPoints >= 10) {
                 gamificationStore.unlockBadge('tracker_pro')
             }
+            if (totalPoints >= 50) {
+                gamificationStore.unlockBadge('tracker_titan')
+            }
         }
     }
 
