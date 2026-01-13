@@ -1,13 +1,68 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useGamificationStore } from '../stores/gamification'
+import { useGoalsStore } from '../stores/goals'
+import { useJournalStore } from '../stores/journal'
+import { useTrackersStore } from '../stores/trackers'
 
 const store = useGamificationStore()
+const goalsStore = useGoalsStore()
+const journalStore = useJournalStore()
+const trackersStore = useTrackersStore()
 
 const allBadges = computed(() => Object.values(store.AVAILABLE_BADGES))
 const unlockedIds = computed(() => store.unlockedBadgeIds)
 
 const isUnlocked = (badgeId: string) => unlockedIds.value.includes(badgeId)
+
+const getBadgeProgress = (badgeId: string) => {
+    // If unlocked, it's 100%
+    if (isUnlocked(badgeId)) return { current: 1, total: 1, percent: 100 }
+
+    let current = 0
+    let total = 0
+
+    switch (badgeId) {
+        case 'first_goal':
+            current = goalsStore.completedGoals.length
+            total = 1
+            break
+        case 'goal_master':
+            current = goalsStore.completedGoals.length
+            total = 5
+            break
+        case 'writer_streak':
+            current = journalStore.entries.length
+            total = 3
+            break
+        case 'journal_enthusiast':
+            current = journalStore.entries.length
+            total = 10
+            break
+        case 'tracker_pro':
+            current = trackersStore.trackers.reduce((sum, t) => sum + t.data.length, 0)
+            total = 10
+            break
+        case 'tracker_titan':
+            current = trackersStore.trackers.reduce((sum, t) => sum + t.data.length, 0)
+            total = 50
+            break
+        case 'level_5':
+            current = store.level
+            total = 5
+            break
+        default:
+            return null // No progress tracking for this badge (e.g. time-based ones)
+    }
+
+    if (current > total) current = total
+
+    return {
+        current,
+        total,
+        percent: (current / total) * 100
+    }
+}
 </script>
 
 <template>
@@ -51,8 +106,22 @@ const isUnlocked = (badgeId: string) => unlockedIds.value.includes(badgeId)
         <div class="badge-info">
             <h4>{{ badge.name }}</h4>
             <p>{{ badge.description }}</p>
+            
             <div class="status-tag" v-if="isUnlocked(badge.id)">Unlocked</div>
-            <div class="status-tag locked-tag" v-else>Locked</div>
+            
+            <template v-else>
+                <div class="status-tag locked-tag">Locked</div>
+                
+                <!-- Progress Bar for Locked Badges -->
+                <div class="badge-progress" v-if="getBadgeProgress(badge.id)">
+                    <div class="progress-details">
+                        <span class="progress-text">{{ getBadgeProgress(badge.id)!.current }} / {{ getBadgeProgress(badge.id)!.total }}</span>
+                    </div>
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill" :style="{ width: getBadgeProgress(badge.id)!.percent + '%' }"></div>
+                    </div>
+                </div>
+            </template>
         </div>
       </div>
     </div>
@@ -271,6 +340,36 @@ const isUnlocked = (badgeId: string) => unlockedIds.value.includes(badgeId)
 .status-tag.locked-tag {
     background-color: var(--color-surface-hover);
     color: var(--color-text-muted);
+}
+
+.badge-progress {
+    margin-top: 0.75rem;
+}
+
+.progress-details {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 0.25rem;
+}
+
+.progress-text {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    font-weight: 600;
+}
+
+.progress-bar-bg {
+    height: 6px;
+    background-color: var(--color-surface-hover);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background-color: var(--color-primary);
+    border-radius: 3px;
+    transition: width 0.3s ease;
 }
 
 .xp-guide {
