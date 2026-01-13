@@ -141,7 +141,7 @@ const handleCreateTracker = (trackerData: any) => {
         <div class="empty-goal-card card" v-else @click="handleCreateGoalClick">
            <div class="empty-content">
              <span class="icon-large">+</span>
-             <p>Create your first goal</p>
+             <p>Create a goal</p>
              <span class="sub-text">Set your PathMark</span>
            </div>
         </div>
