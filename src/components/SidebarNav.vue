@@ -61,6 +61,10 @@ const handleLogout = async () => {
         <span class="icon">📈</span>
         Trackers
       </RouterLink>
+      <RouterLink to="/badges" class="nav-item" active-class="active" @click="$emit('link-clicked')">
+        <span class="icon">🏆</span>
+        Badges
+      </RouterLink>
       <RouterLink to="/settings" class="nav-item" active-class="active" @click="$emit('link-clicked')">
         <span class="icon">⚙️</span>
         Settings
@@ -85,21 +89,20 @@ const handleLogout = async () => {
         <div class="avatar">{{ userInitial }}</div>
         <div class="user-info">
             <span class="username">{{ store.user?.displayName || 'User' }}</span>
-            <span class="level-badge" v-if="gamificationStore.level > 1">Lvl {{ gamificationStore.level }} Navigator</span>
-            <span v-else-if="subscriptionStore.isPremium" class="premium-badge">✓ Premium</span>
+            <span v-if="subscriptionStore.isPremium" class="premium-badge">✓ Premium</span>
+            
+            <!-- XP Info Block -->
+            <div class="level-stats">
+               <div class="level-info">
+                   <span class="level-badge">Lvl {{ gamificationStore.level }}</span>
+                   <span class="xp-text">{{ Math.floor(gamificationStore.xp) }} / {{ gamificationStore.xpToNextLevel }} XP</span>
+               </div>
+               <div class="xp-container-mini">
+                    <div class="xp-bar" :style="{ width: gamificationStore.progressPercent + '%' }"></div>
+               </div>
+            </div>
         </div>
       </div>
-      
-      <!-- XP Bar / Player Card -->
-      <RouterLink to="/badges" class="player-card" title="View Badges">
-          <div class="xp-info">
-              <span>Level {{ gamificationStore.level }}</span>
-              <span class="xp-nums">{{ Math.floor(gamificationStore.xp) }} / {{ gamificationStore.xpToNextLevel }} XP</span>
-          </div>
-          <div class="xp-container">
-            <div class="xp-bar" :style="{ width: gamificationStore.progressPercent + '%' }"></div>
-          </div>
-      </RouterLink>
 
       <button class="theme-toggle" @click.stop="themeStore.toggleTheme" :title="themeStore.isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'">
         {{ themeStore.isDark ? '☀️' : '🌙' }}
@@ -108,56 +111,45 @@ const handleLogout = async () => {
   </aside>
 </template>
 
+
 <style scoped>
 /* Only showing NEW or MODIFIED styles for brevity */
+
 
 .profile-header {
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    margin-bottom: 1rem;
     width: 100%;
 }
 
+.level-stats {
+    margin-top: 0.25rem;
+    width: 100%;
+}
+
+.level-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.7rem;
+    margin-bottom: 0.15rem;
+}
+
 .level-badge {
-    font-size: 0.75rem;
     color: var(--color-warning);
     font-weight: 700;
 }
 
-.player-card {
-    display: block;
-    background-color: var(--color-surface-hover);
-    padding: 0.75rem;
-    border-radius: 8px;
-    margin-bottom: 1rem;
-    text-decoration: none;
-    border: 1px solid transparent;
-    transition: border-color 0.2s;
-}
-
-.player-card:hover {
-    border-color: var(--color-border);
-}
-
-.xp-info {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.75rem;
-    color: var(--color-text);
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-}
-
-.xp-nums {
+.xp-text {
     color: var(--color-text-muted);
 }
 
-.xp-container {
+.xp-container-mini {
     width: 100%;
-    height: 8px; /* Increased height */
+    height: 4px;
     background-color: var(--color-border);
-    border-radius: 4px;
+    border-radius: 2px;
     overflow: hidden;
 }
 
