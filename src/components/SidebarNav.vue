@@ -64,6 +64,10 @@ const handleLogout = async () => {
         <span class="icon">🏆</span>
         Badges
       </RouterLink>
+      <RouterLink to="/shop" class="nav-item" active-class="active" @click="$emit('link-clicked')">
+        <span class="icon">🛍️</span>
+        XP Shop
+      </RouterLink>
       <RouterLink to="/settings" class="nav-item" active-class="active" @click="$emit('link-clicked')">
         <span class="icon">⚙️</span>
         Settings

@@ -15,7 +15,9 @@ export interface Badge {
 export interface GamificationState {
     xp: number
     level: number
+    coins: number
     badges: string[] // IDs of unlocked badges
+    unlockedItems: string[] // IDs of unlocked shop items
 }
 
 export const useGamificationStore = defineStore('gamification', () => {
@@ -24,12 +26,54 @@ export const useGamificationStore = defineStore('gamification', () => {
     // State
     const xp = ref(0)
     const level = ref(1)
+    const coins = ref(0)
     const unlockedBadgeIds = ref<string[]>([])
+    const unlockedItemIds = ref<string[]>([])
     const recentUnlock = ref<Badge | null>(null) // For toast/notification
 
     // Constants
     const XP_PER_LEVEL_BASE = 100
-    const XP_MULTIPLIER = 1.5 // Each level needs 1.5x more XP than the last
+    // const XP_MULTIPLIER = 1.5 // (Unused in current formula, keeping for reference)
+
+    // Shop Items
+    const SHOP_ITEMS = [
+        {
+            id: 'theme_ocean',
+            type: 'theme',
+            targetId: 'ocean', // Maps to theme store ID
+            name: 'Ocean Blue',
+            description: 'The classic blue theme.',
+            cost: 0, // Default
+            icon: '🌊'
+        },
+        {
+            id: 'theme_sunset',
+            type: 'theme',
+            targetId: 'sunset',
+            name: 'Sunset Orange',
+            description: 'Warm and energetic vibes.',
+            cost: 500,
+            icon: '🌅'
+        },
+        {
+            id: 'theme_forest',
+            type: 'theme',
+            targetId: 'forest',
+            name: 'Forest Green',
+            description: 'Calm and natural.',
+            cost: 750,
+            icon: '🌲'
+        },
+        {
+            id: 'theme_lavender',
+            type: 'theme',
+            targetId: 'lavender',
+            name: 'Lavender Purple',
+            description: 'Creative and peaceful.',
+            cost: 1000,
+            icon: '💜'
+        }
+    ]
 
     // Badge Definitions
     const AVAILABLE_BADGES: Record<string, Badge> = {
@@ -97,7 +141,6 @@ export const useGamificationStore = defineStore('gamification', () => {
     })
 
     const xpToNextLevel = computed(() => {
-        // Simple formula: Level 1 needs 100, Level 2 needs 150, etc.
         return XP_PER_LEVEL_BASE * level.value
     })
 
@@ -106,8 +149,6 @@ export const useGamificationStore = defineStore('gamification', () => {
     })
 
     // Actions
-    // Watch for auth changes to load data automatically
-    // This prevents race conditions where SidebarNav mounts before Auth is ready
     watchEffect(async () => {
         if (authStore.user) {
             await loadGamificationData()
@@ -115,7 +156,9 @@ export const useGamificationStore = defineStore('gamification', () => {
             // Reset state on logout
             xp.value = 0
             level.value = 1
+            coins.value = 0
             unlockedBadgeIds.value = []
+            unlockedItemIds.value = []
         }
     })
 
@@ -131,9 +174,10 @@ export const useGamificationStore = defineStore('gamification', () => {
                 if (data) {
                     xp.value = data.xp || 0
                     level.value = data.level || 1
+                    coins.value = data.coins || 0
                     unlockedBadgeIds.value = data.badges || []
+                    unlockedItemIds.value = data.unlockedItems || ['theme_ocean']
                 } else {
-                    // Initialize if missing
                     await initGamification(userDocRef)
                 }
             }
@@ -146,12 +190,16 @@ export const useGamificationStore = defineStore('gamification', () => {
         const initialState = {
             xp: 0,
             level: 1,
-            badges: []
+            coins: 0,
+            badges: [],
+            unlockedItems: ['theme_ocean']
         }
         await setDoc(docRef, { gamification: initialState }, { merge: true })
         xp.value = 0
         level.value = 1
+        coins.value = 0
         unlockedBadgeIds.value = []
+        unlockedItemIds.value = ['theme_ocean']
     }
 
     const saveGamificationData = async () => {
@@ -161,7 +209,9 @@ export const useGamificationStore = defineStore('gamification', () => {
                 gamification: {
                     xp: xp.value,
                     level: level.value,
-                    badges: unlockedBadgeIds.value
+                    coins: coins.value,
+                    badges: unlockedBadgeIds.value,
+                    unlockedItems: unlockedItemIds.value
                 }
             })
         } catch (error) {
@@ -171,9 +221,9 @@ export const useGamificationStore = defineStore('gamification', () => {
 
     const awardXP = async (amount: number) => {
         xp.value += amount
+        coins.value += amount
 
         // Check Level Up
-        // While loop in case massive XP gain levels up multiple times
         let leveledUp = false
         while (xp.value >= xpToNextLevel.value) {
             xp.value -= xpToNextLevel.value
@@ -185,14 +235,13 @@ export const useGamificationStore = defineStore('gamification', () => {
             if (level.value >= 5) {
                 unlockBadge('level_5')
             }
-            // Could set a "LevelUp" flag for UI celebration
         }
 
         await saveGamificationData()
     }
 
     const unlockBadge = async (badgeId: string) => {
-        if (unlockedBadgeIds.value.includes(badgeId)) return // Already unlocked
+        if (unlockedBadgeIds.value.includes(badgeId)) return
 
         if (AVAILABLE_BADGES[badgeId]) {
             unlockedBadgeIds.value.push(badgeId)
@@ -202,17 +251,37 @@ export const useGamificationStore = defineStore('gamification', () => {
         }
     }
 
+    const purchaseItem = async (itemId: string) => {
+        const item = SHOP_ITEMS.find(i => i.id === itemId)
+        if (!item) return { success: false, message: 'Item not found' }
+        if (unlockedItemIds.value.includes(itemId)) return { success: false, message: 'Already owned' }
+
+        if (coins.value < item.cost) {
+            return { success: false, message: `Need ${item.cost - coins.value} more points` }
+        }
+
+        coins.value -= item.cost
+        unlockedItemIds.value.push(itemId)
+        await saveGamificationData()
+
+        return { success: true, message: `Purchased ${item.name}!` }
+    }
+
     return {
         xp,
         level,
+        coins,
         unlockedBadges,
         unlockedBadgeIds,
+        unlockedItemIds,
+        SHOP_ITEMS,
         xpToNextLevel,
         progressPercent,
         recentUnlock,
         loadGamificationData,
         awardXP,
         unlockBadge,
+        purchaseItem,
         AVAILABLE_BADGES
     }
 })
