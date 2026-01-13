@@ -149,7 +149,7 @@ const handleGoogleLogin = async () => {
           
           <form @submit.prevent="handleRegister" novalidate>
             <div class="form-group">
-              <label>Full Name</label>
+              <label>Full Name <span class="required">*</span></label>
               <input 
                 type="text" 
                 v-model.trim="fullName" 
@@ -161,7 +161,7 @@ const handleGoogleLogin = async () => {
             </div>
 
             <div class="form-group">
-              <label>Email</label>
+              <label>Email <span class="required">*</span></label>
               <input 
                 type="email" 
                 v-model.trim="email" 
@@ -173,7 +173,7 @@ const handleGoogleLogin = async () => {
             </div>
             
             <div class="form-group">
-              <label>Password</label>
+              <label>Password <span class="required">*</span></label>
               <input 
                 type="password" 
                 v-model="password" 
@@ -366,6 +366,11 @@ header p {
 
 .form-group {
   margin-bottom: 1.25rem;
+}
+
+.required {
+  color: var(--color-danger);
+  margin-left: 0.25rem;
 }
 
 label {

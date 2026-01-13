@@ -1,12 +1,18 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, reactive, onMounted, onUnmounted } from 'vue'
 
 const emit = defineEmits(['close', 'save'])
 
 const name = ref('')
 const unit = ref('')
+const touched = reactive({
+  name: false,
+  unit: false
+})
 
 const save = () => {
+  touched.name = true
+  touched.unit = true
   if (!name.value || !unit.value) return
   emit('save', { name: name.value, unit: unit.value })
 }
@@ -41,13 +47,30 @@ onUnmounted(() => {
 
       <div class="modal-body">
         <div class="form-group">
-          <label>Tracker Name</label>
-          <input v-model.trim="name" type="text" placeholder="e.g., Weight" autofocus required>
+          <label>Tracker Name <span class="required">*</span></label>
+          <input 
+            v-model.trim="name" 
+            type="text" 
+            placeholder="e.g., Weight" 
+            autofocus 
+            required
+            @blur="touched.name = true"
+            :class="{ 'input-error': touched.name && !name }"
+          >
+          <span v-if="touched.name && !name" class="error-text">Name is required</span>
         </div>
 
         <div class="form-group">
-          <label>Unit</label>
-          <input v-model.trim="unit" type="text" placeholder="e.g., kg" required>
+          <label>Unit <span class="required">*</span></label>
+          <input 
+            v-model.trim="unit" 
+            type="text" 
+            placeholder="e.g., kg" 
+            required
+            @blur="touched.unit = true"
+            :class="{ 'input-error': touched.unit && !unit }"
+          >
+          <span v-if="touched.unit && !unit" class="error-text">Unit is required</span>
         </div>
       </div>
 
@@ -137,6 +160,22 @@ header {
 
 .form-group {
   margin-bottom: 1rem;
+}
+
+.required {
+  color: var(--color-danger);
+  margin-left: 0.25rem;
+}
+
+.error-text {
+  color: var(--color-danger);
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  display: block;
+}
+
+.input-error {
+  border-color: var(--color-danger);
 }
 
 .form-group label {

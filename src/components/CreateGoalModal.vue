@@ -3,15 +3,25 @@ import { ref, reactive, onMounted, onUnmounted, computed } from 'vue'
 
 const emit = defineEmits(['close', 'save'])
 
+const getDefaultDate = () => {
+  const date = new Date()
+  date.setDate(date.getDate() + 7)
+  return date.toISOString().split('T')[0]
+}
+
 const form = reactive({
   title: '',
   category: 'General',
-  dueDate: '',
+  dueDate: getDefaultDate(),
   specific: '',
   measurable: '',
   achievable: '',
   relevant: '',
   timeBound: ''
+})
+
+const touched = reactive({
+  title: false
 })
 
 const categories = ['General', 'Health', 'Career', 'Finance', 'Education', 'Lifestyle']
@@ -21,7 +31,10 @@ const minDate = computed(() => {
 })
 
 const save = () => {
-  if (!form.title) return
+  if (!form.title) {
+    touched.title = true
+    return
+  }
   
   emit('save', {
     title: form.title,
@@ -67,8 +80,17 @@ onUnmounted(() => {
 
       <div class="modal-body">
         <div class="form-group">
-          <label>Goal Title</label>
-          <input v-model.trim="form.title" type="text" placeholder="e.g., Run a Marathon" autofocus required>
+          <label>Goal Title <span class="required">*</span></label>
+          <input 
+            v-model.trim="form.title" 
+            type="text" 
+            placeholder="e.g., Run a Marathon" 
+            autofocus 
+            required
+            @blur="touched.title = true"
+            :class="{ 'input-error': touched.title && !form.title }"
+          >
+          <span v-if="touched.title && !form.title" class="error-text">Title is required</span>
         </div>
 
         <div class="row">
@@ -252,6 +274,22 @@ textarea {
   font-size: 0.875rem;
   color: var(--color-text-muted);
   margin-bottom: 1rem;
+}
+
+.required {
+  color: var(--color-danger);
+  margin-left: 0.25rem;
+}
+
+.error-text {
+  color: var(--color-danger);
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  display: block;
+}
+
+.input-error {
+  border-color: var(--color-danger);
 }
 
 .smart-grid {
