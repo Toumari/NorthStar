@@ -185,6 +185,7 @@ const handleLogout = async () => {
     z-index: 40;
     transform: translateX(-100%);
     box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+    padding-top: calc(1.5rem + env(safe-area-inset-top)); /* Prevent notch overlap */
   }
   
   /* Parent wrapper needs .open class to slide this in */

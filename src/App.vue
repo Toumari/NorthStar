@@ -63,6 +63,7 @@ const closeMobileMenu = () => {
   background-color: var(--color-surface);
   border-bottom: 1px solid var(--color-border);
   padding: 1rem;
+  padding-top: max(1rem, env(safe-area-inset-top)); /* Handle notch */
   align-items: center;
   gap: 1rem;
   position: fixed;
@@ -109,7 +110,7 @@ const closeMobileMenu = () => {
 @media (max-width: 768px) {
   .app-layout {
     flex-direction: column;
-    padding-top: 60px; /* Space for mobile header */
+    padding-top: calc(60px + env(safe-area-inset-top)); /* Space for mobile header + notch */
   }
 
   .app-layout:has(.main-content.full-screen) {
