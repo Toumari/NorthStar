@@ -245,6 +245,8 @@ h2 {
   font-size: 0.875rem;
 }
 
+.btn-danger:hover {
+  background-color: var(--color-danger);
   color: white;
 }
 
