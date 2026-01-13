@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 
@@ -12,6 +12,10 @@ const error = ref('')
 const emailError = ref('')
 const passwordError = ref('')
 const loading = ref(false)
+
+const isValid = computed(() => {
+  return email.value.trim() !== '' && password.value !== ''
+})
 
 const validate = () => {
   let isValid = true
@@ -133,9 +137,10 @@ const handleGoogleLogin = async () => {
               <label>Email</label>
               <input 
                 type="email" 
-                v-model="email" 
+                v-model.trim="email" 
                 :class="{ 'input-error': emailError }"
                 placeholder="you@example.com"
+                required
               >
               <span class="error-text" v-if="emailError">{{ emailError }}</span>
             </div>
@@ -147,6 +152,7 @@ const handleGoogleLogin = async () => {
                 v-model="password" 
                 :class="{ 'input-error': passwordError }"
                 placeholder="••••••••"
+                required
               >
               <span class="error-text" v-if="passwordError">{{ passwordError }}</span>
               <div class="forgot-link">
@@ -156,7 +162,7 @@ const handleGoogleLogin = async () => {
 
             <div v-if="error" class="error-msg">{{ error }}</div>
 
-            <button type="submit" class="btn-primary" :disabled="loading">
+            <button type="submit" class="btn-primary" :disabled="loading || !isValid">
               {{ loading ? 'Signing in...' : 'Sign In' }}
             </button>
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive, onMounted, onUnmounted } from 'vue'
+import { ref, reactive, onMounted, onUnmounted, computed } from 'vue'
 
 const emit = defineEmits(['close', 'save'])
 
@@ -15,6 +15,10 @@ const form = reactive({
 })
 
 const categories = ['General', 'Health', 'Career', 'Finance', 'Education', 'Lifestyle']
+
+const minDate = computed(() => {
+  return new Date().toISOString().split('T')[0]
+})
 
 const save = () => {
   if (!form.title) return
@@ -64,7 +68,7 @@ onUnmounted(() => {
       <div class="modal-body">
         <div class="form-group">
           <label>Goal Title</label>
-          <input v-model="form.title" type="text" placeholder="e.g., Run a Marathon" autofocus>
+          <input v-model.trim="form.title" type="text" placeholder="e.g., Run a Marathon" autofocus required>
         </div>
 
         <div class="row">
@@ -76,7 +80,7 @@ onUnmounted(() => {
           </div>
           <div class="form-group half">
             <label>Due Date</label>
-            <input v-model="form.dueDate" type="date">
+            <input v-model="form.dueDate" type="date" :min="minDate">
           </div>
         </div>
 
@@ -111,7 +115,7 @@ onUnmounted(() => {
 
       <footer>
         <button class="btn-text" @click="$emit('close')">Cancel</button>
-        <button class="btn-primary" @click="save">Create Goal</button>
+        <button class="btn-primary" @click="save" :disabled="!form.title.trim()">Create Goal</button>
       </footer>
     </div>
   </div>

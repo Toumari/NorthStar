@@ -129,7 +129,7 @@ const handleDelete = async () => {
           ></textarea>
           <!-- Save hint -->
            <div class="editor-footer">
-              <button class="btn-primary" @click="handleSave" :disabled="isSaving || isEntryLocked">
+              <button class="btn-primary" @click="handleSave" :disabled="isSaving || isEntryLocked || !content.trim()">
                   {{ isSaving ? 'Saving...' : 'Save Entry' }}
               </button>
            </div>

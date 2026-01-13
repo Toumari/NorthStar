@@ -71,8 +71,8 @@ const addData = (trackerId: string) => {
       <div class="card create-card">
         <h3>Create New Tracker</h3>
         <div class="form-row">
-          <input v-model="newTrackerName" placeholder="Tracker Name (e.g. Weight)" />
-          <input v-model="newTrackerUnit" placeholder="Unit (e.g. kg)" />
+          <input v-model.trim="newTrackerName" placeholder="Tracker Name (e.g. Weight)" />
+          <input v-model.trim="newTrackerUnit" placeholder="Unit (e.g. kg)" />
           <button class="btn-primary" @click="createTracker" :disabled="!newTrackerName || !newTrackerUnit">Create</button>
         </div>
       </div>
@@ -99,6 +99,7 @@ const addData = (trackerId: string) => {
             type="number" 
             v-model="newDataValue" 
             placeholder="Value" 
+            step="any"
             @focus="selectedTrackerId = tracker.id"
           >
           <input 

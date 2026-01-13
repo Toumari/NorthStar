@@ -42,18 +42,18 @@ onUnmounted(() => {
       <div class="modal-body">
         <div class="form-group">
           <label>Tracker Name</label>
-          <input v-model="name" type="text" placeholder="e.g., Weight" autofocus>
+          <input v-model.trim="name" type="text" placeholder="e.g., Weight" autofocus required>
         </div>
 
         <div class="form-group">
           <label>Unit</label>
-          <input v-model="unit" type="text" placeholder="e.g., kg">
+          <input v-model.trim="unit" type="text" placeholder="e.g., kg" required>
         </div>
       </div>
 
       <footer>
         <button class="btn-text" @click="$emit('close')">Cancel</button>
-        <button class="btn-primary" @click="save" :disabled="!name || !unit">Create Tracker</button>
+        <button class="btn-primary" @click="save" :disabled="!name.trim() || !unit.trim()">Create Tracker</button>
       </footer>
     </div>
   </div>
