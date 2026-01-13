@@ -14,7 +14,6 @@ const themeStore = useThemeStore()
 
 onMounted(() => {
   subscriptionStore.loadSubscription()
-  gamificationStore.loadGamificationData()
 })
 
 const props = defineProps<{

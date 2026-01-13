@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
+import { ref, computed, watchEffect } from 'vue'
 import { useAuthStore } from './auth'
 import { db } from '../firebase'
 import { doc, getDoc, updateDoc, setDoc } from 'firebase/firestore'
@@ -106,6 +106,19 @@ export const useGamificationStore = defineStore('gamification', () => {
     })
 
     // Actions
+    // Watch for auth changes to load data automatically
+    // This prevents race conditions where SidebarNav mounts before Auth is ready
+    watchEffect(async () => {
+        if (authStore.user) {
+            await loadGamificationData()
+        } else {
+            // Reset state on logout
+            xp.value = 0
+            level.value = 1
+            unlockedBadgeIds.value = []
+        }
+    })
+
     const loadGamificationData = async () => {
         if (!authStore.user) return
 
