@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useGoalsStore } from '../stores/goals'
+import CreateGoalModal from '../components/CreateGoalModal.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -12,7 +13,14 @@ const goal = computed(() => store.goals.find(g => g.id === goalId))
 
 const newTaskTitle = ref('')
 const newTaskDate = ref(new Date().toISOString().split('T')[0])
-const showSmartDetails = ref(false)
+const isEditing = ref(false)
+
+const hasSmartDetails = computed(() => {
+  if (!goal.value?.smart) return false
+  const s = goal.value.smart
+  // Check if any field has content
+  return !!(s.specific || s.measurable || s.achievable || s.relevant || s.timeBound)
+})
 
 const isDeleting = ref(false)
 
@@ -37,6 +45,21 @@ const handleDelete = async () => {
     }
   }
 }
+
+const handleUpdateGoal = async (updatedData: any) => {
+  try {
+      await store.updateGoal(goalId, {
+          title: updatedData.title,
+          category: updatedData.category,
+          dueDate: updatedData.dueDate,
+          smart: updatedData.smart
+      })
+      isEditing.value = false
+  } catch (e) {
+      console.error(e)
+      alert("Failed to update goal")
+  }
+}
 </script>
 
 <template>
@@ -49,7 +72,10 @@ const handleDelete = async () => {
           <h2>{{ goal.title }}</h2>
         </div>
       </div>
-      <button class="btn-danger" @click="handleDelete">Delete Goal</button>
+      <div class="header-actions">
+        <button class="btn-outline" @click="isEditing = true">Edit Goal</button>
+        <button class="btn-danger" @click="handleDelete">Delete</button>
+      </div>
     </header>
 
     <div class="main-grid">
@@ -70,7 +96,7 @@ const handleDelete = async () => {
           </p>
         </section>
 
-        <section class="smart-info" v-if="goal.smart">
+        <section class="smart-info" v-if="hasSmartDetails">
           <div class="section-header">
             <h3>S.M.A.R.T. Framework</h3>
           </div>
@@ -102,6 +128,9 @@ const handleDelete = async () => {
             <h3>S.M.A.R.T. Framework</h3>
           </div>
           <p class="text-muted">No S.M.A.R.T. details defined for this goal.</p>
+          <button class="btn-text-primary" @click="isEditing = true">
+            + Add Details
+          </button>
         </section>
       </div>
 
@@ -159,6 +188,13 @@ const handleDelete = async () => {
     <p>The goal you're looking for doesn't exist or you don't have permission to view it.</p>
     <button class="btn-primary" @click="router.push('/goals')">Return to Goals</button>
   </div>
+
+  <CreateGoalModal 
+    v-if="isEditing" 
+    :initial-goal="goal"
+    @close="isEditing = false"
+    @save="handleUpdateGoal"
+  />
 </template>
 
 <style scoped>
@@ -209,9 +245,26 @@ h2 {
   font-size: 0.875rem;
 }
 
-.btn-danger:hover {
-  background-color: var(--color-danger);
   color: white;
+}
+
+.header-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-outline {
+  background: none;
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.btn-outline:hover {
+  background-color: var(--color-surface-hover);
 }
 
 .main-grid {
@@ -295,6 +348,20 @@ h2 {
 
 .tasks-section h3 {
   margin-bottom: 1.5rem;
+}
+
+.btn-text-primary {
+  background: none;
+  border: none;
+  color: var(--color-primary);
+  font-weight: 500;
+  padding: 0;
+  margin-top: 0.5rem;
+  cursor: pointer;
+}
+
+.btn-text-primary:hover {
+  text-decoration: underline;
 }
 
 .add-task-form {

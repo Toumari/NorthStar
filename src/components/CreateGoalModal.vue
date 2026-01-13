@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted, onUnmounted, computed } from 'vue'
 
+const props = defineProps<{
+  initialGoal?: any
+}>()
+
 const emit = defineEmits(['close', 'save'])
 
 const getDefaultDate = () => {
@@ -59,6 +63,20 @@ onMounted(() => {
   document.body.style.top = `-${scrollPosition}px`
   document.body.style.width = '100%'
   document.body.style.overflow = 'hidden' // Redundant but safe
+
+  if (props.initialGoal) {
+    form.title = props.initialGoal.title
+    form.category = props.initialGoal.category
+    form.dueDate = props.initialGoal.dueDate
+    
+    if (props.initialGoal.smart) {
+      form.specific = props.initialGoal.smart.specific || ''
+      form.measurable = props.initialGoal.smart.measurable || ''
+      form.achievable = props.initialGoal.smart.achievable || ''
+      form.relevant = props.initialGoal.smart.relevant || ''
+      form.timeBound = props.initialGoal.smart.timeBound || ''
+    }
+  }
 })
 
 onUnmounted(() => {
@@ -74,7 +92,7 @@ onUnmounted(() => {
   <div class="modal-overlay" @click.self="$emit('close')" @touchmove.self.prevent>
     <div class="modal-content">
       <header>
-        <h2>Create New Goal</h2>
+        <h2>{{ initialGoal ? 'Edit Goal' : 'Create New Goal' }}</h2>
         <button class="close-btn" @click="$emit('close')">&times;</button>
       </header>
 
@@ -137,7 +155,9 @@ onUnmounted(() => {
 
       <footer>
         <button class="btn-text" @click="$emit('close')">Cancel</button>
-        <button class="btn-primary" @click="save" :disabled="!form.title.trim()">Create Goal</button>
+        <button class="btn-primary" @click="save" :disabled="!form.title.trim()">
+          {{ initialGoal ? 'Save Changes' : 'Create Goal' }}
+        </button>
       </footer>
     </div>
   </div>
