@@ -179,6 +179,11 @@ const isEquipped = (targetId: string) => themeStore.activeTheme === targetId
 .theme-preview-forest { background-color: #10b981; color: white; }
 .theme-preview-lavender { background-color: #8b5cf6; color: white; }
 
+:root.dark .theme-preview-ocean { background-color: #38bdf8; }
+:root.dark .theme-preview-sunset { background-color: #fbba74; }
+:root.dark .theme-preview-forest { background-color: #4ade80; }
+:root.dark .theme-preview-lavender { background-color: #c4b5fd; }
+
 .item-details h4 {
     margin: 0 0 0.25rem 0;
     font-size: 1.1rem;
