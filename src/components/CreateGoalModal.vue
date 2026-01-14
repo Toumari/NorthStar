@@ -1,11 +1,17 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted, onUnmounted, computed } from 'vue'
 
+import { useGoalsStore } from '../stores/goals'
+
 const props = defineProps<{
   initialGoal?: any
 }>()
 
-const emit = defineEmits(['close', 'save'])
+const emit = defineEmits(['close'])
+const store = useGoalsStore()
+const isSaving = ref(false)
+
+const getDefaultDate = () => {
 
 const getDefaultDate = () => {
   const date = new Date()
@@ -34,24 +40,39 @@ const minDate = computed(() => {
   return new Date().toISOString().split('T')[0]
 })
 
-const save = () => {
+const save = async () => {
   if (!form.title) {
     touched.title = true
     return
   }
   
-  emit('save', {
-    title: form.title,
-    category: form.category,
-    dueDate: form.dueDate,
-    smart: {
-      specific: form.specific,
-      measurable: form.measurable,
-      achievable: form.achievable,
-      relevant: form.relevant,
-      timeBound: form.timeBound
+  isSaving.value = true
+  try {
+    const goalData = {
+      title: form.title,
+      category: form.category,
+      dueDate: form.dueDate,
+      smart: {
+        specific: form.specific,
+        measurable: form.measurable,
+        achievable: form.achievable,
+        relevant: form.relevant,
+        timeBound: form.timeBound
+      }
     }
-  })
+
+    if (props.initialGoal) {
+      emit('save', goalData) // Keep emit for edit (GoalDetailView uses this)
+    } else {
+      await store.addGoal(goalData)
+      emit('close')
+    }
+  } catch (e) {
+    console.error(e)
+    alert("Failed to create goal. Please try again.")
+  } finally {
+    isSaving.value = false
+  }
 }
 
 // Lock body scroll when modal is open using position: fixed (iOS fix)
@@ -156,8 +177,8 @@ onUnmounted(() => {
   
         <footer>
           <button class="btn-text" @click="$emit('close')">Cancel</button>
-          <button class="btn-primary" @click="save" :disabled="!form.title.trim()">
-            {{ initialGoal ? 'Save Changes' : 'Create Goal' }}
+          <button class="btn-primary" @click="save" :disabled="!form.title.trim() || isSaving">
+            {{ isSaving ? 'Saving...' : (initialGoal ? 'Save Changes' : 'Create Goal') }}
           </button>
         </footer>
       </div>

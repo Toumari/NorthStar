@@ -30,11 +30,6 @@ const handleNewGoalClick = () => {
     showUpgradePrompt.value = true
   }
 }
-
-const handleCreateGoal = (goalData: any) => {
-  store.addGoal(goalData)
-  showCreateModal.value = false
-}
 </script>
 
 <template>
@@ -71,7 +66,6 @@ const handleCreateGoal = (goalData: any) => {
     <CreateGoalModal 
       v-if="showCreateModal" 
       @close="showCreateModal = false"
-      @save="handleCreateGoal"
     />
     
     <UpgradePrompt

@@ -103,7 +103,12 @@ export const useGoalsStore = defineStore('goals', () => {
             createdAt: Date.now()
         }
 
-        await addDoc(collection(db, `users/${user.uid}/goals`), newGoal)
+        try {
+            await addDoc(collection(db, `users/${user.uid}/goals`), newGoal)
+        } catch (error) {
+            console.error("Error adding goal:", error)
+            throw error
+        }
     }
 
     const removeGoal = async (id: string) => {
