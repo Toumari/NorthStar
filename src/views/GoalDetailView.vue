@@ -64,7 +64,8 @@ const handleBack = () => {
   if (window.history.state && window.history.state.back) {
     router.back()
   } else {
-    router.push('/goals')
+    // Default to Dashboard if no history (safer/more common landing)
+    router.push('/')
   }
 }
 </script>
