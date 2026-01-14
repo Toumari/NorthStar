@@ -26,10 +26,10 @@ const isEntryLocked = computed(() => {
 
 const formattedDate = computed(() => {
     return new Date(props.date).toLocaleDateString('en-US', {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
+        weekday: 'short', // Mon
+        year: 'numeric', // 2026
+        month: 'short', // Jan
+        day: 'numeric' // 12
     })
 })
 
@@ -89,10 +89,10 @@ const displayText = computed(() => {
         </div>
         
         <div class="actions" v-if="!isEditing && entry">
-            <button class="btn-icon" @click="startEditing" title="Edit">
-                ✏️
+            <button class="btn-action edit" @click="startEditing">
+                Edit
             </button>
-            <button class="btn-icon delete" @click="handleDelete" title="Delete">
+            <button class="btn-action delete" @click="handleDelete" title="Delete">
                  🗑️
             </button>
         </div>
@@ -187,31 +187,35 @@ const displayText = computed(() => {
 
 .actions {
     display: flex;
-    gap: 0.5rem;
-    opacity: 0; /* Hidden by default for cleaner look */
-    transition: opacity 0.2s;
+    gap: 0.75rem;
+    /* Always visible now */
+    opacity: 1; 
 }
 
-.journal-card:hover .actions {
-    opacity: 1;
-}
-
-.btn-icon {
+.btn-action {
     background: none;
     border: none;
     cursor: pointer;
-    font-size: 1rem;
-    opacity: 0.6;
-    transition: opacity 0.2s, transform 0.2s;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    transition: all 0.2s;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
 }
 
-.btn-icon:hover {
-    opacity: 1;
-    transform: scale(1.1);
+.btn-action:hover {
+    background-color: var(--color-surface-hover);
+    color: var(--color-primary);
 }
 
-.btn-icon.delete:hover {
-    filter: grayscale(0) !important; /* Reset any filters */
+.btn-action.delete {
+    color: var(--color-text-muted); /* Muted delete by default */
+}
+
+.btn-action.delete:hover {
+    color: var(--color-danger);
+    background-color: rgba(220, 38, 38, 0.1); /* Subtle red bg */
 }
 
 .content-read {
