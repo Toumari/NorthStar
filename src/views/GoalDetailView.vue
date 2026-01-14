@@ -57,7 +57,14 @@ const handleUpdateGoal = async (updatedData: any) => {
       isEditing.value = false
   } catch (e) {
       console.error(e)
-      alert("Failed to update goal")
+  }
+}
+
+const handleBack = () => {
+  if (window.history.state && window.history.state.back) {
+    router.back()
+  } else {
+    router.push('/goals')
   }
 }
 </script>
@@ -66,7 +73,8 @@ const handleUpdateGoal = async (updatedData: any) => {
   <div v-if="goal && !isDeleting" class="goal-detail-view">
     <header class="page-header">
       <div class="header-content">
-        <button class="back-btn" @click="router.back()">← Back</button>
+
+        <button class="back-btn" @click="handleBack">← Back</button>
         <div class="title-section">
           <span class="category-tag">{{ goal.category }}</span>
           <h2>{{ goal.title }}</h2>
