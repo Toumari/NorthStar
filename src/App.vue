@@ -128,6 +128,7 @@ watch(route, async () => {
 
   .main-content {
     padding: 1.5rem; /* Restored comfortable padding */
+    padding-top: 2.5rem; /* Extra breathing room below header */
   }
   
   .main-content.full-screen {
