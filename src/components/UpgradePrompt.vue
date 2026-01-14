@@ -64,11 +64,16 @@ defineEmits<{
   right: 0;
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.6);
-  display: flex;
-  justify-content: center;
-  align-items: center;
   z-index: 1000;
+  /* Make overlay the scroll container */
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
   padding: 1rem;
+  /* Safe area padding */
+  padding-top: max(2rem, env(safe-area-inset-top));
+  padding-bottom: max(2rem, env(safe-area-inset-bottom));
+  overscroll-behavior: contain;
 }
 
 .upgrade-modal {
@@ -80,8 +85,8 @@ defineEmits<{
   position: relative;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   text-align: center;
-  max-height: 90vh;
-  overflow-y: auto;
+  /* Magic centering that is safe for overflow */
+  margin: auto;
 }
 
 .close-btn {
