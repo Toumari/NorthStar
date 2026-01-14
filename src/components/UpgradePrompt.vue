@@ -1,49 +1,51 @@
 <template>
-  <div class="modal-overlay" @click.self="$emit('close')">
-    <div class="upgrade-modal">
-      <button class="close-btn" @click="$emit('close')">×</button>
-      
-      <div class="icon">🚀</div>
-      
-      <h2>Upgrade to Premium</h2>
-      
-      <p class="message">{{ message }}</p>
-      
-      <div class="benefits">
-        <h3>Premium Benefits:</h3>
-        <ul>
-          <li>✓ Unlimited goals</li>
-          <li>✓ Unlimited habit trackers</li>
-          <li>✓ Full journal history</li>
-          <li>✓ Advanced analytics (coming soon)</li>
-          <li>✓ Data export (coming soon)</li>
-        </ul>
+  <Teleport to="body">
+    <div class="modal-overlay" @click.self="$emit('close')">
+      <div class="upgrade-modal">
+        <button class="close-btn" @click="$emit('close')">×</button>
+        
+        <div class="icon">🚀</div>
+        
+        <h2>Upgrade to Premium</h2>
+        
+        <p class="message">{{ message }}</p>
+        
+        <div class="benefits">
+          <h3>Premium Benefits:</h3>
+          <ul>
+            <li>✓ Unlimited goals</li>
+            <li>✓ Unlimited habit trackers</li>
+            <li>✓ Full journal history</li>
+            <li>✓ Advanced analytics (coming soon)</li>
+            <li>✓ Data export (coming soon)</li>
+          </ul>
+        </div>
+        
+        <div class="pricing">
+          <div class="price-option">
+            <span class="price">£1.99</span>
+            <span class="period">/month</span>
+          </div>
+          <div class="price-option highlight">
+            <span class="badge">Best Value</span>
+            <span class="price">£15</span>
+            <span class="period">/year</span>
+            <span class="savings">Save 37%</span>
+          </div>
+          <div class="price-option">
+            <span class="price">£25</span>
+            <span class="period">lifetime</span>
+          </div>
+        </div>
+        
+        <RouterLink to="/pricing" class="btn-upgrade" @click="$emit('close')">
+          View Pricing Plans
+        </RouterLink>
+        
+        <button class="btn-text" @click="$emit('close')">Maybe Later</button>
       </div>
-      
-      <div class="pricing">
-        <div class="price-option">
-          <span class="price">£1.99</span>
-          <span class="period">/month</span>
-        </div>
-        <div class="price-option highlight">
-          <span class="badge">Best Value</span>
-          <span class="price">£15</span>
-          <span class="period">/year</span>
-          <span class="savings">Save 37%</span>
-        </div>
-        <div class="price-option">
-          <span class="price">£25</span>
-          <span class="period">lifetime</span>
-        </div>
-      </div>
-      
-      <RouterLink to="/pricing" class="btn-upgrade" @click="$emit('close')">
-        View Pricing Plans
-      </RouterLink>
-      
-      <button class="btn-text" @click="$emit('close')">Maybe Later</button>
     </div>
-  </div>
+  </Teleport>
 </template>
 
 <script setup lang="ts">
