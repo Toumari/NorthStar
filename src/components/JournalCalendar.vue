@@ -156,14 +156,19 @@ const currentStreak = computed(() => {
 <style scoped>
 .calendar-card {
   background-color: var(--color-surface);
-  border: 1px solid var(--color-border);
   border-radius: 12px;
   padding: 1.5rem;
   width: 100%;
-  /* height: 100%; Removed to allow natural height in sidebar */
   display: flex;
   flex-direction: column;
   gap: 2rem;
+  box-shadow: var(--shadow-soft);
+  border: 1px solid transparent; 
+}
+
+:root.dark .calendar-card {
+    border-color: var(--color-border);
+    box-shadow: none;
 }
 
 .calendar-card.sidebar-mode {
