@@ -31,8 +31,8 @@ const trend = computed(() => {
 const diff = computed(() => {
     if (!latestData.value || !previousData.value) return null
     const val = latestData.value.value - previousData.value.value
-    // Format to max 2 decimals if needed, or keeping it simple
-    return Math.abs(val)
+    // Fix floating point precision issues (e.g. 0.5999999 instead of 0.6)
+    return Number(Math.abs(val).toFixed(2))
 })
 
 const formattedDate = computed(() => {
