@@ -2,14 +2,22 @@
 import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useGoalsStore } from '../stores/goals'
+import { useTrackersStore } from '../stores/trackers'
 import CreateGoalModal from '../components/CreateGoalModal.vue'
+import TrackerSummaryCard from '../components/TrackerSummaryCard.vue'
 
 const route = useRoute()
 const router = useRouter()
 const store = useGoalsStore()
+const trackersStore = useTrackersStore()
 
 const goalId = route.params.id as string
 const goal = computed(() => store.goals.find(g => g.id === goalId))
+
+const relatedTracker = computed(() => {
+    if (!goal.value?.relatedTrackerId) return null
+    return trackersStore.trackers.find(t => t.id === goal.value?.relatedTrackerId)
+})
 
 const newTaskTitle = ref('')
 const newTaskDate = ref(new Date().toISOString().split('T')[0])
@@ -52,6 +60,7 @@ const handleUpdateGoal = async (updatedData: any) => {
           title: updatedData.title,
           category: updatedData.category,
           dueDate: updatedData.dueDate,
+          relatedTrackerId: updatedData.relatedTrackerId,
           smart: updatedData.smart
       })
       isEditing.value = false
@@ -103,6 +112,14 @@ const handleBack = () => {
           <p class="status-text" :class="{ success: goal.progress === 100 }">
             {{ goal.progress === 100 ? 'Goal Completed! 🎉' : `${goal.tasks.filter(t => !t.completed).length} tasks remaining` }}
           </p>
+        </section>
+
+        <section class="tracker-section" v-if="relatedTracker">
+            <header class="section-header">
+                <h3>Linked Tracker</h3>
+                <RouterLink :to="{ name: 'trackers' }" class="view-link">View All</RouterLink>
+            </header>
+            <TrackerSummaryCard :tracker="relatedTracker" />
         </section>
 
         <section class="smart-info" v-if="hasSmartDetails">
@@ -290,7 +307,7 @@ h2 {
   }
 }
 
-.progress-card, .smart-info, .tasks-section {
+.progress-card, .smart-info, .tasks-section, .tracker-section {
   background-color: var(--color-surface);
   border-radius: 12px;
   padding: 1.5rem;
@@ -330,6 +347,18 @@ h2 {
 
 .section-header {
   margin-bottom: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.view-link {
+    font-size: 0.85rem;
+    color: var(--color-primary);
+    text-decoration: none;
+}
+.view-link:hover {
+    text-decoration: underline;
 }
 
 .smart-content {

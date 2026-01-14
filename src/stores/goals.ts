@@ -38,6 +38,7 @@ export interface Goal {
     progress: number
     tasks: Task[]
     createdAt: number
+    relatedTrackerId?: string
 }
 
 export const useGoalsStore = defineStore('goals', () => {

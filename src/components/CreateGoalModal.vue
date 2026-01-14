@@ -2,13 +2,15 @@
 import { ref, reactive, onMounted, onUnmounted, computed } from 'vue'
 
 import { useGoalsStore } from '../stores/goals'
+import { useTrackersStore } from '../stores/trackers'
 
 const props = defineProps<{
   initialGoal?: any
 }>()
 
-const emit = defineEmits(['close'])
+const emit = defineEmits(['close', 'save'])
 const store = useGoalsStore()
+const trackersStore = useTrackersStore()
 const isSaving = ref(false)
 
 const getDefaultDate = () => {
@@ -20,7 +22,9 @@ const getDefaultDate = () => {
 const form = reactive({
   title: '',
   category: 'General',
+  category: 'General',
   dueDate: getDefaultDate(),
+  relatedTrackerId: '',
   specific: '',
   measurable: '',
   achievable: '',
@@ -50,6 +54,7 @@ const save = async () => {
       title: form.title,
       category: form.category,
       dueDate: form.dueDate,
+      relatedTrackerId: form.relatedTrackerId, // Include relatedTrackerId in form submission
       smart: {
         specific: form.specific,
         measurable: form.measurable,
@@ -87,6 +92,7 @@ onMounted(() => {
     form.title = props.initialGoal.title
     form.category = props.initialGoal.category
     form.dueDate = props.initialGoal.dueDate
+    form.relatedTrackerId = props.initialGoal.relatedTrackerId || ''
     
     if (props.initialGoal.smart) {
       form.specific = props.initialGoal.smart.specific || ''
@@ -142,6 +148,17 @@ onUnmounted(() => {
               <label>Due Date</label>
               <input v-model="form.dueDate" type="date" :min="minDate">
             </div>
+          </div>
+
+          <div class="form-group">
+            <label>Link a Tracker (Optional)</label>
+            <select v-model="form.relatedTrackerId">
+                <option value="">No linked tracker</option>
+                <option v-for="tracker in trackersStore.trackers" :key="tracker.id" :value="tracker.id">
+                    {{ tracker.name }} ({{ tracker.unit }})
+                </option>
+            </select>
+            <p class="help-text">Visualize your progress with data.</p>
           </div>
   
           <div class="smart-section">
