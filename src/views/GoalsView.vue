@@ -1,3 +1,4 @@
+<script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
 import { useGoalsStore } from '../stores/goals'
 import { useSubscriptionStore } from '../stores/subscription'
