@@ -5,6 +5,7 @@ import { useSubscriptionStore } from '../stores/subscription'
 import GoalCard from '../components/GoalCard.vue'
 import CreateGoalModal from '../components/CreateGoalModal.vue'
 import UpgradePrompt from '../components/UpgradePrompt.vue'
+import SkeletonLoader from '../components/SkeletonLoader.vue'
 import { useRoute, useRouter } from 'vue-router'
 
 const store = useGoalsStore()
@@ -122,7 +123,18 @@ const handleNewGoalClick = () => {
       </button>
     </div>
 
-    <div v-if="filteredGoals.length === 0" class="empty-state">
+    <div v-if="store.isLoading" class="goals-grid">
+         <div class="card" v-for="i in 6" :key="i" style="height: 200px; display: flex; flex-direction: column; justify-content: space-between; padding: 1.5rem; background-color: var(--color-surface); border: 1px solid var(--color-border); border-radius: 12px;">
+              <div>
+                  <SkeletonLoader width="60%" height="24px" marginBottom="1rem" />
+                  <SkeletonLoader width="90%" height="16px" marginBottom="0.5rem" />
+                  <SkeletonLoader width="40%" height="16px" />
+              </div>
+               <SkeletonLoader width="100%" height="8px" borderRadius="4px" />
+          </div>
+    </div>
+
+    <div v-else-if="filteredGoals.length === 0" class="empty-state">
       <h3>No {{ currentFilter !== 'all' ? currentFilter : '' }} goals found</h3>
       <p v-if="store.goals.length === 0">Define your PathMark and start tracking your progress.</p>
       <p v-else>Adjust your filters or create a new goal.</p>

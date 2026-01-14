@@ -26,6 +26,7 @@ export interface Tracker {
 
 export const useTrackersStore = defineStore('trackers', () => {
     const trackers = ref<Tracker[]>([])
+    const isLoading = ref(true)
     let unsubscribe: (() => void) | null = null
 
     watchEffect(() => {
@@ -38,10 +39,15 @@ export const useTrackersStore = defineStore('trackers', () => {
                     id: doc.id,
                     ...doc.data()
                 })) as Tracker[]
+                isLoading.value = false
+            }, (error) => {
+                console.error("Error fetching trackers:", error)
+                isLoading.value = false
             })
         } else {
             if (unsubscribe) unsubscribe()
             trackers.value = []
+            // Reset loading state if needed or keep false
         }
     })
 
@@ -109,6 +115,7 @@ export const useTrackersStore = defineStore('trackers', () => {
         trackers,
         addTracker,
         removeTracker,
-        addDataPoint
+        addDataPoint,
+        isLoading
     }
 })

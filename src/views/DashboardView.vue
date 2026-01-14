@@ -12,13 +12,16 @@ import CreateGoalModal from '../components/CreateGoalModal.vue'
 import CreateTrackerModal from '../components/CreateTrackerModal.vue'
 import UpgradePrompt from '../components/UpgradePrompt.vue'
 import JournalCalendar from '../components/JournalCalendar.vue'
-import { ref } from 'vue'
+import SkeletonLoader from '../components/SkeletonLoader.vue'
+import { ref, computed } from 'vue'
 
 const store = useGoalsStore()
 const journalStore = useJournalStore()
 const trackersStore = useTrackersStore()
 const subscriptionStore = useSubscriptionStore()
 const gamificationStore = useGamificationStore()
+
+const isLoading = computed(() => store.isLoading || trackersStore.isLoading || gamificationStore.isLoaded === false) // Note: gamification.isLoaded is boolean, false usually means loading initially
 
 const showGoalModal = ref(false)
 const showTrackerModal = ref(false)
@@ -61,7 +64,14 @@ const handleCreateTracker = (trackerData: any) => {
       <p class="subtitle">Welcome back to your PathMark.</p>
     </header>
 
-    <div class="stats-grid">
+    <div class="stats-grid" v-if="isLoading">
+       <div class="stat-card" v-for="i in 3" :key="i">
+           <SkeletonLoader width="60%" height="20px" marginBottom="10px" />
+           <SkeletonLoader width="40%" height="32px" />
+       </div>
+    </div>
+
+    <div class="stats-grid" v-else>
       <RouterLink to="/goals?filter=completed" class="stat-card highlight">
         <h3>Completed Goals</h3>
         <p class="stat-value">{{ store.completedGoals.length }}</p>
@@ -130,7 +140,17 @@ const handleCreateTracker = (trackerData: any) => {
            <RouterLink to="/goals" class="view-all">View All</RouterLink>
         </div>
       </header>
-      <div class="goals-grid">
+      <div class="goals-grid" v-if="isLoading">
+          <div class="card" v-for="i in 3" :key="i" style="height: 200px; display: flex; flex-direction: column; justify-content: space-between;">
+              <div>
+                  <SkeletonLoader width="50%" height="24px" marginBottom="1rem" />
+                  <SkeletonLoader width="90%" height="16px" marginBottom="0.5rem" />
+                  <SkeletonLoader width="70%" height="16px" />
+              </div>
+               <SkeletonLoader width="100%" height="8px" borderRadius="4px" />
+          </div>
+      </div>
+      <div class="goals-grid" v-else>
         <template v-if="store.activeGoals.length > 0">
           <GoalCard 
             v-for="goal in store.activeGoals.slice(0, 3)" 
@@ -169,7 +189,17 @@ const handleCreateTracker = (trackerData: any) => {
           </div>
         </header>
 
-        <div class="trackers-grid" v-if="trackersStore.trackers.length > 0">
+        <div class="trackers-grid" v-if="isLoading">
+             <div class="card" v-for="i in 4" :key="i" style="height: 150px;">
+                 <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
+                     <SkeletonLoader width="40%" height="20px" />
+                     <SkeletonLoader width="15%" height="16px" />
+                 </div>
+                 <SkeletonLoader width="60%" height="32px" marginBottom="10px" />
+                 <SkeletonLoader width="30%" height="16px" />
+             </div>
+        </div>
+        <div class="trackers-grid" v-else-if="trackersStore.trackers.length > 0">
           <TrackerSummaryCard 
             v-for="tracker in trackersStore.trackers.slice(0, 4)" 
             :key="tracker.id" 
