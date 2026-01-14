@@ -68,14 +68,14 @@ defineEmits<{
   background-color: rgba(0, 0, 0, 0.6);
   z-index: 1000;
   /* Make overlay the scroll container */
+  /* Scroll handling */
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  max-height: 100%; /* Delegate height constraint to content if needed, key is overlay scroll */
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   padding: 1rem;
-  /* Safe area padding */
-  padding-top: max(2rem, env(safe-area-inset-top));
-  padding-bottom: max(2rem, env(safe-area-inset-bottom));
-  overscroll-behavior: contain;
 }
 
 .upgrade-modal {

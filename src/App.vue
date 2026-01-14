@@ -68,8 +68,10 @@ const closeMobileMenu = () => {
   top: 0;
   left: 0;
   right: 0;
+  right: 0;
   z-index: 20;
-  height: 60px;
+  min-height: 60px;
+  height: auto;
 }
 
 .menu-btn {
