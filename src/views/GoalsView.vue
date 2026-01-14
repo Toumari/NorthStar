@@ -12,13 +12,7 @@ const showCreateModal = ref(false)
 const showUpgradePrompt = ref(false)
 
 onMounted(() => {
-  console.log('[GoalsView] onMounted called')
-  try {
-    subscriptionStore.loadSubscription()
-    console.log('[GoalsView] Subscription load triggered')
-  } catch (e) {
-    console.error('[GoalsView] Error in onMounted:', e)
-  }
+  subscriptionStore.loadSubscription()
 })
 
 const canCreateGoal = computed(() => {
@@ -41,8 +35,6 @@ const handleCreateGoal = (goalData: any) => {
   store.addGoal(goalData)
   showCreateModal.value = false
 }
-
-console.log('[GoalsView] Setup completed')
 </script>
 
 <template>
