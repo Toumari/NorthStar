@@ -12,8 +12,6 @@ const store = useGoalsStore()
 const isSaving = ref(false)
 
 const getDefaultDate = () => {
-
-const getDefaultDate = () => {
   const date = new Date()
   date.setDate(date.getDate() + 7)
   return date.toISOString().split('T')[0]
