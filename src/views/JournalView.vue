@@ -10,6 +10,7 @@ const subscriptionStore = useSubscriptionStore()
 const showUpgradePrompt = ref(false)
 
 const datePickerValue = ref('')
+const dateInputRef = ref<HTMLInputElement | null>(null)
 
 onMounted(() => {
   subscriptionStore.loadSubscription()
@@ -19,21 +20,15 @@ const todayStr = new Date().toISOString().split('T')[0]
 
 // Main Feed Logic
 const feedItems = computed(() => {
-    // 1. Get all existing entries sorted DESC
     const entries = [...store.entries].sort((a, b) => b.date.localeCompare(a.date))
     
     const items = []
     const entryDates = new Set(entries.map(e => e.date))
 
-    // 2. Ensure Today is present (if not exists)
-    //    We prioritize showing Today at the very top if it's not there.
     if (!entryDates.has(todayStr)) {
          items.push({ date: todayStr, entry: undefined, isToday: true })
     }
 
-    // 3. Add existing entries
-    //    If we already pushed "Today" (as empty), we skip it here (it won't be in entries anyway).
-    //    If "Today" IS in entries, we add it here naturally.
     entries.forEach(entry => {
         items.push({ 
             date: entry.date, 
@@ -42,40 +37,36 @@ const feedItems = computed(() => {
         })
     })
 
-    // 4. Handle "Jump to Date" injection
-    //    If user picked a date that isn't today and isn't in entries, we should show it.
     if (datePickerValue.value) {
         const picked = datePickerValue.value
         if (picked !== todayStr && !entryDates.has(picked)) {
-            // Insert it after Today (or at top if somehow Today isn't there)
-            // Actually, let's just replace the view or unshift? 
-            // Better UX: Insert it at the top (above today? or just below?) 
-            // Let's put it at the very top for focus.
             items.unshift({ date: picked, entry: undefined, isToday: false })
-        } else {
-             // If it exists, we might want to scroll to it... 
-             // For now, logic handles display.
         }
     }
-
-    // Sort again? Or keep "Focus" -> "Today" -> "History"?
-    // "Focus" -> "Today" -> "History" seems best for interaction.
-    // But logically, reverse chrono is best.
-    // Let's stick to: If Picked Date is effectively "New Focus", put it top.
     
     return items
 })
 
 const handleJumpDate = () => {
-    // Just triggering reactivity for the computed property is enough
-    // But we might want to auto-scroll if it exists deep down.
     if (!datePickerValue.value) return
-    
     const element = document.getElementById(`entry-${datePickerValue.value}`)
     if (element) {
         element.scrollIntoView({ behavior: 'smooth', block: 'center' })
-        // Clear picker so we don't duplicate sticky logic? 
-        // No, keep it so they know what they picked.
+    }
+}
+
+const triggerDatePicker = () => {
+    // Programmatically open the native picker
+    if (dateInputRef.value) {
+        // @ts-ignore - showPicker is modern API supported in most browsers
+        if (dateInputRef.value.showPicker) {
+            // @ts-ignore
+            dateInputRef.value.showPicker()
+        } else {
+            // Fallback for older browsers (focus might trigger it on mobile)
+            dateInputRef.value.focus()
+            dateInputRef.value.click() // forceful attempt
+        }
     }
 }
 </script>
@@ -86,11 +77,16 @@ const handleJumpDate = () => {
           <header class="feed-header">
               <h1>Journal</h1>
               <div class="header-controls">
-                  <span class="label">Jump to:</span>
+                  <button class="btn-calendar" @click="triggerDatePicker">
+                      <span class="icon">📅</span>
+                      <span class="label">Jump to Date</span>
+                  </button>
+                  <!-- Hidden Input for Native Picker -->
                   <input 
+                    ref="dateInputRef"
                     type="date" 
                     v-model="datePickerValue" 
-                    class="date-picker-input"
+                    class="hidden-date-input"
                     @change="handleJumpDate"
                   />
               </div>
@@ -126,7 +122,7 @@ const handleJumpDate = () => {
 }
 
 .feed-container {
-    max-width: 700px;
+    max-width: 850px; /* Widened from 700px */
     margin: 0 auto;
 }
 
@@ -135,6 +131,8 @@ const handleJumpDate = () => {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--color-border); /* Added logic to define header area better */
 }
 
 .feed-header h1 {
@@ -145,29 +143,50 @@ const handleJumpDate = () => {
 }
 
 .header-controls {
+    position: relative;
+}
+
+.btn-calendar {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 0.5rem;
     background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
     padding: 0.5rem 1rem;
     border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 600;
+    color: var(--color-text);
     box-shadow: var(--shadow-soft);
 }
 
-.label {
-    font-size: 0.875rem;
-    color: var(--color-text-muted);
-    font-weight: 500;
+.btn-calendar:hover {
+    background-color: var(--color-surface-hover);
+    transform: translateY(-1px);
 }
 
-.date-picker-input {
-    background: transparent;
-    border: none;
-    color: var(--color-text);
-    font-family: inherit;
-    font-size: 0.9rem;
+.btn-calendar .icon {
+    font-size: 1.1rem;
+}
+
+.hidden-date-input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
     cursor: pointer;
-    outline: none;
+    pointer-events: none; /* Let button handle clicks via script, or allow click-through? */
+    /* pointer-events: none is safer if we use showPicker() */
+}
+
+/* Fallback: If showPicker not supported, make input cover button */
+@supports not selector(::-webkit-calendar-picker-indicator) {
+    .hidden-date-input {
+        pointer-events: auto;
+    }
 }
 
 /* Mobile Tweak */
@@ -177,14 +196,7 @@ const handleJumpDate = () => {
     }
     
     .feed-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 1rem;
-    }
-    
-    .header-controls {
-        width: 100%;
-        justify-content: space-between;
+        margin-bottom: 1.5rem;
     }
 }
 </style>
