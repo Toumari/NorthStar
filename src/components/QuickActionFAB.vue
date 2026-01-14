@@ -75,7 +75,7 @@ const handleAction = (action: 'goal' | 'tracker' | 'journal') => {
 /* Compensate for mobile tab bar if needed, though standard is bottom-right */
 @media (max-width: 768px) {
     .fab-container {
-        bottom: 5rem; /* Lift above potential mobile nav or safe area */
+        bottom: 2rem; /* Lowered from 5rem for better reachability */
         right: 1.5rem;
     }
 }
