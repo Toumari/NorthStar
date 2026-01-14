@@ -69,11 +69,8 @@ onErrorCaptured((err) => {
 
     <main class="main-content" :class="{ 'full-screen': hideSidebar }" v-if="!globalError">
 
-      <RouterView v-slot="{ Component }">
-        <Transition name="fade" mode="out-in">
-          <component :is="Component" />
-        </Transition>
-      </RouterView>
+      <RouterView />
+
     </main>
   </div>
 </template>

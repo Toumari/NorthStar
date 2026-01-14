@@ -117,4 +117,8 @@ router.beforeEach(async (to, from, next) => {
   }
 })
 
+router.afterEach((to, from) => {
+  console.log(`[Router] Navigation COMPLETE from ${String(from.name)} to ${String(to.name)}`)
+})
+
 export default router
