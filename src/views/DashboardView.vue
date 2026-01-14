@@ -62,18 +62,18 @@ const handleCreateTracker = (trackerData: any) => {
     </header>
 
     <div class="stats-grid">
-      <div class="stat-card highlight">
+      <RouterLink to="/goals?filter=completed" class="stat-card highlight">
         <h3>Completed Goals</h3>
         <p class="stat-value">{{ store.completedGoals.length }}</p>
-      </div>
-      <div class="stat-card">
+      </RouterLink>
+      <RouterLink to="/goals?filter=active" class="stat-card">
         <h3>Active Goals</h3>
         <p class="stat-value">{{ store.activeGoalsCount }}</p>
-      </div>
-      <div class="stat-card">
+      </RouterLink>
+      <RouterLink to="/goals?filter=today" class="stat-card">
         <h3>Tasks for Today</h3>
         <p class="stat-value">{{ store.todaysTasksCount }}</p>
-      </div>
+      </RouterLink>
     </div>
     
     
@@ -234,6 +234,14 @@ const handleCreateTracker = (trackerData: any) => {
   padding: 1.5rem;
   border-radius: 12px;
   border: 1px solid var(--color-border);
+  text-decoration: none; /* Remove underline from RouterLink */
+  display: block; /* Ensure block layout for link */
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
 }
 
 .stat-card.highlight {
