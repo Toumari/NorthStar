@@ -30,6 +30,7 @@ export const useGamificationStore = defineStore('gamification', () => {
     const unlockedBadgeIds = ref<string[]>([])
     const unlockedItemIds = ref<string[]>([])
     const recentUnlock = ref<Badge | null>(null) // For toast/notification
+    const isLoaded = ref(false)
 
     // Constants
     const XP_PER_LEVEL_BASE = 100
@@ -159,11 +160,13 @@ export const useGamificationStore = defineStore('gamification', () => {
             coins.value = 0
             unlockedBadgeIds.value = []
             unlockedItemIds.value = []
+            isLoaded.value = false
         }
     })
 
     const loadGamificationData = async () => {
         if (!authStore.user) return
+        if (isLoaded.value) return // Prevent multiple loads
 
         try {
             const userDocRef = doc(db, 'users', authStore.user.uid)
@@ -172,17 +175,19 @@ export const useGamificationStore = defineStore('gamification', () => {
             if (userDoc.exists()) {
                 const data = userDoc.data().gamification as any
                 if (data) {
-                    xp.value = data.xp || 0
-                    level.value = data.level || 1
-                    coins.value = data.coins || 0
-                    unlockedBadgeIds.value = data.badges || []
-                    unlockedItemIds.value = data.unlockedItems || ['theme_ocean']
+                    xp.value = Number(data.xp) || 0
+                    level.value = Number(data.level) || 1
+                    coins.value = Number(data.coins) || 0
+                    unlockedBadgeIds.value = Array.isArray(data.badges) ? data.badges : []
+                    unlockedItemIds.value = Array.isArray(data.unlockedItems) ? data.unlockedItems : ['theme_ocean']
                 } else {
                     await initGamification(userDocRef)
                 }
+                isLoaded.value = true // Mark as loaded only on success
             }
         } catch (error) {
             console.error('Error loading gamification data:', error)
+            // Do NOT set isLoaded = true via error
         }
     }
 
@@ -204,6 +209,11 @@ export const useGamificationStore = defineStore('gamification', () => {
 
     const saveGamificationData = async () => {
         if (!authStore.user) return
+        if (!isLoaded.value) {
+            console.warn('Attempted to save gamification data before loading. Aborting to prevent overwrite.')
+            return
+        }
+
         try {
             await updateDoc(doc(db, 'users', authStore.user.uid), {
                 gamification: {
