@@ -38,48 +38,50 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="modal-overlay" @click.self="$emit('close')" @touchmove.self.prevent>
-    <div class="modal-content">
-      <header>
-        <h2>Create New Tracker</h2>
-        <button class="close-btn" @click="$emit('close')">&times;</button>
-      </header>
-
-      <div class="modal-body">
-        <div class="form-group">
-          <label>Tracker Name <span class="required">*</span></label>
-          <input 
-            v-model.trim="name" 
-            type="text" 
-            placeholder="e.g., Weight" 
-            autofocus 
-            required
-            @blur="touched.name = true"
-            :class="{ 'input-error': touched.name && !name }"
-          >
-          <span v-if="touched.name && !name" class="error-text">Name is required</span>
+  <Teleport to="body">
+    <div class="modal-overlay" @click.self="$emit('close')" @touchmove.self.prevent>
+      <div class="modal-content">
+        <header>
+          <h2>Create New Tracker</h2>
+          <button class="close-btn" @click="$emit('close')">&times;</button>
+        </header>
+  
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Tracker Name <span class="required">*</span></label>
+            <input 
+              v-model.trim="name" 
+              type="text" 
+              placeholder="e.g., Weight" 
+              autofocus 
+              required
+              @blur="touched.name = true"
+              :class="{ 'input-error': touched.name && !name }"
+            >
+            <span v-if="touched.name && !name" class="error-text">Name is required</span>
+          </div>
+  
+          <div class="form-group">
+            <label>Unit <span class="required">*</span></label>
+            <input 
+              v-model.trim="unit" 
+              type="text" 
+              placeholder="e.g., kg" 
+              required
+              @blur="touched.unit = true"
+              :class="{ 'input-error': touched.unit && !unit }"
+            >
+            <span v-if="touched.unit && !unit" class="error-text">Unit is required</span>
+          </div>
         </div>
-
-        <div class="form-group">
-          <label>Unit <span class="required">*</span></label>
-          <input 
-            v-model.trim="unit" 
-            type="text" 
-            placeholder="e.g., kg" 
-            required
-            @blur="touched.unit = true"
-            :class="{ 'input-error': touched.unit && !unit }"
-          >
-          <span v-if="touched.unit && !unit" class="error-text">Unit is required</span>
-        </div>
+  
+        <footer>
+          <button class="btn-text" @click="$emit('close')">Cancel</button>
+          <button class="btn-primary" @click="save" :disabled="!name.trim() || !unit.trim()">Create Tracker</button>
+        </footer>
       </div>
-
-      <footer>
-        <button class="btn-text" @click="$emit('close')">Cancel</button>
-        <button class="btn-primary" @click="save" :disabled="!name.trim() || !unit.trim()">Create Tracker</button>
-      </footer>
     </div>
-  </div>
+  </Teleport>
 </template>
 
 <style scoped>

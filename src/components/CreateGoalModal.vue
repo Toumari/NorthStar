@@ -89,78 +89,80 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="modal-overlay" @click.self="$emit('close')" @touchmove.self.prevent>
-    <div class="modal-content">
-      <header>
-        <h2>{{ initialGoal ? 'Edit Goal' : 'Create New Goal' }}</h2>
-        <button class="close-btn" @click="$emit('close')">&times;</button>
-      </header>
-
-      <div class="modal-body">
-        <div class="form-group">
-          <label>Goal Title <span class="required">*</span></label>
-          <input 
-            v-model.trim="form.title" 
-            type="text" 
-            placeholder="e.g., Run a Marathon" 
-            autofocus 
-            required
-            @blur="touched.title = true"
-            :class="{ 'input-error': touched.title && !form.title }"
-          >
-          <span v-if="touched.title && !form.title" class="error-text">Title is required</span>
-        </div>
-
-        <div class="row">
-          <div class="form-group half">
-            <label>Category</label>
-            <select v-model="form.category">
-              <option v-for="c in categories" :key="c" :value="c">{{ c }}</option>
-            </select>
+  <Teleport to="body">
+    <div class="modal-overlay" @click.self="$emit('close')" @touchmove.self.prevent>
+      <div class="modal-content">
+        <header>
+          <h2>{{ initialGoal ? 'Edit Goal' : 'Create New Goal' }}</h2>
+          <button class="close-btn" @click="$emit('close')">&times;</button>
+        </header>
+  
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Goal Title <span class="required">*</span></label>
+            <input 
+              v-model.trim="form.title" 
+              type="text" 
+              placeholder="e.g., Run a Marathon" 
+              autofocus 
+              required
+              @blur="touched.title = true"
+              :class="{ 'input-error': touched.title && !form.title }"
+            >
+            <span v-if="touched.title && !form.title" class="error-text">Title is required</span>
           </div>
-          <div class="form-group half">
-            <label>Due Date</label>
-            <input v-model="form.dueDate" type="date" :min="minDate">
-          </div>
-        </div>
-
-        <div class="smart-section">
-          <h3>S.M.A.R.T. Framework</h3>
-          <p class="description">Make your goal crystal clear.</p>
-          
-          <div class="smart-grid">
-            <div class="form-group">
-              <label>Specific</label>
-              <textarea v-model="form.specific" placeholder="What exactly do you want to accomplish?"></textarea>
+  
+          <div class="row">
+            <div class="form-group half">
+              <label>Category</label>
+              <select v-model="form.category">
+                <option v-for="c in categories" :key="c" :value="c">{{ c }}</option>
+              </select>
             </div>
-            <div class="form-group">
-              <label>Measurable</label>
-              <textarea v-model="form.measurable" placeholder="How will you track progress?"></textarea>
-            </div>
-            <div class="form-group">
-              <label>Achievable</label>
-              <textarea v-model="form.achievable" placeholder="How can you make this goal realistic?"></textarea>
-            </div>
-            <div class="form-group">
-              <label>Relevant</label>
-              <textarea v-model="form.relevant" placeholder="Why does this goal matter to you?"></textarea>
-            </div>
-            <div class="form-group">
-              <label>Time-bound</label>
-              <textarea v-model="form.timeBound" placeholder="When exactly do you want to accomplish this?"></textarea>
+            <div class="form-group half">
+              <label>Due Date</label>
+              <input v-model="form.dueDate" type="date" :min="minDate">
             </div>
           </div>
+  
+          <div class="smart-section">
+            <h3>S.M.A.R.T. Framework</h3>
+            <p class="description">Make your goal crystal clear.</p>
+            
+            <div class="smart-grid">
+              <div class="form-group">
+                <label>Specific</label>
+                <textarea v-model="form.specific" placeholder="What exactly do you want to accomplish?"></textarea>
+              </div>
+              <div class="form-group">
+                <label>Measurable</label>
+                <textarea v-model="form.measurable" placeholder="How will you track progress?"></textarea>
+              </div>
+              <div class="form-group">
+                <label>Achievable</label>
+                <textarea v-model="form.achievable" placeholder="How can you make this goal realistic?"></textarea>
+              </div>
+              <div class="form-group">
+                <label>Relevant</label>
+                <textarea v-model="form.relevant" placeholder="Why does this goal matter to you?"></textarea>
+              </div>
+              <div class="form-group">
+                <label>Time-bound</label>
+                <textarea v-model="form.timeBound" placeholder="When exactly do you want to accomplish this?"></textarea>
+              </div>
+            </div>
+          </div>
         </div>
+  
+        <footer>
+          <button class="btn-text" @click="$emit('close')">Cancel</button>
+          <button class="btn-primary" @click="save" :disabled="!form.title.trim()">
+            {{ initialGoal ? 'Save Changes' : 'Create Goal' }}
+          </button>
+        </footer>
       </div>
-
-      <footer>
-        <button class="btn-text" @click="$emit('close')">Cancel</button>
-        <button class="btn-primary" @click="save" :disabled="!form.title.trim()">
-          {{ initialGoal ? 'Save Changes' : 'Create Goal' }}
-        </button>
-      </footer>
     </div>
-  </div>
+  </Teleport>
 </template>
 
 <style scoped>
