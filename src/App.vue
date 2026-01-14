@@ -7,6 +7,7 @@ import { useThemeStore } from './stores/theme'
 const isMobileMenuOpen = ref(false)
 const route = useRoute()
 const themeStore = useThemeStore()
+const globalError = ref<string | null>(null)
 
 // Initialize theme
 themeStore.initTheme()
@@ -20,12 +21,30 @@ const hideSidebar = computed(() => {
 const closeMobileMenu = () => {
   isMobileMenuOpen.value = false
 }
+
+import { onErrorCaptured } from 'vue'
+onErrorCaptured((err) => {
+  console.error("Global Error Captured:", err)
+  // Check for specific chunk load error which is common in hot reloads/updates
+  if (String(err).includes('Importing a module script failed')) {
+      window.location.reload()
+      return false
+  }
+  globalError.value = String(err)
+  return false // Stop propagation
+})
 </script>
 
 <template>
   <div class="app-layout">
+     <div v-if="globalError" class="global-error-boundary">
+      <h2>Something went wrong :(</h2>
+      <p class="error-msg">{{ globalError }}</p>
+      <button @click="globalError = null; $router.go(0)" class="btn-retry">Reload App</button>
+    </div>
+
     <!-- Mobile Header -->
-    <header class="mobile-header" v-if="!hideSidebar">
+    <header class="mobile-header" v-if="!hideSidebar && !globalError">
       <button class="menu-btn" @click="isMobileMenuOpen = !isMobileMenuOpen">
         <span class="hamburger">☰</span>
       </button>
@@ -33,12 +52,13 @@ const closeMobileMenu = () => {
     </header>
 
     <!-- Sidebar with overlay logic -->
-    <div class="sidebar-wrapper" :class="{ 'open': isMobileMenuOpen }" v-if="!hideSidebar">
+    <div class="sidebar-wrapper" :class="{ 'open': isMobileMenuOpen }" v-if="!hideSidebar && !globalError">
       <div class="overlay" @click="isMobileMenuOpen = false"></div>
       <SidebarNav :is-open="isMobileMenuOpen" @link-clicked="closeMobileMenu" />
     </div>
 
-    <main class="main-content" :class="{ 'full-screen': hideSidebar }">
+    <main class="main-content" :class="{ 'full-screen': hideSidebar }" v-if="!globalError">
+
       <RouterView v-slot="{ Component }">
         <Transition name="fade" mode="out-in">
           <component :is="Component" />
@@ -169,5 +189,42 @@ const closeMobileMenu = () => {
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+
+.global-error-boundary {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 9999;
+  background-color: var(--color-background);
+  color: var(--color-text);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  text-align: center;
+}
+
+.error-msg {
+  color: var(--color-danger);
+  margin: 1rem 0;
+  font-family: monospace;
+  background: rgba(255,0,0,0.1);
+  padding: 1rem;
+  border-radius: 8px;
+  max-width: 80%;
+  overflow-wrap: break-word;
+}
+
+.btn-retry {
+  padding: 0.75rem 1.5rem;
+  background-color: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
 }
 </style>
