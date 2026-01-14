@@ -37,6 +37,7 @@ const handleNewGoalClick = () => {
   }
 }
 
+const handleCreateGoal = (goalData: any) => {
   store.addGoal(goalData)
   showCreateModal.value = false
 }
