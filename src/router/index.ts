@@ -106,7 +106,9 @@ router.beforeEach(async (to, from, next) => {
 
   const isAuthenticated = authStore.isAuthenticated
 
+  console.log(`[Router] Navigating from ${String(from.name)} to ${String(to.name)}`)
   if (to.meta.requiresAuth && !isAuthenticated) {
+    console.log('[Router] Auth required, redirecting to login')
     next('/login')
   } else if (to.meta.guest && isAuthenticated) {
     next('/')

@@ -8,18 +8,23 @@ const isMobileMenuOpen = ref(false)
 const route = useRoute()
 const themeStore = useThemeStore()
 const globalError = ref<string | null>(null)
+const logs = ref<string[]>([])
 
-// Initialize theme
-themeStore.initTheme()
+// Capture original console methods
+const originalLog = console.log
+const originalError = console.warn
+const originalWarn = console.error
 
-// Routes where sidebar should be hidden
-const hideSidebar = computed(() => {
-  return ['login', 'register', 'forgot-password'].includes(route.name as string)
-})
+console.log = (...args) => {
+  logs.value.push(`[LOG] ${args.join(' ')}`)
+  if (logs.value.length > 20) logs.value.shift()
+  originalLog(...args)
+}
 
-// Close mobile menu on route change
-const closeMobileMenu = () => {
-  isMobileMenuOpen.value = false
+console.error = (...args) => {
+  logs.value.push(`[ERR] ${args.join(' ')}`)
+  if (logs.value.length > 20) logs.value.shift()
+  originalError(...args)
 }
 
 import { onErrorCaptured } from 'vue'
@@ -37,6 +42,11 @@ onErrorCaptured((err) => {
 
 <template>
   <div class="app-layout">
+    <!-- Visual Logger Overlay -->
+    <div v-if="true" style="position: fixed; bottom: 0; right: 0; background: rgba(0,0,0,0.8); color: lime; padding: 10px; z-index: 10000; font-family: monospace; font-size: 10px; max-height: 200px; overflow-y: auto; pointer-events: none; width: 300px;">
+        <div v-for="(log, i) in logs" :key="i">{{ log }}</div>
+    </div>
+
      <div v-if="globalError" class="global-error-boundary">
       <h2>Something went wrong :(</h2>
       <p class="error-msg">{{ globalError }}</p>
