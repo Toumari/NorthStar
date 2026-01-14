@@ -13,6 +13,7 @@ import {
     query,
     where
 } from 'firebase/firestore'
+import confetti from 'canvas-confetti'
 
 export interface Task {
     id: string
@@ -147,6 +148,13 @@ export const useGoalsStore = defineStore('goals', () => {
 
         // Gamification Hook
         if (completed && !wasCompleted) {
+            // Trigger Confetti!
+            confetti({
+                particleCount: 150,
+                spread: 70,
+                origin: { y: 0.6 }
+            })
+
             const gamificationStore = useGamificationStore()
             gamificationStore.awardXP(50)
             gamificationStore.unlockBadge('first_goal')

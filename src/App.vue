@@ -1,11 +1,18 @@
 <script setup lang="ts">
 import { ref, computed, watch, nextTick } from 'vue'
-import { RouterView, useRoute } from 'vue-router'
+import { RouterView, useRoute, useRouter } from 'vue-router'
 import SidebarNav from './components/SidebarNav.vue'
 import { useThemeStore } from './stores/theme'
+import QuickActionFAB from './components/QuickActionFAB.vue'
+import CreateGoalModal from './components/CreateGoalModal.vue'
+import CreateTrackerModal from './components/CreateTrackerModal.vue'
+import { useGoalsStore } from './stores/goals'
+import { useTrackersStore } from './stores/trackers'
+import { useSubscriptionStore } from './stores/subscription'
 
 const isMobileMenuOpen = ref(false)
 const route = useRoute()
+const router = useRouter()
 const themeStore = useThemeStore()
 const mainContentRef = ref<HTMLElement | null>(null)
 
@@ -29,6 +36,40 @@ watch(route, async () => {
     mainContentRef.value.scrollTop = 0
   }
 })
+
+// Global Modals State
+const showGoalModal = ref(false)
+const showTrackerModal = ref(false)
+const goalsStore = useGoalsStore()
+const trackersStore = useTrackersStore()
+const subscriptionStore = useSubscriptionStore()
+
+const handleCreateGoal = (goalData: any) => {
+  goalsStore.addGoal(goalData)
+  showGoalModal.value = false
+}
+
+const handleCreateTracker = (trackerData: any) => {
+  trackersStore.addTracker(trackerData.name, trackerData.unit)
+  showTrackerModal.value = false
+}
+
+const openGoalModal = () => {
+    // Basic limit check (simplified for global FAB, could add UpgradePrompt global later)
+    if (subscriptionStore.canCreateGoal(goalsStore.goals.length)) {
+        showGoalModal.value = true
+    } else {
+        alert("Free limit reached. Upgrade to Premium!")
+    }
+}
+
+const openTrackerModal = () => {
+    if (subscriptionStore.canCreateTracker(trackersStore.trackers.length)) {
+        showTrackerModal.value = true
+    } else {
+        alert("Free limit reached. Upgrade to Premium!")
+    }
+}
 </script>
 
 <template>
@@ -52,6 +93,25 @@ watch(route, async () => {
       <RouterView />
 
     </main>
+    
+    <QuickActionFAB 
+      v-if="!hideSidebar"
+      @create-goal="openGoalModal"
+      @create-tracker="openTrackerModal"
+      @navigate-journal="router.push('/journal')"
+    />
+
+    <CreateGoalModal 
+      v-if="showGoalModal"
+      @close="showGoalModal = false"
+      @save="handleCreateGoal"
+    />
+
+    <CreateTrackerModal 
+      v-if="showTrackerModal"
+      @close="showTrackerModal = false"
+      @save="handleCreateTracker"
+    />
   </div>
 </template>
 
