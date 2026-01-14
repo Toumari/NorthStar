@@ -114,11 +114,15 @@ const formattedDate = computed(() => {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  flex: 1; /* Allow name to take available space */
+  min-width: 0; /* Enable flex shrinkage */
 }
 
 .unit {
   font-size: 0.8rem;
   color: var(--color-text-muted);
+  white-space: nowrap; /* Prevent wrapping */
+  flex-shrink: 0; /* Don't shrink the unit */
 }
 
 .content {
