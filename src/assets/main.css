@@ -12,6 +12,9 @@
   /* Slate 200 */
 
   --color-primary: #0284c7;
+  --color-primary-rgb: 2, 132, 199;
+  /* Sky 600 RGB for shadows */
+
   /* Sky 600 */
   --color-primary-light: rgba(2, 132, 199, 0.1);
   --color-primary-dark: #0369a1;
@@ -29,6 +32,9 @@
   --color-text-muted: #64748b;
   /* Slate 500 */
 
+  --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  --shadow-medium: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
+
   --font-family-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
@@ -44,6 +50,9 @@
   /* Slate 700 */
 
   --color-primary: #38bdf8;
+  --color-primary-rgb: 56, 189, 248;
+  /* Sky 400 RGB */
+
   /* Sky 400 */
   --color-primary-light: rgba(56, 189, 248, 0.1);
   --color-primary-dark: #0284c7;
@@ -60,6 +69,9 @@
   /* Slate 50 */
   --color-text-muted: #94a3b8;
   /* Slate 400 */
+
+  --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+  --shadow-medium: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
 }
 
 /* --- Theme Variants (Applied via body class or html[data-theme]) --- */
@@ -67,6 +79,7 @@
 /* Ocean (Default Blue) - implicit, but explicit class for clarity */
 .theme-ocean {
   --color-primary: #0284c7;
+  --color-primary-rgb: 2, 132, 199;
   /* Sky 600 */
   --color-primary-dark: #0369a1;
   /* Sky 700 */
@@ -85,6 +98,7 @@
 /* Sunset (Orange/Pink) */
 .theme-sunset {
   --color-primary: #f97316;
+  --color-primary-rgb: 249, 115, 22;
   /* Orange 500 */
   --color-primary-dark: #ea580c;
   /* Orange 600 */
@@ -93,6 +107,7 @@
 
 :root.dark.theme-sunset {
   --color-primary: #f97316;
+  --color-primary-rgb: 249, 115, 22;
   /* Orange 500 - Much warmer than 300 */
   --color-primary-dark: #ea580c;
   /* Orange 600 */
@@ -103,6 +118,7 @@
 /* Forest (Green) */
 .theme-forest {
   --color-primary: #10b981;
+  --color-primary-rgb: 16, 185, 129;
   /* Emerald 500 */
   --color-primary-dark: #059669;
   /* Emerald 600 */
@@ -111,6 +127,7 @@
 
 :root.dark.theme-forest {
   --color-primary: #10b981;
+  --color-primary-rgb: 16, 185, 129;
   /* Emerald 500 - Deeper green than 300 */
   --color-primary-dark: #059669;
   /* Emerald 600 */
@@ -121,6 +138,7 @@
 /* Lavender (Purple) */
 .theme-lavender {
   --color-primary: #8b5cf6;
+  --color-primary-rgb: 139, 92, 246;
   /* Violet 500 */
   --color-primary-dark: #7c3aed;
   /* Violet 600 */
@@ -129,6 +147,7 @@
 
 :root.dark.theme-lavender {
   --color-primary: #a78bfa;
+  --color-primary-rgb: 167, 139, 250;
   /* Violet 400 - Slightly brighter than 300 */
   --color-primary-dark: #8b5cf6;
   /* Violet 500 */

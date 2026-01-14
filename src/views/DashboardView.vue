@@ -263,10 +263,16 @@ const handleCreateTracker = (trackerData: any) => {
   background-color: var(--color-surface);
   padding: 1.5rem;
   border-radius: 12px;
-  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-soft);
+  border: 1px solid transparent;
   text-decoration: none; /* Remove underline from RouterLink */
   display: block; /* Ensure block layout for link */
   transition: transform 0.2s, box-shadow 0.2s;
+}
+
+:root.dark .stat-card {
+    border-color: var(--color-border);
+    box-shadow: none;
 }
 
 .stat-card:hover {
@@ -358,9 +364,15 @@ const handleCreateTracker = (trackerData: any) => {
 
 .card {
   background-color: var(--color-surface);
-  border: 1px solid var(--color-border);
   border-radius: 12px;
   padding: 1.5rem;
+  box-shadow: var(--shadow-soft);
+  border: 1px solid transparent; /* default no border in light mode if we have shadow */
+}
+
+:root.dark .card {
+    border-color: var(--color-border);
+    box-shadow: none; /* Dark mode often prefers borders over shadows */
 }
 
 .journal-date {

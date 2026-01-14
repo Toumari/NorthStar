@@ -95,7 +95,15 @@ const handleAction = (action: 'goal' | 'tracker' | 'journal') => {
   box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.4);
   transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), background-color 0.2s;
   position: relative;
+  position: relative;
   z-index: 2;
+  animation: pulse-glow 3s infinite;
+}
+
+@keyframes pulse-glow {
+    0% { box-shadow: 0 0 0 0 rgba(var(--color-primary-rgb), 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(var(--color-primary-rgb), 0); }
+    100% { box-shadow: 0 0 0 0 rgba(var(--color-primary-rgb), 0); }
 }
 
 .fab-main:hover {
