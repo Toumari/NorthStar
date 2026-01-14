@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch, nextTick } from 'vue'
 import { RouterView, useRoute } from 'vue-router'
 import SidebarNav from './components/SidebarNav.vue'
 import { useThemeStore } from './stores/theme'
@@ -7,6 +7,7 @@ import { useThemeStore } from './stores/theme'
 const isMobileMenuOpen = ref(false)
 const route = useRoute()
 const themeStore = useThemeStore()
+const mainContentRef = ref<HTMLElement | null>(null)
 
 // Initialize theme
 themeStore.initTheme()
@@ -20,6 +21,14 @@ const hideSidebar = computed(() => {
 const closeMobileMenu = () => {
   isMobileMenuOpen.value = false
 }
+
+// Scroll to top on route change (since we scroll the div, not window)
+watch(route, async () => {
+  await nextTick()
+  if (mainContentRef.value) {
+    mainContentRef.value.scrollTop = 0
+  }
+})
 </script>
 
 <template>
@@ -38,7 +47,7 @@ const closeMobileMenu = () => {
       <SidebarNav :is-open="isMobileMenuOpen" @link-clicked="closeMobileMenu" />
     </div>
 
-    <main class="main-content" :class="{ 'full-screen': hideSidebar }">
+    <main class="main-content" :class="{ 'full-screen': hideSidebar }" ref="mainContentRef">
 
       <RouterView />
 
@@ -118,7 +127,7 @@ const closeMobileMenu = () => {
   }
 
   .main-content {
-    padding: 1rem; /* Reduce padding on mobile */
+    padding: 1.5rem; /* Restored comfortable padding */
   }
   
   .main-content.full-screen {
