@@ -3,7 +3,7 @@ import { ref, computed, watchEffect, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useJournalStore } from '../stores/journal'
 import { useSubscriptionStore } from '../stores/subscription'
-import JournalCalendar from '../components/JournalCalendar.vue'
+import JournalTimeline from '../components/JournalTimeline.vue'
 import UpgradePrompt from '../components/UpgradePrompt.vue'
 
 const store = useJournalStore()
@@ -12,9 +12,22 @@ const route = useRoute()
 const router = useRouter()
 const showUpgradePrompt = ref(false)
 
+// Mobile State
+const isMobile = ref(false)
+const showTimelineMobile = ref(true) // Start showing timeline on mobile
+
 onMounted(() => {
   subscriptionStore.loadSubscription()
+  checkMobile()
+  window.addEventListener('resize', checkMobile)
 })
+
+const checkMobile = () => {
+    isMobile.value = window.innerWidth <= 900
+    if (!isMobile.value) {
+        showTimelineMobile.value = true // Always show sidebar on desktop
+    }
+}
 
 // Get date from query or default to today
 const selectedDate = computed(() => {
@@ -59,11 +72,9 @@ const handleSave = async () => {
   }
 }
 
-// Auto-save debounce could be added here, but manual for now is safer/simpler
-const formattedDate = computed(() => {
+const formattedDateHeader = computed(() => {
   return new Date(selectedDate.value).toLocaleDateString('en-US', {
     weekday: 'long',
-    year: 'numeric',
     month: 'long',
     day: 'numeric'
   })
@@ -77,176 +88,166 @@ const handleDelete = async () => {
         await store.deleteEntry(entry.id)
         content.value = ''
         saveMessage.value = 'Deleted'
+        // Go back to timeline view on mobile to pick another
+        if (isMobile.value) showTimelineMobile.value = true
     }
+}
+
+const handleSelectDate = (date: string) => {
+    router.replace({ query: { date } })
+    if (isMobile.value) {
+        showTimelineMobile.value = false // Slide to editor
+    }
+}
+
+const backToTimeline = () => {
+    showTimelineMobile.value = true
 }
 </script>
 
 <template>
-  <div class="journal-view">
-    <div class="layout-grid">
-      <!-- Left Sidebar: Calendar & Stats -->
-      <aside class="journal-sidebar">
-        <div class="sidebar-content">
-             <JournalCalendar mode="sidebar" />
-        </div>
-      </aside>
+  <div class="journal-layout">
+    <!-- Sidebar: Timeline (Always visible on DT, conditionally on Mobile) -->
+    <aside class="journal-sidebar" :class="{ 'hidden-mobile': isMobile && !showTimelineMobile }">
+        <JournalTimeline 
+            :selectedDate="selectedDate"
+            @select-date="handleSelectDate"
+        />
+    </aside>
 
-      <!-- Main Content: Daily Editor -->
-      <main class="daily-page">
-        <header class="page-header">
-           <div class="date-display">
-             <h1>{{ formattedDate }}</h1>
-             <p class="subtitle">
-               Daily Journal
-               <span v-if="isEntryLocked" class="locked-badge" @click="showUpgradePrompt = true">
-                 🔒 Read-only
-               </span>
-             </p>
-           </div>
-           
-           <div class="actions">
-             <span class="save-status" :class="{ 'visible': saveMessage }">{{ saveMessage }}</span>
-             <button class="btn-text delete-btn" @click="handleDelete" v-if="store.entries.find(e => e.date === selectedDate)">
-                Delete
-             </button>
-           </div>
+    <!-- Main Editor -->
+    <main class="journal-editor" :class="{ 'visible-mobile': isMobile && !showTimelineMobile }">
+        <header class="editor-header">
+            <button class="back-btn" v-if="isMobile" @click="backToTimeline">
+                ← Back
+            </button>
+            <div class="date-info">
+                <h2>{{ formattedDateHeader }}</h2>
+                <span v-if="isEntryLocked" class="locked-label" @click="showUpgradePrompt = true">🔒 Read-only</span>
+            </div>
+            <div class="actions">
+                <span class="save-status" :class="{ visible: saveMessage }">{{ saveMessage }}</span>
+                <button class="icon-btn delete" @click="handleDelete" title="Delete Entry" v-if="store.entries.find(e => e.date === selectedDate)">
+                    🗑️
+                </button>
+            </div>
         </header>
 
-        <div class="editor-container">
-          <div v-if="isEntryLocked" class="read-only-banner">
-            <span class="banner-icon">🔒</span>
-            <span class="banner-text">Read-only mode - Entries older than 14 days can't be edited on the free plan.</span>
-            <button class="btn-banner-upgrade" @click="showUpgradePrompt = true">Upgrade to Edit</button>
-          </div>
-          
-          <textarea 
-            v-model="content" 
-            placeholder="What's on your mind?..." 
-            class="main-textarea"
-            :disabled="isEntryLocked"
-            @blur="handleSave"
-            @keydown.ctrl.enter="handleSave"
-          ></textarea>
-          <!-- Save hint -->
-           <div class="editor-footer">
-              <button class="btn-primary" @click="handleSave" :disabled="isSaving || isEntryLocked || !content.trim()">
-                  {{ isSaving ? 'Saving...' : 'Save Entry' }}
-              </button>
-           </div>
+        <div class="editor-body font-serif">
+             <div v-if="isEntryLocked" class="locked-banner">
+                <p>To edit past entries, upgrade to Premium.</p>
+                <button class="btn-xs" @click="showUpgradePrompt = true">Upgrade</button>
+             </div>
+
+            <textarea 
+                v-model="content" 
+                placeholder="Write your story..."
+                class="zen-textarea"
+                :disabled="isEntryLocked"
+                @blur="handleSave"
+                @keydown.ctrl.enter="handleSave" 
+            ></textarea>
         </div>
-      </main>
-    </div>
+    </main>
     
     <UpgradePrompt
       v-if="showUpgradePrompt"
-      message="Free users can only edit journal entries from the last 14 days. Upgrade to Premium to edit your full journal history!"
+      message="Unlock your full history with Premium."
       @close="showUpgradePrompt = false"
     />
   </div>
 </template>
 
 <style scoped>
-.journal-view {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
+.journal-layout {
+    display: flex;
+    height: 100%;
+    overflow: hidden;
+    background-color: var(--color-background);
 }
 
-.layout-grid {
-  display: grid;
-  grid-template-columns: 350px 1fr;
-  gap: 2rem;
-  height: 100%;
-  overflow: hidden; /* Prevent double scrollbars */
+.journal-sidebar {
+    width: 350px;
+    height: 100%;
+    flex-shrink: 0;
+    z-index: 2;
+    background-color: var(--color-surface);
+    border-right: 1px solid var(--color-border);
 }
 
-@media (max-width: 900px) {
-  .layout-grid {
-    grid-template-columns: 1fr;
-    overflow-y: auto;
+.journal-editor {
+    flex: 1;
     display: flex;
     flex-direction: column;
-  }
-  
-  .journal-sidebar {
-      order: -1; /* Sidebar ON TOP */
-      height: auto;
-      border-right: none;
-      padding-right: 0;
-      border-bottom: 1px solid var(--color-border);
-      padding-bottom: 2rem;
-  }
+    height: 100%;
+    background-color: var(--color-background); /* Maybe make this white/paper color? */
 }
 
-/* Sidebar */
-.journal-sidebar {
-  border-right: 1px solid var(--color-border);
-  padding-right: 2rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: center; /* Center content vertically */
-  height: 100%;
-  overflow-y: auto;
-}
-
+/* Mobile Responsive Logic */
 @media (max-width: 900px) {
     .journal-sidebar {
-        border-right: none;
-        padding-right: 0;
-        border-bottom: 1px solid var(--color-border);
-        padding-bottom: 2rem;
-        justify-content: flex-start; /* Reset for mobile */
-        max-height: 50vh; /* Limit height so it doesn't take over */
+        width: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        transform: translateX(0);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .journal-sidebar.hidden-mobile {
+        transform: translateX(-100%);
+    }
+
+    .journal-editor {
+        width: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        transform: translateX(100%);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 3; /* Above sidebar */
+    }
+
+    .journal-editor.visible-mobile {
+        transform: translateX(0);
     }
 }
 
-.sidebar-content {
-    /* Container for calendar */
+/* Editor Styles */
+.editor-header {
+    padding: 1rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    /* border-bottom: 1px solid var(--color-border); */ /* Keep it clean? */
 }
 
-/* Main Page */
-.daily-page {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  overflow-y: auto;
-  padding-right: 1rem; /* Space for scrollbar */
+.back-btn {
+    background: none;
+    border: none;
+    font-size: 1rem;
+    color: var(--color-primary);
+    cursor: pointer;
+    margin-right: 1rem;
 }
 
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 2rem;
-  padding-top: 1rem;
+.date-info h2 {
+    font-size: 1.5rem;
+    font-family: 'Lora', serif;
+    font-weight: 600;
+    color: var(--color-text);
 }
 
-.date-display h1 {
-  font-size: 2rem;
-  font-weight: 700;
-  color: var(--color-text);
-  margin: 0;
-  line-height: 1.2;
-}
-
-.subtitle {
-  color: var(--color-text-muted);
-  font-size: 1rem;
-  margin-top: 0.25rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.locked-badge {
-  color: var(--color-primary);
-  font-weight: 600;
-  cursor: pointer;
-  font-size: 0.9rem;
-}
-
-.locked-badge:hover {
-  text-decoration: underline;
+.locked-label {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    background: var(--color-surface-hover);
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-left: 0.5rem;
+    cursor: pointer;
 }
 
 .actions {
@@ -256,7 +257,7 @@ const handleDelete = async () => {
 }
 
 .save-status {
-    font-size: 0.875rem;
+    font-size: 0.8rem;
     color: var(--color-text-muted);
     opacity: 0;
     transition: opacity 0.3s;
@@ -266,115 +267,84 @@ const handleDelete = async () => {
     opacity: 1;
 }
 
-.delete-btn {
-    color: var(--color-danger);
-    font-size: 0.875rem;
-}
-
-.btn-text {
+.icon-btn {
     background: none;
     border: none;
-    padding: 0;
     cursor: pointer;
-    font-weight: 500;
+    font-size: 1.2rem;
+    opacity: 0.5;
+    transition: opacity 0.2s;
 }
 
-.btn-text:hover {
-    text-decoration: underline;
+.icon-btn:hover {
+    opacity: 1;
 }
 
-/* Editor */
-.editor-container {
+.editor-body {
     flex: 1;
+    padding: 0 2rem 2rem 2rem; /* Comfortable padding */
+    max-width: 800px;
+    width: 100%;
+    margin: 0 auto;
     display: flex;
     flex-direction: column;
-    background-color: var(--color-surface);
-    border-radius: 12px;
-    border: 1px solid var(--color-border);
-    padding: 2rem;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-    position: relative;
-}
-
-.read-only-banner {
-  background-color: var(--color-primary-soft);
-  border: 1px solid var(--color-primary);
-  border-radius: 8px;
-  padding: 0.75rem 1rem;
-  margin-bottom: 1rem;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  font-size: 0.9rem;
-}
-
-.banner-icon {
-  font-size: 1.2rem;
-}
-
-.banner-text {
-  flex: 1;
-  color: var(--color-text);
-}
-
-.btn-banner-upgrade {
-  background-color: var(--color-primary);
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  font-weight: 600;
-  cursor: pointer;
-  font-size: 0.85rem;
-  white-space: nowrap;
-}
-
-.btn-banner-upgrade:hover {
-  opacity: 0.9;
-}
-
-.main-textarea {
-    flex: 1;
-    width: 100%;
-    border: none;
-    background: transparent;
-    font-size: 1.125rem;
-    line-height: 1.6;
-    color: var(--color-text);
-    resize: none;
-    font-family: inherit; /* OR 'Merriweather', serif if we want book feel */
-}
-
-.main-textarea:focus {
-    outline: none;
-}
-
-.editor-footer {
-    display: flex;
-    justify-content: flex-end;
-    margin-top: 1rem;
-}
-
-.btn-primary {
-  background-color: var(--color-primary);
-  color: white;
-  border: none;
-  padding: 0.75rem 2rem;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: opacity 0.2s;
-}
-
-.btn-primary:disabled {
-    opacity: 0.7;
-    cursor: not-allowed;
 }
 
 @media (max-width: 900px) {
-    .editor-container {
-        padding: 1rem;
-        min-height: 50vh;
+    .editor-body {
+        padding: 0 1rem 1rem 1rem;
     }
+}
+
+.font-serif {
+    font-family: 'Lora', serif;
+}
+
+.zen-textarea {
+    flex: 1;
+    width: 100%;
+    background: transparent;
+    border: none;
+    resize: none;
+    font-size: 1.25rem;
+    line-height: 1.8;
+    color: var(--color-text);
+    outline: none;
+    padding-top: 1rem;
+}
+
+.zen-textarea::placeholder {
+    color: var(--color-text-muted);
+    font-style: italic;
+    opacity: 0.5;
+}
+
+.locked-banner {
+    background-color: var(--color-surface);
+    border: 1px dashed var(--color-border);
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: center;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.locked-banner p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+}
+
+.btn-xs {
+    background-color: var(--color-primary);
+    color: white;
+    border: none;
+    padding: 0.25rem 0.75rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    cursor: pointer;
 }
 </style>
