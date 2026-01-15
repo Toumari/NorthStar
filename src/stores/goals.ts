@@ -137,14 +137,15 @@ export const useGoalsStore = defineStore('goals', () => {
     }
 
     const ensureInboxGoal = async () => {
-        const inbox = goals.value.find(g => g.category === 'General' && g.title === 'General')
+        // Check for 'Inbox' or legacy 'General'
+        const inbox = goals.value.find(g => (g.category === 'Inbox' && g.title === 'Inbox') || (g.category === 'General' && g.title === 'General'))
         if (inbox) return inbox.id
 
         // Create if not exists
         const id = await addGoal({
-            title: 'General',
-            description: 'Bucket for one-off tasks',
-            category: 'General',
+            title: 'Inbox',
+            description: 'Capture everything here',
+            category: 'Inbox',
             smart: {
                 specific: '',
                 measurable: '',

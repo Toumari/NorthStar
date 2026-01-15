@@ -20,13 +20,17 @@ const daysLeft = computed(() => {
 
 import { useRouter } from 'vue-router'
 const router = useRouter()
+
+const isInbox = computed(() => props.goal.category === 'Inbox' || props.goal.category === 'General')
 </script>
 
 <template>
   <div class="goal-card" @click="router.push(`/goals/${goal.id}`)">
     <div class="card-header">
-      <span class="category-tag">{{ goal.category }}</span>
-      <span class="due-date" :class="{ overdue: daysLeft < 0 }">
+      <span class="category-tag" :class="{ 'inbox-tag': isInbox }">
+          {{ isInbox ? '📥 Inbox' : goal.category }}
+      </span>
+      <span class="due-date" :class="{ overdue: daysLeft < 0 }" v-if="!isInbox">
         {{ daysLeft > 0 ? `${daysLeft}d left` : 'Overdue' }}
       </span>
     </div>
@@ -84,7 +88,14 @@ const router = useRouter()
   font-weight: 600;
   color: var(--color-text-muted);
   text-transform: uppercase;
+  text-transform: uppercase;
   letter-spacing: 0.05em;
+}
+
+.inbox-tag {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    color: var(--color-text);
 }
 
 .due-date {

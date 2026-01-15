@@ -114,10 +114,10 @@ const handleCreateTracker = (trackerData: any) => {
           <h3>Active Goals</h3>
           <p class="stat-value">{{ store.activeGoalsCount }}</p>
         </RouterLink>
-        <div class="stat-card compact">
+        <RouterLink to="/goals?filter=today" class="stat-card compact">
              <h3>Tasks Today</h3>
              <p class="stat-value">{{ store.todaysTasks.length }}</p>
-        </div>
+        </RouterLink>
       </div>
 
       <!-- Right Column: Focus List -->
