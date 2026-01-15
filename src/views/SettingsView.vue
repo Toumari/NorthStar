@@ -483,7 +483,130 @@ onMounted(async () => {
     border: 1px solid var(--color-border); /* Fixed hardcoded border */
 }
 
-/* ... existing styles ... */
+.detail-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem; /* Adjusted for better spacing */
+    font-size: 0.9rem;
+}
+
+.detail-item:last-child {
+    margin-bottom: 0;
+}
+
+.detail-label {
+    color: var(--color-text-muted);
+}
+
+.detail-value {
+    color: var(--color-text);
+    font-weight: 600;
+}
+
+.plan-type {
+    text-transform: capitalize;
+    font-weight: 600;
+}
+
+.form-group small {
+    display: block;
+    margin-top: 0.25rem;
+    color: var(--color-text-muted);
+}
+
+.input-row {
+    display: flex;
+    gap: 1rem;
+}
+
+input {
+  background-color: var(--color-background);
+  border: 1px solid var(--color-border);
+  padding: 0.75rem;
+  border-radius: 8px;
+  color: var(--color-text);
+  width: 100%;
+}
+
+.input-disabled {
+    background-color: var(--color-surface-hover);
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.btn-primary {
+  background-color: var(--color-primary);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn-secondary {
+  background-color: transparent;
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.btn-secondary:hover {
+    background-color: var(--color-surface-hover);
+}
+
+.btn-danger {
+  background-color: var(--color-danger);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-toggle {
+    background-color: var(--color-surface-hover);
+    border: 1px solid var(--color-border);
+    color: var(--color-text);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.premium-badge {
+    color: var(--color-primary);
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.subscription-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-end;
+}
+
+.btn-manage {
+    font-size: 0.875rem;
+    color: var(--color-primary);
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--color-primary);
+    border-radius: 6px;
+    transition: all 0.2s;
+}
+
+.btn-manage:hover {
+    background-color: var(--color-primary);
+    color: white;
+}
 
 .preference-item {
     display: flex;
