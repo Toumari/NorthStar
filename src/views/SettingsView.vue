@@ -219,7 +219,6 @@ const refreshSubscription = async () => {
         // Show subtle feedback instead of alert
         const status = result.status
         const msg = status === 'canceled' ? 'Subscription synced: Canceled' : 'Subscription synced'
-        const msg = status === 'canceled' ? 'Subscription synced: Canceled' : 'Subscription synced'
         // console.log(msg) removed for production
         
     } catch (error: any) {
