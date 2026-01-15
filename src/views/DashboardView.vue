@@ -13,7 +13,8 @@ import CreateTrackerModal from '../components/CreateTrackerModal.vue'
 import UpgradePrompt from '../components/UpgradePrompt.vue'
 import JournalCalendar from '../components/JournalCalendar.vue'
 import SkeletonLoader from '../components/SkeletonLoader.vue'
-import { ref, computed } from 'vue'
+import OnboardingWizard from '../components/OnboardingWizard.vue' // [NEW]
+import { ref, computed, onMounted } from 'vue'
 
 const store = useGoalsStore()
 const journalStore = useJournalStore()
@@ -27,6 +28,39 @@ const showGoalModal = ref(false)
 const showTrackerModal = ref(false)
 const showUpgradePrompt = ref(false)
 const upgradeMessage = ref('')
+const showOnboarding = ref(false) // [NEW]
+
+// Check for Onboarding Eligibility
+onMounted(async () => {
+    // Wait a tick for stores to potentially load if they aren't ready (though dashboard usually waits)
+    // Actually, store data might be empty simply because of fetch latency, but isLoading handles the UI.
+    // We should check AFTER loading.
+    
+    // Quick check: if localstorage says done, we skip.
+    const isDone = localStorage.getItem('onboarding_complete')
+    if (isDone) return
+
+    // If not done, we wait for data? 
+    // For now, let's assume if the stores are empty and we are "ready", show it.
+    // Ideally, we'd watch `isLoading` and trigger when it flips to false.
+})
+
+// Better approach: Watch isLoading. When it becomes false, check eligibility.
+import { watch } from 'vue'
+watch(isLoading, (loading) => {
+    if (!loading) {
+        const isDone = localStorage.getItem('onboarding_complete')
+        if (!isDone) {
+            // Check emptiness
+            if (store.goals.length === 0 && trackersStore.trackers.length === 0 && journalStore.entries.length === 0) {
+                 showOnboarding.value = true
+            } else {
+                // If they have data but no flag, mark as done silently so they don't see it later
+                localStorage.setItem('onboarding_complete', 'true')
+            }
+        }
+    }
+}, { immediate: true }) // Check immediately in case already loaded
 
 const handleCreateGoalClick = () => {
     if (subscriptionStore.canCreateGoal(store.goals.length)) {
@@ -229,6 +263,11 @@ const handleCreateTracker = (trackerData: any) => {
       v-if="showUpgradePrompt"
       :message="upgradeMessage"
       @close="showUpgradePrompt = false"
+    />
+
+    <OnboardingWizard
+        v-if="showOnboarding"
+        @close="showOnboarding = false"
     />
   </div>
 </template>
