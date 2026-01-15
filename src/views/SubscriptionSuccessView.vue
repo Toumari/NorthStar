@@ -53,7 +53,7 @@ onMounted(async () => {
   align-items: center;
   justify-content: center;
   padding: 2rem;
-  background: linear-gradient(135deg, var(--color-primary-soft) 0%, var(--color-background) 100%);
+  background: linear-gradient(135deg, var(--color-primary-light) 0%, var(--color-background) 100%);
 }
 
 .success-card {
@@ -69,7 +69,7 @@ onMounted(async () => {
 .success-icon {
   width: 80px;
   height: 80px;
-  background-color: #10b981;
+  background-color: var(--color-success);
   color: white;
   border-radius: 50%;
   display: flex;

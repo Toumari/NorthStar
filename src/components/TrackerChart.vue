@@ -29,13 +29,16 @@ const props = defineProps<{
 }>()
 
 const chartData = computed(() => {
+  const isDark = themeStore.isDark
+  const primaryColor = isDark ? '#38bdf8' : '#0284c7' // Sky 400 vs Sky 600 matches main.css
+  
   return {
     labels: props.tracker.data.map(d => d.date),
     datasets: [
       {
         label: props.tracker.name,
-        backgroundColor: '#38bdf8',
-        borderColor: '#38bdf8',
+        backgroundColor: primaryColor,
+        borderColor: primaryColor,
         data: props.tracker.data.map(d => d.value),
         tension: 0.3
       }
