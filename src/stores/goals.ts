@@ -117,7 +117,7 @@ export const useGoalsStore = defineStore('goals', () => {
     const addGoal = async (goal: Omit<Goal, 'id' | 'createdAt' | 'progress' | 'completed' | 'tasks'>) => {
         const authStore = useAuthStore()
         const user = authStore.user
-        if (!user) return
+        if (!user) return null
 
         const newGoal = {
             ...goal,
@@ -128,11 +128,33 @@ export const useGoalsStore = defineStore('goals', () => {
         }
 
         try {
-            await addDoc(collection(db, `users/${user.uid}/goals`), newGoal)
+            const docRef = await addDoc(collection(db, `users/${user.uid}/goals`), newGoal)
+            return docRef.id
         } catch (error) {
             console.error("Error adding goal:", error)
             throw error
         }
+    }
+
+    const ensureInboxGoal = async () => {
+        const inbox = goals.value.find(g => g.category === 'General' && g.title === 'General')
+        if (inbox) return inbox.id
+
+        // Create if not exists
+        const id = await addGoal({
+            title: 'General',
+            description: 'Bucket for one-off tasks',
+            category: 'General',
+            smart: {
+                specific: '',
+                measurable: '',
+                achievable: '',
+                relevant: '',
+                timeBound: ''
+            },
+            dueDate: ''
+        })
+        return id
     }
 
     const removeGoal = async (id: string) => {
@@ -231,6 +253,7 @@ export const useGoalsStore = defineStore('goals', () => {
         todaysTasksCount,
         todaysTasks, // [NEW]
         addGoal,
+        ensureInboxGoal,
         removeGoal,
         updateGoal,
         addTask,

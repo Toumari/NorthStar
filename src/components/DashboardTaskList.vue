@@ -13,6 +13,24 @@ const handleToggle = (goalId: string, taskId: string) => {
 // Group tasks by completion status for better visualization
 const pendingTasks = computed(() => tasks.value.filter(t => !t.task.completed))
 const completedTasks = computed(() => tasks.value.filter(t => t.task.completed))
+
+import { ref } from 'vue'
+const newTaskTitle = ref('')
+
+const handleQuickAdd = async () => {
+    if (!newTaskTitle.value.trim()) return
+    
+    // 1. Ensure Inbox Goal exists
+    const goalId = await store.ensureInboxGoal()
+    if (!goalId) return
+
+    // 2. Add task for Today
+    const today = new Date()
+    const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
+    
+    await store.addTask(goalId, newTaskTitle.value, dateStr)
+    newTaskTitle.value = ''
+}
 </script>
 
 <template>
@@ -20,6 +38,16 @@ const completedTasks = computed(() => tasks.value.filter(t => t.task.completed))
         <div class="header">
             <h3>Today's Focus</h3>
             <span class="count">{{ pendingTasks.length }} pending</span>
+        </div>
+
+        <div class="quick-add">
+            <input 
+                v-model="newTaskTitle" 
+                type="text" 
+                placeholder="Add a task for today..." 
+                @keyup.enter="handleQuickAdd"
+            >
+            <button @click="handleQuickAdd" :disabled="!newTaskTitle.trim()">+</button>
         </div>
 
         <div class="tasks-list" v-if="tasks.length > 0">
@@ -101,6 +129,39 @@ const completedTasks = computed(() => tasks.value.filter(t => t.task.completed))
     background-color: var(--color-surface-hover);
     padding: 0.2rem 0.6rem;
     border-radius: 12px;
+}
+
+.quick-add {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.quick-add input {
+    flex: 1;
+    padding: 0.75rem;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    background-color: var(--color-background);
+    color: var(--color-text);
+}
+
+.quick-add button {
+    background-color: var(--color-primary);
+    color: white;
+    border: none;
+    width: 40px;
+    border-radius: 8px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.quick-add button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 .tasks-list {
@@ -215,6 +276,7 @@ const completedTasks = computed(() => tasks.value.filter(t => t.task.completed))
     align-items: center;
     justify-content: center;
     text-align: center;
+    color: var(--color-text-muted);
     color: var(--color-text-muted);
     min-height: 100px;
 }

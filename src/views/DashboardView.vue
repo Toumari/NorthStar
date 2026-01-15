@@ -103,27 +103,35 @@ const handleCreateTracker = (trackerData: any) => {
       <p class="subtitle">Welcome back to your PathMark.</p>
     </header>
 
-    <div class="stats-grid" v-if="isLoading">
-       <div class="stat-card" v-for="i in 3" :key="i">
-           <SkeletonLoader width="60%" height="20px" marginBottom="10px" />
-           <SkeletonLoader width="40%" height="32px" />
-       </div>
+    <div class="dashboard-split" v-if="!isLoading">
+      <!-- Left Column: Compact Stats -->
+      <div class="stats-col">
+        <RouterLink to="/goals?filter=completed" class="stat-card compact highlight">
+          <h3>Completed Goals</h3>
+          <p class="stat-value">{{ store.completedGoals.length }}</p>
+        </RouterLink>
+        <RouterLink to="/goals?filter=active" class="stat-card compact">
+          <h3>Active Goals</h3>
+          <p class="stat-value">{{ store.activeGoalsCount }}</p>
+        </RouterLink>
+        <div class="stat-card compact">
+             <h3>Tasks Today</h3>
+             <p class="stat-value">{{ store.todaysTasks.length }}</p>
+        </div>
+      </div>
+
+      <!-- Right Column: Focus List -->
+      <div class="focus-col">
+        <DashboardTaskList />
+      </div>
     </div>
 
+    <!-- Loading State -->
     <div class="stats-grid" v-else>
-      <RouterLink to="/goals?filter=completed" class="stat-card highlight">
-        <h3>Completed Goals</h3>
-        <p class="stat-value">{{ store.completedGoals.length }}</p>
-      </RouterLink>
-      <RouterLink to="/goals?filter=active" class="stat-card">
-        <h3>Active Goals</h3>
-        <p class="stat-value">{{ store.activeGoalsCount }}</p>
-      </RouterLink>
-      
-      <!-- [NEW] Interactive Task List replacing the static counter -->
-      <div class="task-list-container">
-          <DashboardTaskList />
-      </div>
+       <div class="stat-card" v-for="i in 3" :key="i">
+            <SkeletonLoader width="60%" height="20px" marginBottom="10px" />
+            <SkeletonLoader width="40%" height="32px" />
+       </div>
     </div>
     
     
@@ -293,17 +301,40 @@ const handleCreateTracker = (trackerData: any) => {
   color: var(--color-text-muted);
 }
 
-.stats-grid {
+.dashboard-split {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: 200px 1fr;
   gap: 1.5rem;
   margin-bottom: 2rem;
   align-items: stretch;
 }
 
-.task-list-container {
-    grid-column: span 1;
-    min-height: 250px;
+.stats-col {
+ display: flex;
+ flex-direction: column;
+ gap: 1rem;
+}
+
+.focus-col {
+  height: 100%;
+}
+
+@media (max-width: 768px) {
+  .dashboard-split {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
+  }
+  
+  .stats-col {
+    flex-direction: row;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+  }
+  
+  .stats-col .stat-card {
+    min-width: 140px;
+    flex: 1;
+  }
 }
 
 .recent-goals {
@@ -364,6 +395,23 @@ const handleCreateTracker = (trackerData: any) => {
   font-weight: 700;
   color: var(--color-text);
   margin: 0;
+}
+
+/* Compact Mode */
+.stat-card.compact {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.stat-card.compact h3 {
+    font-size: 0.75rem;
+    margin-bottom: 0.25rem;
+}
+
+.stat-card.compact .stat-value {
+    font-size: 1.5rem;
 }
 
 .section-header {
