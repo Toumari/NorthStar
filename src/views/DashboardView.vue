@@ -31,36 +31,37 @@ const upgradeMessage = ref('')
 const showOnboarding = ref(false) // [NEW]
 
 // Check for Onboarding Eligibility
+// Check for Onboarding Eligibility
 onMounted(async () => {
-    // Wait a tick for stores to potentially load if they aren't ready (though dashboard usually waits)
-    // Actually, store data might be empty simply because of fetch latency, but isLoading handles the UI.
-    // We should check AFTER loading.
-    
-    // Quick check: if localstorage says done, we skip.
-    const isDone = localStorage.getItem('onboarding_complete')
-    if (isDone) return
-
-    // If not done, we wait for data? 
-    // For now, let's assume if the stores are empty and we are "ready", show it.
-    // Ideally, we'd watch `isLoading` and trigger when it flips to false.
+    // Rely on the watcher below to handle logic once loading settles
 })
 
 // Better approach: Watch isLoading. When it becomes false, check eligibility.
 import { watch } from 'vue'
+import { useAuthStore } from '../stores/auth' // [NEW]
+
+const authStore = useAuthStore() // [NEW]
+
 watch(isLoading, (loading) => {
     if (!loading) {
-        const isDone = localStorage.getItem('onboarding_complete')
+        // [MODIFIED] Check Firestore profile instead of LocalStorage
+        const isDone = authStore.userProfile?.hasCompletedOnboarding
+        
         if (!isDone) {
-            // Check emptiness
+            // Check emptiness of data: strictly 0 goals, 0 trackers, 0 journal entries
+            // AND ensure we have a valid user profile loaded (if it's null, we assume loading or error)
             if (store.goals.length === 0 && trackersStore.trackers.length === 0 && journalStore.entries.length === 0) {
                  showOnboarding.value = true
             } else {
-                // If they have data but no flag, mark as done silently so they don't see it later
-                localStorage.setItem('onboarding_complete', 'true')
+                // If they have data but flag is false, it means they are an existing user who predates this feature.
+                // We should auto-complete them to avoid spam.
+                if (authStore.user) {
+                    authStore.completeOnboarding()
+                }
             }
         }
     }
-}, { immediate: true }) // Check immediately in case already loaded
+}, { immediate: true })
 
 const handleCreateGoalClick = () => {
     if (subscriptionStore.canCreateGoal(store.goals.length)) {

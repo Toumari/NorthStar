@@ -3,6 +3,7 @@ import { ref, computed } from 'vue'
 import { useGoalsStore } from '../stores/goals'
 import { useTrackersStore } from '../stores/trackers'
 import { useJournalStore } from '../stores/journal'
+import { useAuthStore } from '../stores/auth' // [NEW]
 import confetti from 'canvas-confetti'
 
 const emit = defineEmits(['close'])
@@ -10,6 +11,7 @@ const emit = defineEmits(['close'])
 const goalsStore = useGoalsStore()
 const trackersStore = useTrackersStore()
 const journalStore = useJournalStore()
+const authStore = useAuthStore() // [NEW]
 
 const step = ref(1)
 const steps = [
@@ -103,14 +105,15 @@ const finish = async () => {
         console.error("Critical onboarding error", e)
     } finally {
         // Mark as done and close regardless of partial failures
-        localStorage.setItem('onboarding_complete', 'true')
+        // Mark as done and close regardless of partial failures
+        await authStore.completeOnboarding()
         emit('close')
     }
 }
 
-const skip = () => {
+const skip = async () => {
     if (confirm('Skip the welcome wizard? You can manually add these later.')) {
-        localStorage.setItem('onboarding_complete', 'true')
+        await authStore.completeOnboarding()
         emit('close')
     }
 }

@@ -17,22 +17,58 @@ import {
     reauthenticateWithPopup,
     type User
 } from 'firebase/auth'
-import { collection, doc, deleteDoc, getDocs } from 'firebase/firestore'
+import { collection, doc, deleteDoc, getDocs, getDoc, setDoc } from 'firebase/firestore'
 
 export const useAuthStore = defineStore('auth', () => {
     const user = ref<User | null>(null)
+    const userProfile = ref<any>(null) // [NEW] Stores Firestore user document data
     const isAuthenticated = ref(false)
     const isAuthReady = ref(false)
 
     const initAuth = () => {
         return new Promise<void>((resolve) => {
-            onAuthStateChanged(auth, (currentUser) => {
+            onAuthStateChanged(auth, async (currentUser) => {
                 user.value = currentUser
                 isAuthenticated.value = !!currentUser
+
+                if (currentUser) {
+                    await fetchUserProfile(currentUser.uid)
+                } else {
+                    userProfile.value = null
+                }
+
                 isAuthReady.value = true
                 resolve()
             })
         })
+    }
+
+    const fetchUserProfile = async (uid: string) => {
+        try {
+            const docRef = doc(db, 'users', uid)
+            const docSnap = await getDoc(docRef)
+            if (docSnap.exists()) {
+                userProfile.value = docSnap.data()
+            } else {
+                // Initialize if not exists (lazy creation)
+                userProfile.value = { hasCompletedOnboarding: false }
+                // We could write it here, but maybe wait until they actually do something? 
+                // Let's safe-guard: if it doesn't exist, we assume fresh user.
+            }
+        } catch (e) {
+            console.error("Failed to fetch user profile", e)
+        }
+    }
+
+    const completeOnboarding = async () => {
+        if (!user.value) return
+        try {
+            const docRef = doc(db, 'users', user.value.uid)
+            await setDoc(docRef, { hasCompletedOnboarding: true }, { merge: true })
+            userProfile.value = { ...userProfile.value, hasCompletedOnboarding: true }
+        } catch (e) {
+            console.error("Failed to save onboarding status", e)
+        }
     }
 
     const register = async (email: string, pass: string, name: string) => {
@@ -118,6 +154,8 @@ export const useAuthStore = defineStore('auth', () => {
         user,
         isAuthenticated,
         isAuthReady,
+        userProfile,
+        completeOnboarding,
         initAuth,
         register,
         login,
