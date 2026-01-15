@@ -268,6 +268,7 @@ const handleCreateTracker = (trackerData: any) => {
   text-decoration: none; /* Remove underline from RouterLink */
   display: block; /* Ensure block layout for link */
   transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
 }
 
 :root.dark .stat-card {
