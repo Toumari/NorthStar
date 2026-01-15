@@ -271,6 +271,10 @@ const handleCreateTracker = (trackerData: any) => {
   cursor: pointer;
 }
 
+.stat-card * {
+    cursor: pointer; /* Force text elements to show hand */
+}
+
 :root.dark .stat-card {
     border-color: var(--color-border);
     box-shadow: none;
