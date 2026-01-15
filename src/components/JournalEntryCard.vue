@@ -164,11 +164,24 @@ const displayText = computed(() => {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem; /* Increased from 1rem */
     padding-bottom: 1rem;
     border-bottom: 1px solid var(--color-surface-hover);
-    flex-wrap: wrap; /* Allow wrapping if really tight */
-    gap: 0.5rem;
+    gap: 1rem; /* Base gap */
+}
+
+@media (max-width: 600px) {
+    .card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem; /* Distinct separation on mobile */
+    }
+    
+    .actions {
+        width: 100%;
+        justify-content: flex-end; /* Push buttons to right or keep left? Standard is Right for actions */
+        padding-top: 0.5rem; /* Little extra breathing room */
+    }
 }
 
 .date-group {
