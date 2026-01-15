@@ -32,8 +32,14 @@ const userInitial = computed(() => {
 })
 
 const handleLogout = async () => {
-    await store.logout()
-    router.push('/login')
+    try {
+        await store.logout()
+    } catch (e) {
+        console.error("Logout failed", e)
+    } finally {
+        // Force a page reload to clear all Pinia state and ensure clean login
+        window.location.href = '/login'
+    }
 }
 </script>
 
