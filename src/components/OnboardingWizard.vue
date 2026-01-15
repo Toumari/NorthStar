@@ -50,40 +50,63 @@ const selectPreset = (preset: { name: string, unit: string }) => {
 }
 
 const finish = async () => {
-    // 1. Create Goal if entered
-    if (goalTitle.value) {
-        goalsStore.addGoal({
-            title: goalTitle.value,
-            category: goalCategory.value,
-            targetDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 1 week out
-            tasks: []
-        })
+    try {
+        // 1. Create Goal if entered
+        if (goalTitle.value) {
+            try {
+                // Determine if addGoal is async or not - assuming it might be, awaiting it is safe
+                // Using optimistic updates in store usually doesn't require await but we want to catch errors
+                await goalsStore.addGoal({
+                    title: goalTitle.value,
+                    category: goalCategory.value,
+                    targetDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 1 week out
+                    tasks: []
+                })
+            } catch (e) {
+                console.error("Failed to create onboarding goal", e)
+            }
+        }
+
+        // 2. Create Tracker if entered
+        if (trackerName.value && trackerUnit.value) {
+             try {
+                await trackersStore.addTracker(trackerName.value, trackerUnit.value)
+             } catch (e) {
+                console.error("Failed to create onboarding tracker", e)
+             }
+        }
+
+        // 3. Create Journal Entry if entered
+        if (journalEntry.value) {
+             try {
+                await journalStore.addEntry({
+                    content: journalEntry.value,
+                    date: new Date().toISOString().split('T')[0],
+                    tags: ['First Entry']
+                })
+             } catch (e) {
+                console.error("Failed to create onboarding journal entry", e)
+             }
+        }
+
+        // FIRE CONFETTI
+        try {
+            confetti({
+                particleCount: 150,
+                spread: 70,
+                origin: { y: 0.6 }
+            })
+        } catch (e) {
+            // Ignore confetti errors
+        }
+
+    } catch (e) {
+        console.error("Critical onboarding error", e)
+    } finally {
+        // Mark as done and close regardless of partial failures
+        localStorage.setItem('onboarding_complete', 'true')
+        emit('close')
     }
-
-    // 2. Create Tracker if entered
-    if (trackerName.value && trackerUnit.value) {
-        trackersStore.addTracker(trackerName.value, trackerUnit.value)
-    }
-
-    // 3. Create Journal Entry if entered
-    if (journalEntry.value) {
-         journalStore.addEntry({
-            content: journalEntry.value,
-            date: new Date().toISOString().split('T')[0],
-            tags: ['First Entry']
-        })
-    }
-
-    // FIRE CONFETTI
-    confetti({
-        particleCount: 150,
-        spread: 70,
-        origin: { y: 0.6 }
-    })
-
-    // Mark as done
-    localStorage.setItem('onboarding_complete', 'true')
-    emit('close')
 }
 
 const skip = () => {
