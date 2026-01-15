@@ -52,69 +52,62 @@ const selectPreset = (preset: { name: string, unit: string }) => {
 }
 
 const finish = async () => {
+    // 1. Optimistic Close: Start the exit animation/process immediately?
+    // User noted latency. Let's fire confetti first, then do the work? 
+    // Actually, creating goals/trackers should happen.
+    
     try {
+        // ... Creation Logic (Same as before) ...
         // 1. Create Goal if entered
         if (goalTitle.value) {
             try {
-                // Determine if addGoal is async or not - assuming it might be, awaiting it is safe
-                // Using optimistic updates in store usually doesn't require await but we want to catch errors
                 await goalsStore.addGoal({
                     title: goalTitle.value,
                     category: goalCategory.value,
-                    targetDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 1 week out
+                    targetDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
                     tasks: []
                 })
-            } catch (e) {
-                console.error("Failed to create onboarding goal", e)
-            }
+            } catch (e) { console.error("Goal creation failed", e) }
         }
 
-        // 2. Create Tracker if entered
+        // 2. Create Tracker
         if (trackerName.value && trackerUnit.value) {
              try {
                 await trackersStore.addTracker(trackerName.value, trackerUnit.value)
-             } catch (e) {
-                console.error("Failed to create onboarding tracker", e)
-             }
+             } catch (e) { console.error("Tracker creation failed", e) }
         }
 
-        // 3. Create Journal Entry if entered
+        // 3. Create Journal
         if (journalEntry.value) {
              try {
                 await journalStore.saveEntry(
                     journalEntry.value,
                     new Date().toISOString().split('T')[0]
                 )
-             } catch (e) {
-                console.error("Failed to create onboarding journal entry", e)
-             }
+             } catch (e) { console.error("Journal creation failed", e) }
         }
 
         // FIRE CONFETTI
         try {
-            confetti({
-                particleCount: 150,
-                spread: 70,
-                origin: { y: 0.6 }
-            })
-        } catch (e) {
-            // Ignore confetti errors
-        }
+            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } })
+        } catch (e) {}
 
     } catch (e) {
         console.error("Critical onboarding error", e)
     } finally {
-        // Mark as done and close regardless of partial failures
-        // Mark as done and close regardless of partial failures
-        await authStore.completeOnboarding()
+        // [UX FIX] Close Modal Immediately
         emit('close')
+        
+        // Persist "Done" status in background (don't block UI)
+        authStore.completeOnboarding().catch(err => console.error("Background persistence failed", err))
     }
 }
 
 const skip = async () => {
     if (confirm('Skip the welcome wizard? You can manually add these later.')) {
-        await authStore.completeOnboarding()
+        // [BUG FIX] Close immediately, handle persistence in background
         emit('close')
+        authStore.completeOnboarding().catch(err => console.error("Background persistence failed", err))
     }
 }
 </script>
