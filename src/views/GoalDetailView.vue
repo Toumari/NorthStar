@@ -39,6 +39,12 @@ const handleAddTask = () => {
   newTaskDate.value = ''
 }
 
+const handleRemoveTask = async (taskId: string) => {
+  if (confirm('Are you sure you want to remove this task?')) {
+    await store.removeTask(goalId, taskId)
+  }
+}
+
 const handleDelete = async () => {
   if (confirm('Are you sure you want to delete this goal?')) {
     isDeleting.value = true
@@ -198,6 +204,16 @@ const handleBack = () => {
                 <span class="task-title">{{ task.title }}</span>
                 <span v-if="task.dueDate" class="task-date">{{ task.dueDate }}</span>
               </div>
+              <button 
+                class="btn-delete-task" 
+                @click.stop="handleRemoveTask(task.id)"
+                title="Remove task"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="3 6 5 6 21 6"></polyline>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                </svg>
+              </button>
             </div>
             <p v-if="goal.tasks.length === 0" class="no-tasks">No tasks added yet.</p>
           </div>
@@ -461,9 +477,33 @@ h2 {
   color: var(--color-text-muted);
 }
 
+.btn-delete-task {
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s, color 0.2s;
+}
+
+.task-item:hover .btn-delete-task {
+  opacity: 1;
+}
+
+.btn-delete-task:hover {
+  color: var(--color-danger);
+  background-color: rgba(239, 68, 68, 0.1);
+}
+
 .task-content {
   display: flex;
   flex-direction: column;
+  flex: 1;
 }
 
 .task-date {
@@ -640,6 +680,11 @@ h2 {
   .btn-add {
     height: 48px; /* Taller touch target */
     font-size: 1.25rem;
+  }
+
+  .btn-delete-task {
+    opacity: 1;
+    padding: 0.75rem;
   }
   
   /* Additional padding adjustments */

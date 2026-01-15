@@ -192,6 +192,15 @@ export const useGoalsStore = defineStore('goals', () => {
         await updateGoalProgress(goalId, newTasks)
     }
 
+    const removeTask = async (goalId: string, taskId: string) => {
+        const goal = goals.value.find(g => g.id === goalId)
+        if (!goal) return
+
+        const newTasks = goal.tasks.filter(t => t.id !== taskId)
+
+        await updateGoalProgress(goalId, newTasks)
+    }
+
     return {
         goals,
         activeGoals,
@@ -202,6 +211,7 @@ export const useGoalsStore = defineStore('goals', () => {
         removeGoal,
         updateGoal,
         addTask,
+        removeTask,
         toggleTask,
         isLoading
     }
