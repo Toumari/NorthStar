@@ -179,8 +179,8 @@ const displayText = computed(() => {
     
     .actions {
         width: 100%;
-        justify-content: flex-end; /* Push buttons to right or keep left? Standard is Right for actions */
-        padding-top: 0.5rem; /* Little extra breathing room */
+        justify-content: flex-start; /* Left-align for smooth reading flow */
+        padding-top: 0; 
     }
 }
 
@@ -210,6 +210,7 @@ const displayText = computed(() => {
 .actions {
     display: flex;
     gap: 0.5rem;
+    /* Always visible now */
     opacity: 1; 
 }
 
@@ -219,15 +220,13 @@ const displayText = computed(() => {
     cursor: pointer;
     font-size: 0.9rem;
     font-weight: 600;
+    color: var(--color-text-muted);
     transition: all 0.2s;
     padding: 0.25rem 0.75rem; /* Larger touch target */
     border-radius: 6px;
 }
 
-.btn-action.edit {
-    color: var(--color-text-muted);
-}
-.btn-action.edit:hover {
+.btn-action:hover {
     background-color: var(--color-surface-hover);
     color: var(--color-primary);
 }
@@ -260,7 +259,7 @@ const displayText = computed(() => {
     padding: 2rem;
     background-color: var(--color-background);
     border-radius: 8px;
-    border: 1px dashed var(--color-border);
+    /* border: 1px dashed var(--color-border); REMOVED */
     cursor: pointer;
     transition: background-color 0.2s;
 }
