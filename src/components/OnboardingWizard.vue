@@ -79,11 +79,10 @@ const finish = async () => {
         // 3. Create Journal Entry if entered
         if (journalEntry.value) {
              try {
-                await journalStore.addEntry({
-                    content: journalEntry.value,
-                    date: new Date().toISOString().split('T')[0],
-                    tags: ['First Entry']
-                })
+                await journalStore.saveEntry(
+                    journalEntry.value,
+                    new Date().toISOString().split('T')[0]
+                )
              } catch (e) {
                 console.error("Failed to create onboarding journal entry", e)
              }
