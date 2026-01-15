@@ -92,8 +92,8 @@ const displayText = computed(() => {
             <button class="btn-action edit" @click="startEditing">
                 Edit
             </button>
-            <button class="btn-action delete" @click="handleDelete" title="Delete">
-                 🗑️
+            <button class="btn-action delete" @click="handleDelete" title="Delete Entry">
+                 Delete
             </button>
         </div>
     </header>
@@ -143,6 +143,13 @@ const displayText = computed(() => {
     transition: transform 0.2s, box-shadow 0.2s;
 }
 
+@media (max-width: 600px) {
+    .journal-card {
+        padding: 1rem; /* More space for content relative to edges */
+        border-radius: 8px;
+    }
+}
+
 .journal-card:hover {
     box-shadow: var(--shadow-medium); /* Lift slightly on hover */
 }
@@ -160,6 +167,8 @@ const displayText = computed(() => {
     margin-bottom: 1rem;
     padding-bottom: 1rem;
     border-bottom: 1px solid var(--color-surface-hover);
+    flex-wrap: wrap; /* Allow wrapping if really tight */
+    gap: 0.5rem;
 }
 
 .date-group {
@@ -187,8 +196,7 @@ const displayText = computed(() => {
 
 .actions {
     display: flex;
-    gap: 0.75rem;
-    /* Always visible now */
+    gap: 0.5rem;
     opacity: 1; 
 }
 
@@ -198,24 +206,26 @@ const displayText = computed(() => {
     cursor: pointer;
     font-size: 0.9rem;
     font-weight: 600;
-    color: var(--color-text-muted);
     transition: all 0.2s;
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
+    padding: 0.25rem 0.75rem; /* Larger touch target */
+    border-radius: 6px;
 }
 
-.btn-action:hover {
+.btn-action.edit {
+    color: var(--color-text-muted);
+}
+.btn-action.edit:hover {
     background-color: var(--color-surface-hover);
     color: var(--color-primary);
 }
 
 .btn-action.delete {
-    color: var(--color-text-muted); /* Muted delete by default */
+    color: var(--color-danger); /* Explicit red */
+    background-color: rgba(220, 38, 38, 0.05); /* Very subtle red bg */
 }
 
 .btn-action.delete:hover {
-    color: var(--color-danger);
-    background-color: rgba(220, 38, 38, 0.1); /* Subtle red bg */
+    background-color: rgba(220, 38, 38, 0.15);
 }
 
 .content-read {
