@@ -117,12 +117,15 @@ const openTrackerModal = () => {
 
 <style scoped>
 .app-layout {
+  position: fixed; /* Lock to viewport */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%; /* 100% works best with fixed position */
   display: flex;
-  height: 100dvh;
-  width: 100vw;
   background-color: var(--color-background);
   color: var(--color-text);
-  overflow: hidden;
+  overflow: hidden; /* Prevent body scroll */
 }
 
 .mobile-header {
@@ -133,14 +136,10 @@ const openTrackerModal = () => {
   padding-top: max(1rem, env(safe-area-inset-top)); /* Handle notch */
   align-items: center;
   gap: 1rem;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  right: 0;
+  /* position: fixed;  <-- No longer needed if layout is column flex, but keep for safety overlay? */
+  /* Actually, inside a fixed app-layout, sticky or just normal flex flow works better for headers. */
   z-index: 20;
   min-height: 60px;
-  height: auto;
 }
 
 .menu-btn {
@@ -179,7 +178,9 @@ const openTrackerModal = () => {
 @media (max-width: 768px) {
   .app-layout {
     flex-direction: column;
-    padding-top: calc(60px + env(safe-area-inset-top)); /* Space for mobile header + notch */
+    padding-top: 0; /* Header is now part of the flex flow? Or still fixed? */
+    /* If header is fixed, we need padding. If header is flex item, we don't. */
+    /* Let's make header a Flex Item for stability. */
   }
 
   .app-layout:has(.main-content.full-screen) {
@@ -188,7 +189,7 @@ const openTrackerModal = () => {
 
   .main-content {
     padding: 1.5rem; /* Restored comfortable padding */
-    padding-top: 2.5rem; /* Extra breathing room below header */
+    /* padding-top: 2.5rem;  Removed extra top padding if header is flex */
   }
   
   .main-content.full-screen {
@@ -197,6 +198,9 @@ const openTrackerModal = () => {
 
   .mobile-header {
     display: flex;
+    position: relative; /* Part of flex flow now */
+    border-bottom: 1px solid var(--color-border);
+    flex-shrink: 0; /* Maintain height */
   }
 
   .sidebar-wrapper {
