@@ -16,6 +16,9 @@ import SkeletonLoader from '../components/SkeletonLoader.vue'
 import OnboardingWizard from '../components/OnboardingWizard.vue' // [NEW]
 import DashboardTaskList from '../components/DashboardTaskList.vue' // [NEW]
 import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 const store = useGoalsStore()
 const journalStore = useJournalStore()

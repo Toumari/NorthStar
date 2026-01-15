@@ -80,7 +80,9 @@ export const useGoalsStore = defineStore('goals', () => {
     const activeGoalsCount = computed(() => activeGoals.value.length)
     const todaysTasksCount = computed(() => {
         let count = 0
-        const today = new Date().toISOString().split('T')[0] || ''
+        const d = new Date()
+        const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+
         activeGoals.value.forEach(goal => {
             goal.tasks.forEach(task => {
                 if (!task.completed && task.dueDate && task.dueDate.startsWith(today)) {
@@ -93,7 +95,8 @@ export const useGoalsStore = defineStore('goals', () => {
 
     const todaysTasks = computed(() => {
         const tasks: { task: Task, goalId: string, goalTitle: string, goalCategory: string }[] = []
-        const today = new Date().toISOString().split('T')[0] || ''
+        const d = new Date()
+        const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 
         activeGoals.value.forEach(goal => {
             goal.tasks.forEach(task => {
