@@ -476,175 +476,37 @@ onMounted(async () => {
 }
 
 .subscription-details {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--color-surface-hover); /* Fixed hardcoded rgba */
     padding: 1rem;
     border-radius: 8px;
     margin-top: 1rem;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--color-border); /* Fixed hardcoded border */
 }
 
-.detail-item {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 0.5rem;
-    font-size: 0.9rem;
-}
-
-.detail-item:last-child {
-    margin-bottom: 0;
-}
-
-.detail-label {
-    color: var(--text-secondary);
-}
-
-.detail-value {
-    color: var(--text-primary);
-}
-
-.plan-type {
-    text-transform: capitalize;
-    font-weight: 600;
-}
-
-.form-group small {
-    display: block;
-    margin-top: 0.25rem;
-    color: var(--color-text-muted);
-}
-
-.input-row {
-    display: flex;
-    gap: 1rem;
-}
-
-input {
-  background-color: var(--color-background);
-  border: 1px solid var(--color-border);
-  padding: 0.75rem;
-  border-radius: 8px;
-  color: var(--color-text);
-  width: 100%;
-}
-
-.input-disabled {
-    background-color: var(--color-background-soft); /* Slightly clearer disabled state */
-    cursor: not-allowed;
-    opacity: 0.7;
-}
-
-.btn-primary {
-  background-color: var(--color-primary);
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  white-space: nowrap;
-}
-
-.btn-secondary {
-  background-color: transparent;
-  border: 1px solid var(--color-border);
-  color: var(--color-text);
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  font-weight: 500;
-  cursor: pointer;
-}
-
-.btn-secondary:hover {
-    background-color: var(--color-surface-hover);
-}
-
-.btn-danger {
-  background-color: var(--color-danger); /* Ensure this variable exists or fallback usually red */
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.btn-toggle {
-    background-color: var(--color-surface-hover);
-    border: 1px solid var(--color-border);
-    color: var(--color-text);
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-    cursor: pointer;
-    text-decoration: none;
-    display: inline-block;
-}
-
-.premium-badge {
-    color: var(--color-primary);
-    font-weight: 600;
-    font-size: 1rem;
-}
-
-.subscription-details {
-    margin-top: 1rem;
-    padding-top: 1rem;
-    border-top: 1px solid var(--color-border);
-}
-
-.detail-item {
-    display: flex;
-    justify-content: space-between;
-    margin: 0.5rem 0;
-    font-size: 0.9rem;
-}
-
-.detail-label {
-    color: var(--color-text-muted);
-}
-
-.detail-value {
-    font-weight: 600;
-    color: var(--color-text);
-}
-
-.status-active {
-    color: #10b981;
-}
-
-.status-canceled {
-    color: #f59e0b;
-}
-
-.status-expired {
-    color: var(--color-danger);
-}
-
-.subscription-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    align-items: flex-end;
-}
-
-.btn-manage {
-    font-size: 0.875rem;
-    color: var(--color-primary);
-    text-decoration: none;
-    padding: 0.5rem 1rem;
-    border: 1px solid var(--color-primary);
-    border-radius: 6px;
-    transition: all 0.2s;
-}
-
-.btn-manage:hover {
-    background-color: var(--color-primary);
-    color: white;
-}
+/* ... existing styles ... */
 
 .preference-item {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start; /* Changed from center to allow multiline text flow */
+    gap: 1rem; /* Added gap */
+}
+
+@media (max-width: 600px) {
+    .preference-item {
+        flex-direction: column;
+        align-items: stretch; /* Full width for children */
+    }
+
+    .subscription-actions {
+        width: 100%;
+        align-items: stretch; /* Buttons convert to block/full width */
+        margin-top: 1rem;
+    }
+    
+    .btn-manage, .btn-toggle {
+        text-align: center;
+    }
 }
 
 .pref-info h4 {
