@@ -14,6 +14,7 @@ import UpgradePrompt from '../components/UpgradePrompt.vue'
 import JournalCalendar from '../components/JournalCalendar.vue'
 import SkeletonLoader from '../components/SkeletonLoader.vue'
 import OnboardingWizard from '../components/OnboardingWizard.vue' // [NEW]
+import DashboardTaskList from '../components/DashboardTaskList.vue' // [NEW]
 import { ref, computed, onMounted } from 'vue'
 
 const store = useGoalsStore()
@@ -115,10 +116,11 @@ const handleCreateTracker = (trackerData: any) => {
         <h3>Active Goals</h3>
         <p class="stat-value">{{ store.activeGoalsCount }}</p>
       </RouterLink>
-      <RouterLink to="/goals?filter=today" class="stat-card">
-        <h3>Tasks for Today</h3>
-        <p class="stat-value">{{ store.todaysTasksCount }}</p>
-      </RouterLink>
+      
+      <!-- [NEW] Interactive Task List replacing the static counter -->
+      <div class="task-list-container">
+          <DashboardTaskList />
+      </div>
     </div>
     
     
@@ -208,7 +210,10 @@ const handleCreateTracker = (trackerData: any) => {
       <section class="dashboard-section journal-section">
         <header class="section-header">
           <h3>My Journal</h3>
-          <RouterLink to="/journal" class="view-all">Open Journal</RouterLink>
+          <div class="header-actions-row">
+             <button v-if="!journalStore.hasEntryToday" class="btn-text-action" @click="router.push('/journal')">+ Write Today</button>
+             <RouterLink to="/journal" class="view-all">Open Journal</RouterLink>
+          </div>
         </header>
         
         <JournalCalendar />
@@ -235,11 +240,14 @@ const handleCreateTracker = (trackerData: any) => {
              </div>
         </div>
         <div class="trackers-grid" v-else-if="trackersStore.trackers.length > 0">
-          <TrackerSummaryCard 
+          <RouterLink 
             v-for="tracker in trackersStore.trackers.slice(0, 4)" 
             :key="tracker.id" 
-            :tracker="tracker"
-          />
+            :to="`/trackers/${tracker.id}`"
+            class="tracker-link-wrapper"
+          >
+            <TrackerSummaryCard :tracker="tracker" />
+          </RouterLink>
         </div>
         <div class="empty-state card" v-else>
           <p>No trackers active.</p>
@@ -284,9 +292,15 @@ const handleCreateTracker = (trackerData: any) => {
 
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
   margin-bottom: 2rem;
+  align-items: stretch;
+}
+
+.task-list-container {
+    grid-column: span 1;
+    min-height: 250px;
 }
 
 .recent-goals {
@@ -372,6 +386,12 @@ const handleCreateTracker = (trackerData: any) => {
 
 .view-all:hover {
   text-decoration: underline;
+}
+
+.header-actions-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 
 .actions {
@@ -474,6 +494,13 @@ const handleCreateTracker = (trackerData: any) => {
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 1rem;
   align-content: start;
+}
+
+.tracker-link-wrapper {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    height: 100%;
 }
 
 .empty-state {

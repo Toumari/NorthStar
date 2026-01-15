@@ -91,6 +91,25 @@ export const useGoalsStore = defineStore('goals', () => {
         return count
     })
 
+    const todaysTasks = computed(() => {
+        const tasks: { task: Task, goalId: string, goalTitle: string, goalCategory: string }[] = []
+        const today = new Date().toISOString().split('T')[0] || ''
+
+        activeGoals.value.forEach(goal => {
+            goal.tasks.forEach(task => {
+                if (!task.completed && task.dueDate && task.dueDate.startsWith(today)) {
+                    tasks.push({
+                        task,
+                        goalId: goal.id,
+                        goalTitle: goal.title,
+                        goalCategory: goal.category
+                    })
+                }
+            })
+        })
+        return tasks
+    })
+
     // Actions
     const addGoal = async (goal: Omit<Goal, 'id' | 'createdAt' | 'progress' | 'completed' | 'tasks'>) => {
         const authStore = useAuthStore()
@@ -207,6 +226,7 @@ export const useGoalsStore = defineStore('goals', () => {
         completedGoals,
         activeGoalsCount,
         todaysTasksCount,
+        todaysTasks, // [NEW]
         addGoal,
         removeGoal,
         updateGoal,
