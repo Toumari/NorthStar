@@ -21,15 +21,11 @@ const daysLeft = computed(() => {
 import { useRouter } from 'vue-router'
 const router = useRouter()
 
-import { useRouter } from 'vue-router'
-const router = useRouter()
-
 const isInbox = computed(() => props.goal.category === 'System Created' || props.goal.category === 'Inbox' || props.goal.category === 'General')
 </script>
 
 <template>
   <div class="goal-card" @click="router.push(`/goals/${goal.id}`)">
-    <div class="card-header">
     <div class="card-header">
       <span class="category-tag" :class="{ 'inbox-tag': isInbox }">
           {{ isInbox ? 'System Created' : 'User Created' }}
