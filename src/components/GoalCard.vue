@@ -21,7 +21,13 @@ const daysLeft = computed(() => {
 import { useRouter } from 'vue-router'
 const router = useRouter()
 
-const isInbox = computed(() => props.goal.category === 'System Created' || props.goal.category === 'Inbox' || props.goal.category === 'General')
+const isInbox = computed(() => {
+  if (props.goal.category === 'System Created') return true
+  // Legacy checks (require strict title match to avoid user goals)
+  if (props.goal.category === 'Inbox' && props.goal.title === 'Inbox') return true
+  if (props.goal.category === 'General' && props.goal.title === 'General') return true
+  return false
+})
 </script>
 
 <template>
