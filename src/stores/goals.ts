@@ -163,7 +163,7 @@ export const useGoalsStore = defineStore('goals', () => {
 
         // Create if not exists
         const id = await addGoal({
-            title: 'Quick Tasks', // Better title than "System Created" for the goal itself
+            title: 'One Off Tasks', // Clearer purpose
             description: 'Capture everything here',
             category: 'System Created',
             smart: {
