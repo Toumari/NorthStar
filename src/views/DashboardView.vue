@@ -136,6 +136,44 @@ const handleCreateTracker = (trackerData: any) => {
     
     
     <!-- Recent Achievements & Next Steps -->
+
+    <section class="recent-goals">
+      <header class="section-header">
+        <h3>Recent Goals</h3>
+        <div class="actions" v-if="store.activeGoals.length > 0">
+           <button class="btn-text-action" @click="handleCreateGoalClick">+ Add Goal</button>
+           <RouterLink to="/goals" class="view-all">View All</RouterLink>
+        </div>
+      </header>
+      <div class="goals-grid" v-if="isLoading">
+          <div class="card" v-for="i in 3" :key="i" style="height: 200px; display: flex; flex-direction: column; justify-content: space-between;">
+              <div>
+                  <SkeletonLoader width="50%" height="24px" marginBottom="1rem" />
+                  <SkeletonLoader width="90%" height="16px" marginBottom="0.5rem" />
+                  <SkeletonLoader width="70%" height="16px" />
+              </div>
+               <SkeletonLoader width="100%" height="8px" borderRadius="4px" />
+          </div>
+      </div>
+      <div class="goals-grid" v-else>
+        <template v-if="store.activeGoals.length > 0">
+          <GoalCard 
+            v-for="goal in store.activeGoals.slice(0, 3)" 
+            :key="goal.id" 
+            :goal="goal"
+          />
+        </template>
+        <div class="empty-goal-card card" v-else @click="handleCreateGoalClick">
+           <div class="empty-content">
+             <span class="icon-large">+</span>
+             <p>Create a goal</p>
+             <span class="sub-text">Set your PathMark</span>
+           </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Recent Achievements & Next Steps -->
     <section class="achievements-section" v-if="gamificationStore.unlockedBadges.length > 0">
         <header class="section-header">
             <h3>Recent Unlocks</h3>
@@ -178,42 +216,6 @@ const handleCreateTracker = (trackerData: any) => {
                 </div>
             </div>
         </div>
-    </section>
-
-    <section class="recent-goals">
-      <header class="section-header">
-        <h3>Recent Goals</h3>
-        <div class="actions" v-if="store.activeGoals.length > 0">
-           <button class="btn-text-action" @click="handleCreateGoalClick">+ Add Goal</button>
-           <RouterLink to="/goals" class="view-all">View All</RouterLink>
-        </div>
-      </header>
-      <div class="goals-grid" v-if="isLoading">
-          <div class="card" v-for="i in 3" :key="i" style="height: 200px; display: flex; flex-direction: column; justify-content: space-between;">
-              <div>
-                  <SkeletonLoader width="50%" height="24px" marginBottom="1rem" />
-                  <SkeletonLoader width="90%" height="16px" marginBottom="0.5rem" />
-                  <SkeletonLoader width="70%" height="16px" />
-              </div>
-               <SkeletonLoader width="100%" height="8px" borderRadius="4px" />
-          </div>
-      </div>
-      <div class="goals-grid" v-else>
-        <template v-if="store.activeGoals.length > 0">
-          <GoalCard 
-            v-for="goal in store.activeGoals.slice(0, 3)" 
-            :key="goal.id" 
-            :goal="goal"
-          />
-        </template>
-        <div class="empty-goal-card card" v-else @click="handleCreateGoalClick">
-           <div class="empty-content">
-             <span class="icon-large">+</span>
-             <p>Create a goal</p>
-             <span class="sub-text">Set your PathMark</span>
-           </div>
-        </div>
-      </div>
     </section>
 
     <div class="dashboard-grid">
