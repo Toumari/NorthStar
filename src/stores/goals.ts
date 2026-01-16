@@ -74,9 +74,22 @@ export const useGoalsStore = defineStore('goals', () => {
     })
 
     // Getters
+    const systemGoal = computed(() => {
+        return goals.value.find(g =>
+            g.category === 'System Created' ||
+            (g.category === 'Inbox' && g.title === 'Inbox') ||
+            (g.category === 'General' && g.title === 'General')
+        )
+    })
+
     const activeGoals = computed(() => {
-        const active = goals.value.filter(g => !g.completed)
-        return active.sort((a, b) => {
+        // Exclude system goal from main list
+        return goals.value.filter(g =>
+            !g.completed &&
+            g.category !== 'System Created' &&
+            !(g.category === 'Inbox' && g.title === 'Inbox') &&
+            !(g.category === 'General' && g.title === 'General')
+        ).sort((a, b) => {
             // Helper to check if a goal is a "System/Inbox" goal
             const isSystem = (g: Goal) =>
                 g.category === 'System Created' ||
@@ -91,7 +104,12 @@ export const useGoalsStore = defineStore('goals', () => {
             return 0 // Keep original order for others
         })
     })
-    const completedGoals = computed(() => goals.value.filter(g => g.completed))
+
+    const completedGoals = computed(() => goals.value.filter(g => g.completed &&
+        g.category !== 'System Created' &&
+        !(g.category === 'Inbox' && g.title === 'Inbox') &&
+        !(g.category === 'General' && g.title === 'General')
+    ))
 
     const activeGoalsCount = computed(() => activeGoals.value.length)
     const todaysTasksCount = computed(() => {
@@ -99,6 +117,7 @@ export const useGoalsStore = defineStore('goals', () => {
         const d = new Date()
         const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 
+        // Check user goals
         activeGoals.value.forEach(goal => {
             goal.tasks.forEach(task => {
                 if (!task.completed && task.dueDate && task.dueDate.startsWith(today)) {
@@ -106,6 +125,15 @@ export const useGoalsStore = defineStore('goals', () => {
                 }
             })
         })
+
+        // Check system goal
+        if (systemGoal.value) {
+            systemGoal.value.tasks.forEach(task => {
+                if (!task.completed && task.dueDate && task.dueDate.startsWith(today)) {
+                    count++
+                }
+            })
+        }
         return count
     })
 
@@ -114,6 +142,7 @@ export const useGoalsStore = defineStore('goals', () => {
         const d = new Date()
         const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 
+        // From user goals
         activeGoals.value.forEach(goal => {
             goal.tasks.forEach(task => {
                 if (!task.completed && task.dueDate && task.dueDate.startsWith(today)) {
@@ -126,6 +155,20 @@ export const useGoalsStore = defineStore('goals', () => {
                 }
             })
         })
+
+        // From system goal
+        if (systemGoal.value) {
+            systemGoal.value.tasks.forEach(task => {
+                if (!task.completed && task.dueDate && task.dueDate.startsWith(today)) {
+                    tasks.push({
+                        task,
+                        goalId: systemGoal.value!.id,
+                        goalTitle: 'Daily Scratchpad', // Nicer name for display
+                        goalCategory: 'Daily'
+                    })
+                }
+            })
+        }
         return tasks
     })
 
@@ -246,16 +289,6 @@ export const useGoalsStore = defineStore('goals', () => {
         await updateGoalProgress(goalId, newTasks)
     }
 
-    const toggleTask = async (goalId: string, taskId: string) => {
-        const goal = goals.value.find(g => g.id === goalId)
-        if (!goal) return
-
-        const newTasks = goal.tasks.map(t =>
-            t.id === taskId ? { ...t, completed: !t.completed } : t
-        )
-
-        await updateGoalProgress(goalId, newTasks)
-    }
 
     const removeTask = async (goalId: string, taskId: string) => {
         const goal = goals.value.find(g => g.id === goalId)
@@ -265,6 +298,89 @@ export const useGoalsStore = defineStore('goals', () => {
 
         await updateGoalProgress(goalId, newTasks)
     }
+
+    const toggleTask = async (goalId: string, taskId: string) => {
+        const authStore = useAuthStore()
+        const user = authStore.user
+        if (!user) return
+
+        const goal = goals.value.find(g => g.id === goalId)
+        if (!goal) return
+
+        const task = goal.tasks.find(t => t.id === taskId)
+        if (!task) return
+
+        const newCompleted = !task.completed
+        const updatedTasks = goal.tasks.map(t => t.id === taskId ? { ...t, completed: newCompleted } : t)
+
+        // Calculate legacy progress just in case, though we primarily use task count now
+        const totalTasks = updatedTasks.length
+        const completedTasks = updatedTasks.filter(t => t.completed).length
+        const newProgress = totalTasks === 0 ? 0 : Math.round((completedTasks / totalTasks) * 100)
+
+        // Optimistic update
+        goal.tasks = updatedTasks
+        goal.progress = newProgress
+
+        try {
+            await updateDoc(doc(db, `users/${user.uid}/goals`, goalId), {
+                tasks: updatedTasks,
+                progress: newProgress
+            })
+
+            // Gamification for task completion
+            if (newCompleted) {
+                const gamificationStore = useGamificationStore()
+                gamificationStore.awardXP(5)
+                if (newProgress === 100) {
+                    confetti({
+                        particleCount: 100,
+                        spread: 70,
+                        origin: { y: 0.6 }
+                    })
+                }
+            }
+        } catch (error) {
+            console.error("Error toggling task:", error)
+        }
+    }
+
+    const checkDailyReset = async () => {
+        // Runs on load to wipe old system tasks
+        // We need to wait for systemGoal to be available. 
+        // The watcher handles the timing, this function just needs to do the logic.
+        if (!systemGoal.value) return
+
+        const d = new Date()
+        const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+
+        // Keep ONLY tasks that are created/due for TODAY
+        const tasksToKeep = systemGoal.value.tasks.filter(t => t.dueDate === today)
+
+        // If we have tasks to remove (length mismatch)
+        if (tasksToKeep.length !== systemGoal.value.tasks.length) {
+            const authStore = useAuthStore()
+            if (!authStore.user) return
+
+            try {
+                // Update firestore directly
+                await updateDoc(doc(db, `users/${authStore.user.uid}/goals`, systemGoal.value.id), {
+                    tasks: tasksToKeep,
+                    progress: tasksToKeep.length === 0 ? 0 : Math.round((tasksToKeep.filter(t => t.completed).length / tasksToKeep.length) * 100)
+                })
+                console.log("Daily Scratchpad reset: Old tasks wiped.")
+            } catch (e) {
+                console.error("Failed to reset scratchpad", e)
+            }
+        }
+    }
+
+    // Watch for system goal availability to run cleanup
+    watchEffect(() => {
+        if (!isLoading.value && systemGoal.value) {
+            checkDailyReset()
+        }
+    })
 
     return {
         goals,

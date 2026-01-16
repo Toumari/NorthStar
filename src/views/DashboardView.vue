@@ -46,14 +46,6 @@ import { useAuthStore } from '../stores/auth' // [NEW]
 
 const authStore = useAuthStore() // [NEW]
 
-const recentUserGoals = computed(() => {
-    return store.activeGoals.filter(g => 
-        g.category !== 'System Created' &&
-        !(g.category === 'Inbox' && g.title === 'Inbox') && 
-        !(g.category === 'General' && g.title === 'General')
-    ).slice(0, 3)
-})
-
 watch(isLoading, (loading) => {
     if (!loading) {
         // [MODIFIED] Check Firestore profile instead of LocalStorage
@@ -191,7 +183,7 @@ const handleCreateTracker = (trackerData: any) => {
     <section class="recent-goals">
       <header class="section-header">
         <h3>Recent Goals</h3>
-        <div class="actions" v-if="recentUserGoals.length > 0">
+        <div class="actions" v-if="store.activeGoals.length > 0">
            <button class="btn-text-action" @click="handleCreateGoalClick">+ Add Goal</button>
            <RouterLink to="/goals" class="view-all">View All</RouterLink>
         </div>
@@ -207,9 +199,9 @@ const handleCreateTracker = (trackerData: any) => {
           </div>
       </div>
       <div class="goals-grid" v-else>
-        <template v-if="recentUserGoals.length > 0">
+        <template v-if="store.activeGoals.length > 0">
           <GoalCard 
-            v-for="goal in recentUserGoals" 
+            v-for="goal in store.activeGoals.slice(0, 3)" 
             :key="goal.id" 
             :goal="goal"
           />
