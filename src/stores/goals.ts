@@ -74,7 +74,23 @@ export const useGoalsStore = defineStore('goals', () => {
     })
 
     // Getters
-    const activeGoals = computed(() => goals.value.filter(g => !g.completed))
+    const activeGoals = computed(() => {
+        const active = goals.value.filter(g => !g.completed)
+        return active.sort((a, b) => {
+            // Helper to check if a goal is a "System/Inbox" goal
+            const isSystem = (g: Goal) =>
+                g.category === 'System Created' ||
+                (g.category === 'Inbox' && g.title === 'Inbox') ||
+                (g.category === 'General' && g.title === 'General')
+
+            const aIsSystem = isSystem(a)
+            const bIsSystem = isSystem(b)
+
+            if (aIsSystem && !bIsSystem) return -1
+            if (!aIsSystem && bIsSystem) return 1
+            return 0 // Keep original order for others
+        })
+    })
     const completedGoals = computed(() => goals.value.filter(g => g.completed))
 
     const activeGoalsCount = computed(() => activeGoals.value.length)
