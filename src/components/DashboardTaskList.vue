@@ -235,7 +235,7 @@ const handleQuickAdd = async () => {
   left: 0;
   height: 18px;
   width: 18px;
-  background-color: var(--color-surface-hover);
+  background-color: var(--color-surface);
   border-radius: 4px;
   border: 1px solid var(--color-border);
 }
