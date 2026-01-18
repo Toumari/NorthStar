@@ -32,6 +32,15 @@ const hasSmartDetails = computed(() => {
   return !!(s.specific || s.measurable || s.achievable || s.relevant || s.timeBound)
 })
 
+const isSystemGoal = computed(() => {
+  if (!goal.value) return false
+  return (
+    goal.value.category === 'System Created' ||
+    (goal.value.category === 'Inbox' && goal.value.title === 'Inbox') ||
+    (goal.value.category === 'General' && goal.value.title === 'General')
+  )
+})
+
 const isDeleting = ref(false)
 
 const handleAddTask = () => {
@@ -100,7 +109,7 @@ const handleBack = () => {
       </div>
       <div class="header-actions">
         <button class="btn-outline" @click="isEditing = true">Edit Goal</button>
-        <button class="btn-danger" @click="handleDelete">Delete</button>
+        <button v-if="!isSystemGoal" class="btn-danger" @click="handleDelete">Delete</button>
       </div>
     </header>
 

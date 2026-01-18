@@ -227,6 +227,20 @@ export const useGoalsStore = defineStore('goals', () => {
         const authStore = useAuthStore()
         const user = authStore.user
         if (!user) return
+
+        const goal = goals.value.find(g => g.id === id)
+        if (!goal) return
+
+        // Prevent deletion of System Goal
+        if (
+            goal.category === 'System Created' ||
+            (goal.category === 'Inbox' && goal.title === 'Inbox') ||
+            (goal.category === 'General' && goal.title === 'General')
+        ) {
+            console.warn("Attempted to delete a system goal. Action blocked.")
+            return
+        }
+
         await deleteDoc(doc(db, `users/${user.uid}/goals`, id))
     }
 
