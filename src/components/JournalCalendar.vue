@@ -1,7 +1,16 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { useJournalStore } from '../stores/journal'
+import { useJournalStore, type JournalEntry } from '../stores/journal'
+
+interface CalendarDay {
+  id: string
+  empty?: boolean
+  date?: number
+  fullDate?: string
+  hasEntry?: boolean
+  today?: boolean
+}
 
 const props = defineProps<{
   mode?: 'dashboard' | 'sidebar'
@@ -59,7 +68,7 @@ const nextMonth = () => {
   currentDate.value = new Date(currentDate.value.getFullYear(), currentDate.value.getMonth() + 1, 1)
 }
 
-const onDayClick = (day: any) => {
+const onDayClick = (day: CalendarDay) => {
   if (day.empty) return
   router.push({ path: '/journal', query: { date: day.fullDate } })
 }
@@ -68,26 +77,23 @@ const entriesThisMonth = computed(() => {
 })
 
 const currentStreak = computed(() => {
-  const dates: Set<string> = new Set(store.entries.map((e: any) => e.date))
+  const dates: Set<string> = new Set(store.entries.map((e: JournalEntry) => e.date))
   const today = new Date()
   let streak = 0
-  let checkDate = today
-  
+  const checkDate = new Date(today)
+
   // Check if today has an entry, if not, check yesterday to start streak (allow 1 day gap if today isn't done yet)
-  const todayStr = checkDate.toISOString().split('T')[0]
-  // @ts-ignore
+  const todayStr = checkDate.toISOString().split('T')[0] ?? ''
   if (!dates.has(todayStr)) {
     checkDate.setDate(checkDate.getDate() - 1)
-    const yesterdayStr = checkDate.toISOString().split('T')[0]
-    // @ts-ignore
+    const yesterdayStr = checkDate.toISOString().split('T')[0] ?? ''
     if (!dates.has(yesterdayStr)) {
       return 0
     }
   }
-  
+
   while (true) {
-    const dateStr = checkDate.toISOString().split('T')[0]
-    // @ts-ignore
+    const dateStr = checkDate.toISOString().split('T')[0] ?? ''
     if (dates.has(dateStr)) {
       streak++
       checkDate.setDate(checkDate.getDate() - 1)
@@ -95,7 +101,7 @@ const currentStreak = computed(() => {
       break
     }
   }
-  
+
   return streak
 })
 </script>

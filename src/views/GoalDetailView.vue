@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useGoalsStore } from '../stores/goals'
+import { useGoalsStore, type Goal } from '../stores/goals'
 import { useTrackersStore } from '../stores/trackers'
+import { useToast } from '../composables/useToast'
 import CreateGoalModal from '../components/CreateGoalModal.vue'
 import TrackerSummaryCard from '../components/TrackerSummaryCard.vue'
 
@@ -10,6 +11,7 @@ const route = useRoute()
 const router = useRouter()
 const store = useGoalsStore()
 const trackersStore = useTrackersStore()
+const toast = useToast()
 
 const goalId = route.params.id as string
 const goal = computed(() => store.goals.find(g => g.id === goalId))
@@ -55,12 +57,12 @@ const handleDelete = async () => {
         console.error(e)
         // If error, revert state (though likely goal is still there)
         isDeleting.value = false
-        alert('Failed to delete goal.')
+        toast.error('Failed to delete goal.')
     }
   }
 }
 
-const handleUpdateGoal = async (updatedData: any) => {
+const handleUpdateGoal = async (updatedData: Partial<Goal>) => {
   try {
       await store.updateGoal(goalId, {
           title: updatedData.title,

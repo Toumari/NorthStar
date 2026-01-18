@@ -1,5 +1,6 @@
 import { Handler } from '@netlify/functions'
 import Stripe from 'stripe'
+import { verifyAuthToken } from '../utils/auth'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
     apiVersion: '2024-12-18.acacia'
@@ -15,12 +16,29 @@ export const handler: Handler = async (event) => {
     }
 
     try {
+        // Verify authentication
+        const authResult = await verifyAuthToken(event.headers.authorization)
+        if (!authResult.success) {
+            return {
+                statusCode: 401,
+                body: JSON.stringify({ error: 'Unauthorized' })
+            }
+        }
+
         const { priceId, userId, userEmail } = JSON.parse(event.body || '{}')
 
         if (!priceId || !userId || !userEmail) {
             return {
                 statusCode: 400,
                 body: JSON.stringify({ error: 'Missing required fields' })
+            }
+        }
+
+        // Verify authenticated user matches requested userId
+        if (authResult.userId !== userId) {
+            return {
+                statusCode: 403,
+                body: JSON.stringify({ error: 'Unauthorized' })
             }
         }
 
@@ -52,11 +70,11 @@ export const handler: Handler = async (event) => {
             statusCode: 200,
             body: JSON.stringify({ url: session.url })
         }
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Error creating checkout session:', error)
         return {
             statusCode: 500,
-            body: JSON.stringify({ error: error.message })
+            body: JSON.stringify({ error: 'Failed to create checkout session' })
         }
     }
 }

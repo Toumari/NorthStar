@@ -47,10 +47,11 @@ const handleLogin = async () => {
   try {
     await store.login(email.value, password.value)
     router.push('/')
-  } catch (e: any) {
-    if (e.code === 'auth/invalid-credential' || e.code === 'auth/user-not-found' || e.code === 'auth/wrong-password' || e.code === 'auth/invalid-login-credentials') {
+  } catch (e: unknown) {
+    const err = e as { code?: string }
+    if (err.code === 'auth/invalid-credential' || err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-login-credentials') {
       error.value = 'Incorrect email or password'
-    } else if (e.code === 'auth/too-many-requests') {
+    } else if (err.code === 'auth/too-many-requests') {
       error.value = 'Too many attempts. Please try again later.'
     } else {
       error.value = 'An error occurred. Please try again.'
@@ -67,8 +68,9 @@ const handleGoogleLogin = async () => {
   try {
     await store.loginWithGoogle()
     router.push('/')
-  } catch (e: any) {
-    if (e.code === 'auth/popup-closed-by-user') {
+  } catch (e: unknown) {
+    const err = e as { code?: string }
+    if (err.code === 'auth/popup-closed-by-user') {
       // User closed popup, no error needed usually
     } else {
       error.value = 'Failed to sign in with Google'

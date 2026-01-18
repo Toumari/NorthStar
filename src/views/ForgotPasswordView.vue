@@ -20,8 +20,8 @@ const handleReset = async () => {
     try {
         await store.resetPassword(email.value)
         message.value = 'Check your email for password reset instructions.'
-    } catch (e: any) {
-        error.value = e.message
+    } catch (e: unknown) {
+        error.value = e instanceof Error ? e.message : 'An error occurred'
     } finally {
         loading.value = false
     }

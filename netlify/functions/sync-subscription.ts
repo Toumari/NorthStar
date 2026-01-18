@@ -2,6 +2,7 @@ import { Handler } from '@netlify/functions'
 import Stripe from 'stripe'
 import { initializeApp, cert, getApps } from 'firebase-admin/app'
 import { getFirestore } from 'firebase-admin/firestore'
+import { verifyAuthToken } from '../utils/auth'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
     apiVersion: '2024-12-18.acacia'
@@ -30,12 +31,29 @@ export const handler: Handler = async (event) => {
     }
 
     try {
+        // Verify authentication
+        const authResult = await verifyAuthToken(event.headers.authorization)
+        if (!authResult.success) {
+            return {
+                statusCode: 401,
+                body: JSON.stringify({ error: 'Unauthorized' })
+            }
+        }
+
         const { userId } = JSON.parse(event.body || '{}')
 
         if (!userId) {
             return {
                 statusCode: 400,
                 body: JSON.stringify({ error: 'Missing userId' })
+            }
+        }
+
+        // Verify authenticated user matches requested userId
+        if (authResult.userId !== userId) {
+            return {
+                statusCode: 403,
+                body: JSON.stringify({ error: 'Unauthorized' })
             }
         }
 
@@ -83,11 +101,11 @@ export const handler: Handler = async (event) => {
             })
         }
 
-    } catch (error: any) {
-        console.error('Sync error:', error.message)
+    } catch (error: unknown) {
+        console.error('Sync error:', error)
         return {
             statusCode: 500,
-            body: JSON.stringify({ error: error.message })
+            body: JSON.stringify({ error: 'Failed to sync subscription' })
         }
     }
 }

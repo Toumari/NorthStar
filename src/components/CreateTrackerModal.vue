@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { ref, reactive, onMounted, onUnmounted } from 'vue'
+import { ref, reactive, onMounted, onUnmounted, nextTick } from 'vue'
 
 const emit = defineEmits(['close', 'save'])
 
 const name = ref('')
 const unit = ref('')
+const nameInputRef = ref<HTMLInputElement | null>(null)
 const touched = reactive({
   name: false,
   unit: false
@@ -20,12 +21,16 @@ const save = () => {
 // Lock body scroll when modal is open using position: fixed (iOS fix)
 let scrollPosition = 0
 
-onMounted(() => {
+onMounted(async () => {
   scrollPosition = window.scrollY
   document.body.style.position = 'fixed'
   document.body.style.top = `-${scrollPosition}px`
   document.body.style.width = '100%'
   document.body.style.overflow = 'hidden' // Redundant but safe
+
+  // Focus management for accessibility
+  await nextTick()
+  nameInputRef.value?.focus()
 })
 
 onUnmounted(() => {
@@ -39,39 +44,57 @@ onUnmounted(() => {
 
 <template>
   <Teleport to="body">
-    <div class="modal-overlay" @click.self="$emit('close')" @touchmove.self.prevent>
-      <div class="modal-content">
+    <div
+      class="modal-overlay"
+      @click.self="$emit('close')"
+      @touchmove.self.prevent
+      @keydown.esc="$emit('close')"
+    >
+      <div
+        class="modal-content"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="tracker-modal-title"
+      >
         <header>
-          <h2>Create New Tracker</h2>
-          <button class="close-btn" @click="$emit('close')">&times;</button>
+          <h2 id="tracker-modal-title">Create New Tracker</h2>
+          <button class="close-btn" @click="$emit('close')" aria-label="Close dialog">&times;</button>
         </header>
   
         <div class="modal-body">
           <div class="form-group">
-            <label>Tracker Name <span class="required">*</span></label>
-            <input 
-              v-model.trim="name" 
-              type="text" 
-              placeholder="e.g., Weight" 
-              autofocus 
+            <label for="tracker-name">Tracker Name <span class="required" aria-hidden="true">*</span></label>
+            <input
+              ref="nameInputRef"
+              id="tracker-name"
+              v-model.trim="name"
+              type="text"
+              placeholder="e.g., Weight"
               required
+              aria-required="true"
+              :aria-invalid="touched.name && !name"
+              aria-describedby="tracker-name-error"
               @blur="touched.name = true"
               :class="{ 'input-error': touched.name && !name }"
             >
-            <span v-if="touched.name && !name" class="error-text">Name is required</span>
+            <span v-if="touched.name && !name" id="tracker-name-error" class="error-text" role="alert">Name is required</span>
           </div>
-  
+
           <div class="form-group">
-            <label>Unit <span class="required">*</span></label>
-            <input 
-              v-model.trim="unit" 
-              type="text" 
-              placeholder="e.g., kg" 
+            <label for="tracker-unit">Unit <span class="required" aria-hidden="true">*</span></label>
+            <input
+              id="tracker-unit"
+              v-model.trim="unit"
+              type="text"
+              placeholder="e.g., kg"
               required
+              aria-required="true"
+              :aria-invalid="touched.unit && !unit"
+              aria-describedby="tracker-unit-error"
               @blur="touched.unit = true"
               :class="{ 'input-error': touched.unit && !unit }"
             >
-            <span v-if="touched.unit && !unit" class="error-text">Unit is required</span>
+            <span v-if="touched.unit && !unit" id="tracker-unit-error" class="error-text" role="alert">Unit is required</span>
           </div>
         </div>
   

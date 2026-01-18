@@ -6,8 +6,10 @@ import { useThemeStore } from './stores/theme'
 import QuickActionFAB from './components/QuickActionFAB.vue'
 import CreateGoalModal from './components/CreateGoalModal.vue'
 import CreateTrackerModal from './components/CreateTrackerModal.vue'
-import { useGoalsStore } from './stores/goals'
-import { useTrackersStore } from './stores/trackers'
+import ToastContainer from './components/ToastContainer.vue'
+import { useToast } from './composables/useToast'
+import { useGoalsStore, type CreateGoalData } from './stores/goals'
+import { useTrackersStore, type CreateTrackerData } from './stores/trackers'
 import { useSubscriptionStore } from './stores/subscription'
 
 const isMobileMenuOpen = ref(false)
@@ -43,13 +45,14 @@ const showTrackerModal = ref(false)
 const goalsStore = useGoalsStore()
 const trackersStore = useTrackersStore()
 const subscriptionStore = useSubscriptionStore()
+const toast = useToast()
 
-const handleCreateGoal = (goalData: any) => {
+const handleCreateGoal = (goalData: CreateGoalData) => {
   goalsStore.addGoal(goalData)
   showGoalModal.value = false
 }
 
-const handleCreateTracker = (trackerData: any) => {
+const handleCreateTracker = (trackerData: CreateTrackerData) => {
   trackersStore.addTracker(trackerData.name, trackerData.unit)
   showTrackerModal.value = false
 }
@@ -59,7 +62,7 @@ const openGoalModal = () => {
     if (subscriptionStore.canCreateGoal(goalsStore.goals.length)) {
         showGoalModal.value = true
     } else {
-        alert("Free limit reached. Upgrade to Premium!")
+        toast.warning("Free limit reached. Upgrade to Premium!")
     }
 }
 
@@ -67,7 +70,7 @@ const openTrackerModal = () => {
     if (subscriptionStore.canCreateTracker(trackersStore.trackers.length)) {
         showTrackerModal.value = true
     } else {
-        alert("Free limit reached. Upgrade to Premium!")
+        toast.warning("Free limit reached. Upgrade to Premium!")
     }
 }
 </script>
@@ -107,11 +110,13 @@ const openTrackerModal = () => {
       @save="handleCreateGoal"
     />
 
-    <CreateTrackerModal 
+    <CreateTrackerModal
       v-if="showTrackerModal"
       @close="showTrackerModal = false"
       @save="handleCreateTracker"
     />
+
+    <ToastContainer />
   </div>
 </template>
 

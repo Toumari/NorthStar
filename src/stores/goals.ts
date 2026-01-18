@@ -42,6 +42,8 @@ export interface Goal {
     relatedTrackerId?: string
 }
 
+export type CreateGoalData = Omit<Goal, 'id' | 'createdAt' | 'progress' | 'completed' | 'tasks'>
+
 export const useGoalsStore = defineStore('goals', () => {
     const goals = ref<Goal[]>([])
     const isLoading = ref(true)

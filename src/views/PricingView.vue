@@ -118,6 +118,7 @@
 import { ref } from 'vue'
 import { loadStripe } from '@stripe/stripe-js'
 import { useAuthStore } from '../stores/auth'
+import { auth } from '../firebase'
 
 const authStore = useAuthStore()
 
@@ -143,11 +144,18 @@ const handleUpgrade = async (plan: PlanType) => {
   error.value = ''
 
   try {
+    // Get auth token for authorization
+    const token = await auth.currentUser?.getIdToken()
+    if (!token) {
+      throw new Error('Not authenticated')
+    }
+
     // Call Netlify function to create checkout session
     const response = await fetch('/.netlify/functions/create-checkout-session', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
       },
       body: JSON.stringify({
         priceId: PRICE_IDS[plan],
@@ -167,9 +175,9 @@ const handleUpgrade = async (plan: PlanType) => {
     if (stripe && data.url) {
       window.location.href = data.url
     }
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('Upgrade error:', err)
-    error.value = err.message || 'Failed to start checkout. Please try again.'
+    error.value = err instanceof Error ? err.message : 'Failed to start checkout. Please try again.'
   } finally {
     loading.value = null
   }

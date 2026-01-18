@@ -1,20 +1,24 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useGamificationStore } from '../stores/gamification'
+import { useGamificationStore, type ShopItem } from '../stores/gamification'
 import { useThemeStore } from '../stores/theme'
+import { useToast } from '../composables/useToast'
 
 const store = useGamificationStore()
 const themeStore = useThemeStore()
+const toast = useToast()
 
 // Items grouped by type (currently only themes)
 const themes = computed(() => store.SHOP_ITEMS.filter(i => i.type === 'theme'))
 
-const handlePurchase = async (item: any) => {
+const handlePurchase = async (item: ShopItem) => {
     if (!confirm(`Purchase ${item.name} for ${item.cost} points?`)) return
-    
+
     const result = await store.purchaseItem(item.id)
-    if (!result.success) {
-        alert(result.message) // Simple alert for MVP
+    if (result.success) {
+        toast.success(result.message)
+    } else {
+        toast.error(result.message)
     }
 }
 

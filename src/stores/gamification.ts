@@ -20,6 +20,16 @@ export interface GamificationState {
     unlockedItems: string[] // IDs of unlocked shop items
 }
 
+export interface ShopItem {
+    id: string
+    type: string
+    targetId: string
+    name: string
+    description: string
+    cost: number
+    icon: string
+}
+
 export const useGamificationStore = defineStore('gamification', () => {
     const authStore = useAuthStore()
 

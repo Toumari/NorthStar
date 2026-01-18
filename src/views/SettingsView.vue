@@ -4,11 +4,14 @@ import { useAuthStore } from '../stores/auth'
 import { useSubscriptionStore } from '../stores/subscription'
 import { useThemeStore } from '../stores/theme'
 import { useRouter } from 'vue-router'
+import { useToast } from '../composables/useToast'
+import { auth } from '../firebase'
 
 const authStore = useAuthStore()
 const subscriptionStore = useSubscriptionStore()
 const themeStore = useThemeStore()
 const router = useRouter()
+const toast = useToast()
 
 
 
@@ -45,8 +48,8 @@ const handleUpdateProfile = async () => {
   try {
     await authStore.updateDisplayName(displayName.value)
     profileMessage.value = 'Profile updated successfully.'
-  } catch (e: any) {
-    profileMessage.value = 'Error updating profile: ' + e.message
+  } catch (e: unknown) {
+    profileMessage.value = 'Error updating profile: ' + (e instanceof Error ? e.message : 'Unknown error')
   } finally {
     isUpdatingProfile.value = false
   }
@@ -64,8 +67,8 @@ const initiateDeleteAccount = async () => {
         try {
             await authStore.reauthenticateWithGoogle()
             showDeleteConfirm.value = true
-        } catch (e: any) {
-            alert('Verification failed: ' + e.message)
+        } catch (e: unknown) {
+            toast.error('Verification failed: ' + (e instanceof Error ? e.message : 'Unknown error'))
         }
         return
     }
@@ -83,7 +86,7 @@ const handleReauth = async () => {
     try {
         await authStore.reauthenticate(reauthPassword.value)
         showReauthModal.value = false
-        
+
         // Proceed to next step based on action
         if (reauthAction.value === 'password') {
             showNewPasswordModal.value = true
@@ -94,11 +97,12 @@ const handleReauth = async () => {
         } else if (reauthAction.value === 'delete') {
             showDeleteConfirm.value = true
         }
-    } catch (e: any) {
-        if (e.code === 'auth/wrong-password') {
+    } catch (e: unknown) {
+        const err = e as { code?: string; message?: string }
+        if (err.code === 'auth/wrong-password') {
             reauthError.value = 'Incorrect password.'
         } else {
-            reauthError.value = 'Verification failed: ' + e.message
+            reauthError.value = 'Verification failed: ' + (err.message || 'Unknown error')
         }
     }
 }
@@ -116,9 +120,9 @@ const handleChangePassword = async () => {
     try {
         await authStore.updateUserPassword(newPassword.value)
         showNewPasswordModal.value = false
-        alert('Password changed successfully.')
-    } catch (e: any) {
-        passwordError.value = e.message
+        toast.success('Password changed successfully.')
+    } catch (e: unknown) {
+        passwordError.value = e instanceof Error ? e.message : 'Failed to change password'
     }
 }
 
@@ -126,8 +130,8 @@ const handleDeleteAccount = async () => {
     try {
         await authStore.deleteAccount()
         router.push('/login')
-    } catch (e: any) {
-        alert('Failed to delete account: ' + e.message)
+    } catch (e: unknown) {
+        toast.error('Failed to delete account: ' + (e instanceof Error ? e.message : 'Unknown error'))
     }
 }
 
@@ -160,17 +164,24 @@ const getStatusClass = (status: string) => {
 
 const handleManageSubscription = async () => {
     const customerId = subscriptionStore.subscriptionData.subscriptionCustomerId
-    
+
     if (!customerId) {
-        alert('Unable to access subscription management. Please contact support.')
+        toast.error('Unable to access subscription management. Please contact support.')
         return
     }
-    
+
     try {
+        const token = await auth.currentUser?.getIdToken()
+        if (!token) {
+            toast.error('Not authenticated')
+            return
+        }
+
         const response = await fetch('/.netlify/functions/create-portal-session', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify({ customerId })
         })
@@ -183,9 +194,9 @@ const handleManageSubscription = async () => {
         
         // Redirect to Stripe Customer Portal
         window.location.href = data.url
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Portal error:', error)
-        alert('Failed to open subscription management. Please try again.')
+        toast.error('Failed to open subscription management. Please try again.')
     }
 }
 
@@ -198,10 +209,16 @@ const refreshSubscription = async () => {
 
     isRefreshing.value = true
     try {
+        const token = await auth.currentUser?.getIdToken()
+        if (!token) {
+            return
+        }
+
         const response = await fetch('/.netlify/functions/sync-subscription', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify({ userId: authStore.user?.uid })
         })
@@ -221,9 +238,9 @@ const refreshSubscription = async () => {
         const msg = status === 'canceled' ? 'Subscription synced: Canceled' : 'Subscription synced'
         // console.log(msg) removed for production
         
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Sync error:', error)
-        alert('Failed to sync subscription: ' + error.message)
+        toast.error('Failed to sync subscription: ' + (error instanceof Error ? error.message : 'Unknown error'))
     } finally {
         isRefreshing.value = false
     }

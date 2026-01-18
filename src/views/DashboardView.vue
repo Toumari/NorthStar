@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { useGoalsStore } from '../stores/goals'
+import { useGoalsStore, type CreateGoalData } from '../stores/goals'
 import { useJournalStore } from '../stores/journal'
-import { useTrackersStore } from '../stores/trackers'
+import { useTrackersStore, type CreateTrackerData } from '../stores/trackers'
 import { useSubscriptionStore } from '../stores/subscription'
 import { useGamificationStore } from '../stores/gamification'
 import GoalCard from '../components/GoalCard.vue'
@@ -85,12 +85,12 @@ const handleCreateTrackerClick = () => {
     }
 }
 
-const handleCreateGoal = (goalData: any) => {
+const handleCreateGoal = (goalData: CreateGoalData) => {
   store.addGoal(goalData)
   showGoalModal.value = false
 }
 
-const handleCreateTracker = (trackerData: any) => {
+const handleCreateTracker = (trackerData: CreateTrackerData) => {
   trackersStore.addTracker(trackerData.name, trackerData.unit)
   showTrackerModal.value = false
 }

@@ -1,27 +1,39 @@
 <script setup lang="ts">
-import { ref, reactive, onMounted, onUnmounted, computed } from 'vue'
+import { ref, reactive, onMounted, onUnmounted, computed, nextTick } from 'vue'
 
-import { useGoalsStore } from '../stores/goals'
+import { useGoalsStore, type Goal } from '../stores/goals'
 import { useTrackersStore } from '../stores/trackers'
+import { useToast } from '../composables/useToast'
 
 const props = defineProps<{
-  initialGoal?: any
+  initialGoal?: Goal
 }>()
 
 const emit = defineEmits(['close', 'save'])
 const store = useGoalsStore()
 const trackersStore = useTrackersStore()
+const toast = useToast()
 const isSaving = ref(false)
+const titleInputRef = ref<HTMLInputElement | null>(null)
 
-const getDefaultDate = () => {
+const getDefaultDate = (): string => {
   const date = new Date()
   date.setDate(date.getDate() + 7)
-  return date.toISOString().split('T')[0]
+  return date.toISOString().split('T')[0] ?? ''
 }
 
-const form = reactive({
+const form = reactive<{
+  title: string
+  category: string
+  dueDate: string
+  relatedTrackerId: string
+  specific: string
+  measurable: string
+  achievable: string
+  relevant: string
+  timeBound: string
+}>({
   title: '',
-  category: 'General',
   category: 'General',
   dueDate: getDefaultDate(),
   relatedTrackerId: '',
@@ -52,9 +64,10 @@ const save = async () => {
   try {
     const goalData = {
       title: form.title,
+      description: '',
       category: form.category,
       dueDate: form.dueDate,
-      relatedTrackerId: form.relatedTrackerId, // Include relatedTrackerId in form submission
+      relatedTrackerId: form.relatedTrackerId,
       smart: {
         specific: form.specific,
         measurable: form.measurable,
@@ -72,7 +85,7 @@ const save = async () => {
     }
   } catch (e) {
     console.error(e)
-    alert("Failed to create goal. Please try again.")
+    toast.error("Failed to create goal. Please try again.")
   } finally {
     isSaving.value = false
   }
@@ -81,7 +94,7 @@ const save = async () => {
 // Lock body scroll when modal is open using position: fixed (iOS fix)
 let scrollPosition = 0
 
-onMounted(() => {
+onMounted(async () => {
   scrollPosition = window.scrollY
   document.body.style.position = 'fixed'
   document.body.style.top = `-${scrollPosition}px`
@@ -93,7 +106,7 @@ onMounted(() => {
     form.category = props.initialGoal.category
     form.dueDate = props.initialGoal.dueDate
     form.relatedTrackerId = props.initialGoal.relatedTrackerId || ''
-    
+
     if (props.initialGoal.smart) {
       form.specific = props.initialGoal.smart.specific || ''
       form.measurable = props.initialGoal.smart.measurable || ''
@@ -102,6 +115,10 @@ onMounted(() => {
       form.timeBound = props.initialGoal.smart.timeBound || ''
     }
   }
+
+  // Focus management for accessibility
+  await nextTick()
+  titleInputRef.value?.focus()
 })
 
 onUnmounted(() => {
@@ -115,50 +132,64 @@ onUnmounted(() => {
 
 <template>
   <Teleport to="body">
-    <div class="modal-overlay" @click.self="$emit('close')" @touchmove.self.prevent>
-      <div class="modal-content">
+    <div
+      class="modal-overlay"
+      @click.self="$emit('close')"
+      @touchmove.self.prevent
+      @keydown.esc="$emit('close')"
+    >
+      <div
+        class="modal-content"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="goal-modal-title"
+      >
         <header>
-          <h2>{{ initialGoal ? 'Edit Goal' : 'Create New Goal' }}</h2>
-          <button class="close-btn" @click="$emit('close')">&times;</button>
+          <h2 id="goal-modal-title">{{ initialGoal ? 'Edit Goal' : 'Create New Goal' }}</h2>
+          <button class="close-btn" @click="$emit('close')" aria-label="Close dialog">&times;</button>
         </header>
   
         <div class="modal-body">
           <div class="form-group">
-            <label>Goal Title <span class="required">*</span></label>
-            <input 
-              v-model.trim="form.title" 
-              type="text" 
-              placeholder="e.g., Run a Marathon" 
-              autofocus 
+            <label for="goal-title">Goal Title <span class="required" aria-hidden="true">*</span></label>
+            <input
+              ref="titleInputRef"
+              id="goal-title"
+              v-model.trim="form.title"
+              type="text"
+              placeholder="e.g., Run a Marathon"
               required
+              aria-required="true"
+              :aria-invalid="touched.title && !form.title"
+              aria-describedby="goal-title-error"
               @blur="touched.title = true"
               :class="{ 'input-error': touched.title && !form.title }"
             >
-            <span v-if="touched.title && !form.title" class="error-text">Title is required</span>
+            <span v-if="touched.title && !form.title" id="goal-title-error" class="error-text" role="alert">Title is required</span>
           </div>
   
           <div class="row">
             <div class="form-group half">
-              <label>Category</label>
-              <select v-model="form.category">
+              <label for="goal-category">Category</label>
+              <select id="goal-category" v-model="form.category">
                 <option v-for="c in categories" :key="c" :value="c">{{ c }}</option>
               </select>
             </div>
             <div class="form-group half">
-              <label>Due Date</label>
-              <input v-model="form.dueDate" type="date" :min="minDate">
+              <label for="goal-due-date">Due Date</label>
+              <input id="goal-due-date" v-model="form.dueDate" type="date" :min="minDate">
             </div>
           </div>
 
           <div class="form-group">
-            <label>Link a Tracker (Optional)</label>
-            <select v-model="form.relatedTrackerId">
+            <label for="goal-tracker">Link a Tracker (Optional)</label>
+            <select id="goal-tracker" v-model="form.relatedTrackerId" aria-describedby="tracker-help">
                 <option value="">No linked tracker</option>
                 <option v-for="tracker in trackersStore.trackers" :key="tracker.id" :value="tracker.id">
                     {{ tracker.name }} ({{ tracker.unit }})
                 </option>
             </select>
-            <p class="help-text">Visualize your progress with data.</p>
+            <p id="tracker-help" class="help-text">Visualize your progress with data.</p>
           </div>
   
           <div class="smart-section">
@@ -167,24 +198,24 @@ onUnmounted(() => {
             
             <div class="smart-grid">
               <div class="form-group">
-                <label>Specific</label>
-                <textarea v-model="form.specific" placeholder="What exactly do you want to accomplish?"></textarea>
+                <label for="smart-specific">Specific</label>
+                <textarea id="smart-specific" v-model="form.specific" placeholder="What exactly do you want to accomplish?"></textarea>
               </div>
               <div class="form-group">
-                <label>Measurable</label>
-                <textarea v-model="form.measurable" placeholder="How will you track progress?"></textarea>
+                <label for="smart-measurable">Measurable</label>
+                <textarea id="smart-measurable" v-model="form.measurable" placeholder="How will you track progress?"></textarea>
               </div>
               <div class="form-group">
-                <label>Achievable</label>
-                <textarea v-model="form.achievable" placeholder="How can you make this goal realistic?"></textarea>
+                <label for="smart-achievable">Achievable</label>
+                <textarea id="smart-achievable" v-model="form.achievable" placeholder="How can you make this goal realistic?"></textarea>
               </div>
               <div class="form-group">
-                <label>Relevant</label>
-                <textarea v-model="form.relevant" placeholder="Why does this goal matter to you?"></textarea>
+                <label for="smart-relevant">Relevant</label>
+                <textarea id="smart-relevant" v-model="form.relevant" placeholder="Why does this goal matter to you?"></textarea>
               </div>
               <div class="form-group">
-                <label>Time-bound</label>
-                <textarea v-model="form.timeBound" placeholder="When exactly do you want to accomplish this?"></textarea>
+                <label for="smart-timebound">Time-bound</label>
+                <textarea id="smart-timebound" v-model="form.timeBound" placeholder="When exactly do you want to accomplish this?"></textarea>
               </div>
             </div>
           </div>

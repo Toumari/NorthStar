@@ -60,12 +60,13 @@ const handleRegister = async () => {
   try {
     await store.register(email.value, password.value, fullName.value)
     router.push('/')
-  } catch (e: any) {
-    if (e.code === 'auth/email-already-in-use') {
+  } catch (e: unknown) {
+    const err = e as { code?: string }
+    if (err.code === 'auth/email-already-in-use') {
       emailError.value = 'Email is already in use'
-    } else if (e.code === 'auth/weak-password') {
+    } else if (err.code === 'auth/weak-password') {
       passwordError.value = 'Password is too weak'
-    } else if (e.code === 'auth/invalid-email') {
+    } else if (err.code === 'auth/invalid-email') {
       emailError.value = 'Invalid email address'
     } else {
       error.value = 'Registration failed. Please try again.'
@@ -82,8 +83,9 @@ const handleGoogleLogin = async () => {
   try {
     await store.loginWithGoogle()
     router.push('/')
-  } catch (e: any) {
-    if (e.code === 'auth/popup-closed-by-user') {
+  } catch (e: unknown) {
+    const err = e as { code?: string }
+    if (err.code === 'auth/popup-closed-by-user') {
       // User closed popup, no error needed usually
     } else {
       error.value = 'Failed to sign up with Google'

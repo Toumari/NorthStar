@@ -24,6 +24,11 @@ export interface Tracker {
     data: TrackerValue[]
 }
 
+export interface CreateTrackerData {
+    name: string
+    unit: string
+}
+
 export const useTrackersStore = defineStore('trackers', () => {
     const trackers = ref<Tracker[]>([])
     const isLoading = ref(true)
