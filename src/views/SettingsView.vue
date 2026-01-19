@@ -149,6 +149,9 @@ const formatStatus = (status: string) => {
         'active': 'Active',
         'canceled': 'Canceled',
         'expired': 'Expired',
+        'past_due': 'Past Due',
+        'unpaid': 'Unpaid',
+        'incomplete': 'Incomplete',
         'none': 'None'
     }
     return statusMap[status] || status
@@ -158,7 +161,8 @@ const getStatusClass = (status: string) => {
     return {
         'status-active': status === 'active',
         'status-canceled': status === 'canceled',
-        'status-expired': status === 'expired'
+        'status-expired': status === 'expired',
+        'status-warning': ['past_due', 'unpaid', 'incomplete'].includes(status)
     }
 }
 
@@ -489,6 +493,11 @@ onMounted(async () => {
 
 .status-expired {
     color: #ff3b30;
+    font-weight: 500;
+}
+
+.status-warning {
+    color: #ff9500;
     font-weight: 500;
 }
 

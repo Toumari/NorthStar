@@ -37,8 +37,7 @@
           <li>✓ <strong>Unlimited</strong> goals</li>
           <li>✓ <strong>Unlimited</strong> trackers</li>
           <li>✓ <strong>Full</strong> journal history</li>
-          <li>✓ Advanced analytics <span class="badge">Soon</span></li>
-          <li>✓ Data export <span class="badge">Soon</span></li>
+
         </ul>
         
         <button class="btn-primary" @click="handleUpgrade('monthly')">
@@ -60,8 +59,7 @@
           <li>✓ <strong>Unlimited</strong> goals</li>
           <li>✓ <strong>Unlimited</strong> trackers</li>
           <li>✓ <strong>Full</strong> journal history</li>
-          <li>✓ Advanced analytics <span class="badge">Soon</span></li>
-          <li>✓ Data export <span class="badge">Soon</span></li>
+
         </ul>
         
         <button class="btn-primary" @click="handleUpgrade('yearly')">
@@ -82,8 +80,7 @@
           <li>✓ <strong>Unlimited</strong> goals</li>
           <li>✓ <strong>Unlimited</strong> trackers</li>
           <li>✓ <strong>Full</strong> journal history</li>
-          <li>✓ Advanced analytics <span class="badge">Soon</span></li>
-          <li>✓ Data export <span class="badge">Soon</span></li>
+
           <li>✓ All future features</li>
         </ul>
         
